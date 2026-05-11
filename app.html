@@ -2533,40 +2533,25 @@ function startRealtime() {
         s.analysis           = updated.analysis || {};
       }
 
-      // 2) 교사 화면 갱신
+      // 2) 교사 화면 갱신 — 학교 탭이면 부분 갱신, 그 외는 전체 렌더
       if (role === 'teacher' && !isMine) {
-        // 사이드바 희망학과 업데이트
         renderSidebar();
-        // 해당 학생 상세 보고 있으면 즉시 갱신 (희망대학 포함)
         if (currentNum === updated.student_num) {
-          var updatedS = DB.find(function(x) { return x.student_num === currentNum; });
-          if (updatedS) {
-            renderDetail(updatedS);
-            // 현재 학교 탭이면 학교 목록도 갱신
-            if (currentTab === 'schools') {
-              var tcEl = el('teacherContent');
-              if (tcEl) {
-                var hdr = '<div class="student-hd"><div><div class="t-display">'+esc(updatedS.name)+'</div><div class="t-caption">'+updatedS.student_num+' · '+updatedS.gender+'</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn btn-secondary btn-sm" id="btnEditBasic">✏️ 기본정보</button></div></div>';
-                tcEl.innerHTML = hdr + renderSchoolsTab(updatedS, true);
-                bindSchoolEvents(updatedS);
-                on('btnEditBasic','click',function(){ showEditBasic(updatedS.student_num); });
-              }
-            }
+          if (currentTab === 'schools') {
+            refreshTeacherSchoolsTab(); // 깜빡임 없는 부분 갱신
+          } else {
+            var updatedS = DB.find(function(x){ return x.student_num === currentNum; });
+            if (updatedS) renderDetail(updatedS);
           }
         }
-        toast('✅ '+updated.name+' 학생 정보가 업데이트됐어요');
       }
 
-      // 3) 학생 본인 화면 갱신 (교사가 수정한 경우)
+      // 3) 학생 본인 화면 갱신 — 학교 탭이면 부분 갱신
       if (role === 'student' && stuSession && stuSession.student_num === updated.student_num && !isMine) {
-        // 현재 보고 있는 탭만 갱신 (전체 재렌더 최소화)
         if (stuTab === 'schools') {
-          renderStudentApp();
-        } else {
-          // 다른 탭이면 DB만 업데이트하고 알림만
-          updateNotifBadge();
+          refreshStuSchoolsTab(); // 깜빡임 없는 부분 갱신
         }
-        toast('✅ 선생님이 희망대학 정보를 업데이트했어요');
+        updateNotifBadge();
       }
     })
     .subscribe(function(status, err) {
@@ -3075,8 +3060,14 @@ function closeSidebar(){
 }
 
 function refreshAfterSchoolEdit(num) {
-  if(role==='student') { stuTab='schools'; renderStudentApp(); }
-  else { showStudent(num); }
+  // 학교 탭이면 부분 갱신 (깜빡임 없이 즉시 반영)
+  if(role==='student') {
+    if(stuTab === 'schools') refreshStuSchoolsTab();
+    else { stuTab='schools'; renderStudentApp(); }
+  } else {
+    if(currentTab === 'schools' && currentNum === num) refreshTeacherSchoolsTab();
+    else showStudent(num);
+  }
 }
 
 function showStudent(num){
@@ -3101,8 +3092,8 @@ function showStudent(num){
 function renderDetail(s){
   var tcEl2=el('teacherContent');
   var hdr='<div class="dh"><div class="dh-info"><div class="dh-name">'+s.name+'</div><div class="dh-meta"><span class="dh-num">'+s.student_num+'</span><span class="dh-num">'+(s.gender||'')+'</span>'+(s.career_hope?'<span class="dh-badge" style="background:#ededff;color:#4f46e5">🎯 '+s.career_hope+'</span>':'')+(s.hope_dept?'<span class="dh-badge" style="background:#f0fdf4;color:#16a34a">📚 '+s.hope_dept+'</span>':'')+'</div></div><div class="dh-actions"><button class="btn btn-secondary btn-sm" id="btnEditBasic">✏️ 기본정보</button></div></div>';
-  if(currentTab==='schools') tcEl2.innerHTML=hdr+renderSchoolsTab(s,true);
-  else if(currentTab==='report'){ tcEl2.innerHTML=hdr+renderSchoolsTab(s,true); currentTab='schools'; showAnalysisModal(s.student_num); return; }
+  if(currentTab==='schools') tcEl2.innerHTML=hdr+'<div class="schools-tab-content">'+renderSchoolsTab(s,true)+'</div>';
+  else if(currentTab==='report'){ tcEl2.innerHTML=hdr+'<div class="schools-tab-content">'+renderSchoolsTab(s,true)+'</div>'; currentTab='schools'; showAnalysisModal(s.student_num); return; }
   else if(currentTab==='contact') tcEl2.innerHTML=hdr+renderContactTab(s,true);
   else if(currentTab==='record') tcEl2.innerHTML=hdr+renderAnalysisTab(s,true);
   else tcEl2.innerHTML=hdr+renderCounselTab(s,true);
@@ -3202,19 +3193,50 @@ function collectSchool(){
   return{school:el('fs').value.trim(),dept:el('fd').value.trim(),direction:el('fdir').value,admission_type:el('fadm').value,sub_type:el('fsub').value.trim(),interview:el('fint').value,uni_score:el('funi').value.trim(),stu_score:el('fstu').value.trim(),capacity:el('fcap').value.trim(),csat_min:el('fcsat').value.trim(),note:el('fnote').value.trim(),first_date:el('ffirst').value,interview_date:el('fintd').value,final_date:el('ffinal').value};
 }
 function showAddSchool(num){ openModalSm('희망 대학 추가',schoolFormHtml(null)+'<button class="btn btn-primary" style="width:100%;margin-top:8px" id="btnSaveNewSchool">+ 추가</button>'); on('btnSaveNewSchool','click',function(){ addSchool(num); }); }
-async function addSchool(num){ var s=DB.find(function(x){return x.student_num===num;}),h=collectSchool(); if(!h.school){toast('❌ 대학명 입력');return;} if(!s.hope_schools)s.hope_schools=[]; s.hope_schools.push(h); await saveOneNow(num);
-  if(role==='student'){ addNotif('📚 '+s.name+' 학생이 '+h.school+' '+h.dept+'을(를) 희망대학에 추가했습니다.','teacher','school:'+s.student_num); }
-  else { addNotif('📚 '+s.name+' 학생의 희망대학에 '+h.school+' '+h.dept+'이(가) 추가되었습니다.', s.student_num, 'school:'+s.student_num); }
-  closeModal(); refreshAfterSchoolEdit(num); }
+function addSchool(num){ var s=DB.find(function(x){return x.student_num===num;}),h=collectSchool(); if(!h.school){toast('❌ 대학명 입력');return;} if(!s.hope_schools)s.hope_schools=[]; s.hope_schools.push(h);
+  // 낙관적 업데이트: 화면 먼저
+  closeModal(); refreshAfterSchoolEdit(num);
+  // 백그라운드 저장
+  saveOneNow(num).then(function(){
+    if(role==='student'){ addNotif('📚 '+s.name+' 학생이 '+h.school+' '+h.dept+'을(를) 희망대학에 추가했습니다.','teacher','school:'+s.student_num); }
+    else { addNotif('📚 '+s.name+' 학생의 희망대학에 '+h.school+' '+h.dept+'이(가) 추가되었습니다.', s.student_num, 'school:'+s.student_num); }
+  }).catch(function(){
+    // 저장 실패 시 롤백
+    s.hope_schools.pop();
+    refreshAfterSchoolEdit(num);
+    toast('❌ 저장 실패 — 다시 시도해주세요');
+  }); }
 function showEditSchool(num,idx){ var s=DB.find(function(x){return x.student_num===num;}),h=s.hope_schools[idx]; openModalSm(h.school+' 편집',schoolFormHtml(h)+'<button class="btn btn-primary" style="width:100%;margin-top:8px" id="btnSaveSchool">💾 저장</button>'); on('btnSaveSchool','click',function(){ saveSchool(num,idx); }); }
-async function saveSchool(num,idx){ var s=DB.find(function(x){return x.student_num===num;}); var h=collectSchool(); s.hope_schools[idx]=h; await saveOneNow(num);
-  if(role==='student'){ addNotif('✏️ '+s.name+' 학생이 '+h.school+' 정보를 수정했습니다.','teacher','school:'+s.student_num); }
-  else { addNotif('✏️ '+s.name+' 학생의 '+h.school+' 정보가 수정되었습니다.', s.student_num); }
-  closeModal(); refreshAfterSchoolEdit(num); }
-function deleteSchool(num,idx){ confirm2('대학 삭제','이 대학을 삭제할까요?').then(async function(ok){ if(!ok)return; DB.find(function(x){return x.student_num===num;}).hope_schools.splice(idx,1); await saveOneNow(num); toast('✅ 삭제됨'); refreshAfterSchoolEdit(num); }); }
+function saveSchool(num,idx){ var s=DB.find(function(x){return x.student_num===num;}); var h=collectSchool(); var prev=JSON.parse(JSON.stringify(s.hope_schools[idx])); s.hope_schools[idx]=h;
+  // 낙관적 업데이트: 화면 먼저
+  closeModal(); refreshAfterSchoolEdit(num);
+  // 백그라운드 저장
+  saveOneNow(num).then(function(){
+    if(role==='student'){ addNotif('✏️ '+s.name+' 학생이 '+h.school+' 정보를 수정했습니다.','teacher','school:'+s.student_num); }
+    else { addNotif('✏️ '+s.name+' 학생의 '+h.school+' 정보가 수정되었습니다.', s.student_num); }
+  }).catch(function(){
+    // 저장 실패 시 롤백
+    s.hope_schools[idx]=prev;
+    refreshAfterSchoolEdit(num);
+    toast('❌ 저장 실패 — 다시 시도해주세요');
+  }); }
+function deleteSchool(num,idx){ confirm2('대학 삭제','이 대학을 삭제할까요?').then(function(ok){ if(!ok)return; var s=DB.find(function(x){return x.student_num===num;}); var removed=s.hope_schools.splice(idx,1)[0];
+  // 낙관적 업데이트: 화면 먼저
+  toast('✅ 삭제됨'); refreshAfterSchoolEdit(num);
+  // 백그라운드 저장
+  saveOneNow(num).catch(function(){
+    s.hope_schools.splice(idx,0,removed);
+    refreshAfterSchoolEdit(num);
+    toast('❌ 삭제 실패 — 다시 시도해주세요');
+  }); }); }
 function showAddReserve(num){ openModalSm('예비 대학 추가','<div class="form-group"><label class="form-label">대학명</label><input type="text" id="rs"></div><div class="form-group"><label class="form-label">학과</label><input type="text" id="rd"></div><button class="btn btn-primary" style="width:100%" id="btnSaveReserve">+ 추가</button>'); on('btnSaveReserve','click',function(){ addReserve(num); }); }
-async function addReserve(num){ var s=DB.find(function(x){return x.student_num===num;}),school=el('rs').value.trim(); if(!school){toast('❌ 대학명 입력');return;} if(!s.reserve_schools)s.reserve_schools=[]; s.reserve_schools.push({school:school,dept:el('rd').value.trim()}); await saveOneNow(num); closeModal(); showStudent(num); }
-async function deleteReserve(num,idx){ DB.find(function(x){return x.student_num===num;}).reserve_schools.splice(idx,1); await saveOneNow(num); toast('✅ 삭제됨'); refreshAfterSchoolEdit(num); }
+function addReserve(num){ var s=DB.find(function(x){return x.student_num===num;}),school=el('rs').value.trim(); var dept=el('rd').value.trim(); if(!school){toast('❌ 대학명 입력');return;} if(!s.reserve_schools)s.reserve_schools=[];
+  s.reserve_schools.push({school:school,dept:dept});
+  closeModal(); showStudent(num);
+  saveOneNow(num).catch(function(){ s.reserve_schools.pop(); showStudent(num); toast('❌ 저장 실패'); }); }
+function deleteReserve(num,idx){ var s=DB.find(function(x){return x.student_num===num;}); var removed=s.reserve_schools.splice(idx,1)[0];
+  toast('✅ 삭제됨'); refreshAfterSchoolEdit(num);
+  saveOneNow(num).catch(function(){ s.reserve_schools.splice(idx,0,removed); refreshAfterSchoolEdit(num); toast('❌ 삭제 실패'); }); }
 function editRemark(num){ var s=DB.find(function(x){return x.student_num===num;}); openModalSm('비고 편집','<div class="form-group"><label class="form-label">비고</label><textarea id="mRemark" style="min-height:90px">'+esc(s.remark||'')+'</textarea></div><button class="btn btn-primary" style="width:100%" id="btnSaveRemark">💾 저장</button>'); on('btnSaveRemark','click',async function(){ DB.find(function(x){return x.student_num===num;}).remark=el('mRemark').value.trim(); await saveOneNow(num); closeModal(); showStudent(num); }); }
 
 // ── 연락처 탭 ──────────────────────────────────────
@@ -3326,6 +3348,47 @@ function showManage(){
 function changePwd(){ var p1=el('np1').value,p2=el('np2').value; if(!p1){toast('❌ 비밀번호 입력');return;} if(p1!==p2){toast('❌ 불일치');return;} if(isSupabase()){sbSetPwd(p1).then(function(){toast('✅ 변경됨');});}else if(typeof google!=='undefined'&&google.script){google.script.run.withSuccessHandler(function(){toast('✅ 변경됨');}).setPwd(p1);}else{toast('✅ 변경됨');} }
 
 // ── 학생앱 ──────────────────────────────────────
+// 희망대학 탭만 빠르게 부분 갱신 (탭바·헤더는 그대로 유지)
+function refreshStuSchoolsTab() {
+  var s = DB.find(function(x){return x.student_num===stuSession.student_num;});
+  if (!s) return;
+  var scEl = el('studentContent');
+  if (!scEl) return;
+  // 탭바와 안내문구는 그대로 두고 학교 카드만 다시 그림
+  var schoolsContainer = scEl.querySelector('.schools-tab-content');
+  if (schoolsContainer) {
+    // 컨테이너만 갱신
+    schoolsContainer.outerHTML = '<div class="schools-tab-content">' + renderSchoolsTab(s, false, true) + '</div>';
+  } else {
+    // 컨테이너 없으면 전체 재렌더 (첫 진입)
+    renderStudentApp();
+    return;
+  }
+  // 이벤트 재바인딩
+  on('btnAddSchool','click',function(){ showAddSchool(s.student_num); });
+  on('btnAddReserve','click',function(){ showAddReserve(s.student_num); });
+  on('btnEditRemark','click',function(){ editRemark(s.student_num); });
+  scEl.querySelectorAll('[data-editschool]').forEach(function(btn){ btn.addEventListener('click',function(){ showEditSchool(s.student_num,parseInt(this.dataset.editschool)); }); });
+  scEl.querySelectorAll('[data-delschool]').forEach(function(btn){ btn.addEventListener('click',function(){ deleteSchool(s.student_num,parseInt(this.dataset.delschool)); }); });
+  scEl.querySelectorAll('[data-delreserve]').forEach(function(btn){ btn.addEventListener('click',function(){ deleteReserve(s.student_num,parseInt(this.dataset.delreserve)); }); });
+}
+
+// 교사 화면 — 희망대학 탭만 빠르게 부분 갱신
+function refreshTeacherSchoolsTab() {
+  if (!currentNum || currentTab !== 'schools') return;
+  var s = DB.find(function(x){return x.student_num===currentNum;});
+  if (!s) return;
+  var tcEl = el('teacherContent');
+  if (!tcEl) return;
+  var schoolsContainer = tcEl.querySelector('.schools-tab-content');
+  if (schoolsContainer) {
+    schoolsContainer.outerHTML = '<div class="schools-tab-content">' + renderSchoolsTab(s, true) + '</div>';
+    bindSchoolEvents(s);
+  } else {
+    renderDetail(s);
+  }
+}
+
 function renderStudentApp(){
   var s=DB.find(function(x){return x.student_num===stuSession.student_num;}); if(!s){logout();return;}
   el('stuNameBadge').textContent=s.name;
@@ -3339,7 +3402,7 @@ function renderStudentApp(){
     tbar+='<button class="btn btn-secondary btn-sm" id="btnStuRefresh" title="새로고침" style="flex-shrink:0">🔄</button>';
   }
   tbar+='</div>';
-  if(stuTab==='schools') scEl.innerHTML=tbar+'<div style="font-size:12px;color:#6b7280;background:#f0f7ff;border:1px solid #dbeafe;border-radius:8px;padding:9px 13px;margin-bottom:12px">💡 희망 대학을 직접 추가·수정할 수 있어요!</div>'+renderSchoolsTab(s,false,true);
+  if(stuTab==='schools') scEl.innerHTML=tbar+'<div style="font-size:12px;color:#6b7280;background:#f0f7ff;border:1px solid #dbeafe;border-radius:8px;padding:9px 13px;margin-bottom:12px">💡 희망 대학을 직접 추가·수정할 수 있어요!</div><div class="schools-tab-content">'+renderSchoolsTab(s,false,true)+'</div>';
   else if(stuTab==='stu_report'){ scEl.innerHTML=tbar; showStudentAnalysisModal(s.student_num); return; }
   else if(stuTab==='analysis') scEl.innerHTML=tbar+renderAnalysisTab(s,false);
   else if(stuTab==='counsel') scEl.innerHTML=tbar+renderCounselTab(s,false);
@@ -3363,9 +3426,10 @@ function renderStuEdit(s){
   return'<div class="card card-body"><div class="sec-title">내 정보 수정</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px"><div class="form-group"><label class="form-label">희망 진로</label><input type="text" id="stuCareer" value="'+esc(s.career_hope||'')+'"></div><div class="form-group"><label class="form-label">희망 학과</label><input type="text" id="stuDept" value="'+esc(s.hope_dept||'')+'"></div></div><div class="divider"></div><div class="sec-title">활동 내용</div><div class="form-group"><label class="form-label">자율활동</label><textarea id="stuAuto">'+esc(a.autonomous||'')+'</textarea></div><div class="form-group"><label class="form-label">동아리</label><textarea id="stuClub">'+esc(a.club||'')+'</textarea></div><div class="form-group"><label class="form-label">봉사</label><textarea id="stuVol">'+esc(a.volunteer||'')+'</textarea></div><div class="form-group"><label class="form-label">진로활동</label><textarea id="stuCareerAct">'+esc(a.career_activity||'')+'</textarea></div><button class="btn btn-primary" style="width:100%;margin-top:8px" id="btnSaveStu">💾 저장</button></div>';
 }
 
-async function saveStuEdit(stuNum) {
+function saveStuEdit(stuNum) {
   var s = DB.find(function(x){ return x.student_num === stuNum; });
   if(!s) { toast('❌ 학생 정보를 찾을 수 없어요'); return; }
+  var prev = { career_hope: s.career_hope, hope_dept: s.hope_dept, analysis: JSON.parse(JSON.stringify(s.analysis||{})) };
   s.career_hope = (el('stuCareer')||{value:''}).value.trim();
   s.hope_dept   = (el('stuDept')  ||{value:''}).value.trim();
   if(!s.analysis) s.analysis = {};
@@ -3373,11 +3437,19 @@ async function saveStuEdit(stuNum) {
   s.analysis.club            = (el('stuClub')      ||{value:''}).value.trim();
   s.analysis.volunteer       = (el('stuVol')       ||{value:''}).value.trim();
   s.analysis.career_activity = (el('stuCareerAct') ||{value:''}).value.trim();
-  // Supabase 저장 (Realtime이 교사 화면 자동 갱신)
-  await saveOneNow(stuNum);
-  addNotif('✏️ '+s.name+' 학생이 내 정보(희망 진로·활동)를 수정했습니다.', 'teacher', 'school:'+s.student_num);
+  // 낙관적 업데이트: 화면 먼저
   stuTab = 'schools';
   renderStudentApp();
+  // 백그라운드 저장
+  saveOneNow(stuNum).then(function(){
+    addNotif('✏️ '+s.name+' 학생이 내 정보(희망 진로·활동)를 수정했습니다.', 'teacher', 'school:'+s.student_num);
+  }).catch(function(){
+    // 저장 실패 시 롤백
+    s.career_hope = prev.career_hope; s.hope_dept = prev.hope_dept; s.analysis = prev.analysis;
+    toast('❌ 저장 실패 — 다시 시도해주세요');
+    stuTab = 'edit';
+    renderStudentApp();
+  });
 }
 
 // ── 모달 ──────────────────────────────────────
