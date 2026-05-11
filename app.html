@@ -2306,7 +2306,13 @@ function initSupabase() {
   if (SUPABASE_URL === 'YOUR_SUPABASE_URL') return null;
   try {
     _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      realtime: { params: { eventsPerSecond: 10 } }
+      realtime: {
+        params: { eventsPerSecond: 40 },
+        heartbeatIntervalMs: 15000,   // 15초 (기본 30초) — 연결 유지
+        reconnectAfterMs: function(tries) { return Math.min(tries * 500, 3000); } // 재연결 빠르게
+      },
+      db: { schema: 'public' },
+      global: { fetch: fetch.bind(globalThis) }
     });
     return _sb;
   } catch(e) { console.error('Supabase init fail', e); return null; }
@@ -2457,26 +2463,50 @@ async function sbSetPwd(pwd) {
 var _realtimeChannel = null;
 function startRealtime() {
   if (!_sb || _realtimeChannel) return;
-  _realtimeChannel = _sb.channel('app-realtime')
+  _realtimeChannel = _sb.channel('app-realtime', {
+    config: { broadcast: { self: false }, presence: { key: '' } }
+  })
 
-    // ── 예약/알림 변경 → 양쪽 즉시 반영
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, function() {
-      loadResvData().then(function() {
-        if (role === 'teacher' && navMode === 'resv') renderResvCalendar();
-        if (role === 'student' && stuTab === 'resv') renderStuResvCalendar();
-      });
+    // ── 예약 변경 → payload로 직접 메모리 업데이트 (재요청 없음)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'reservations' }, function(payload) {
+      var r = payload.new;
+      if (!RESERVATIONS.find(function(x){ return x.id === r.id; })) {
+        RESERVATIONS.push({ id:r.id, date:r.date, slot:r.slot, studentNum:r.student_num,
+          studentName:r.student_name, status:r.status, memo:r.memo, createdAt:r.created_at });
+      }
+      if (role === 'teacher' && navMode === 'resv') renderResvCalendar();
+      if (role === 'student' && stuTab === 'resv') renderStuResvCalendar();
     })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, function() {
-      loadResvData().then(function() {
-        updateNotifBadge();
-      });
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'reservations' }, function(payload) {
+      var r = payload.new;
+      var idx = RESERVATIONS.findIndex(function(x){ return x.id === r.id; });
+      if (idx >= 0) RESERVATIONS[idx].status = r.status;
+      if (role === 'teacher' && navMode === 'resv') renderResvCalendar();
+      if (role === 'student' && stuTab === 'resv') renderStuResvCalendar();
     })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'app_settings' }, function() {
-      // 예약 마감·타임 설정 변경 → 캘린더 즉시 갱신
-      loadResvData().then(function() {
-        if (role === 'teacher' && navMode === 'resv') renderResvCalendar();
-        if (role === 'student' && stuTab === 'resv') renderStuResvCalendar();
-      });
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'reservations' }, function(payload) {
+      RESERVATIONS = RESERVATIONS.filter(function(x){ return x.id !== payload.old.id; });
+      if (role === 'teacher' && navMode === 'resv') renderResvCalendar();
+      if (role === 'student' && stuTab === 'resv') renderStuResvCalendar();
+    })
+    // ── 알림 변경
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, function(payload) {
+      var n = payload.new;
+      if (!NOTIFICATIONS.find(function(x){ return x.id === n.id; })) {
+        NOTIFICATIONS.unshift({ id:n.id, msg:n.msg, target:n.target, link:n.link, read:n.read, time:n.time });
+        if (NOTIFICATIONS.length > 50) NOTIFICATIONS = NOTIFICATIONS.slice(0, 50);
+      }
+      updateNotifBadge();
+    })
+    // ── 설정 변경 (마감·타임) → 캘린더 즉시 갱신
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'app_settings' }, function(payload) {
+      if (!payload.new) return;
+      var key = payload.new.key, val = payload.new.value;
+      if (key === 'date_overrides') DATE_SLOT_OVERRIDES = val || {};
+      if (key === 'blocked_slots')  BLOCKED_SLOTS = val || {};
+      if (key === 'consult_slots')  { CONSULT_SLOTS = val || CONSULT_SLOTS; buildSlotLabels(); }
+      if (role === 'teacher' && navMode === 'resv') renderResvCalendar();
+      if (role === 'student' && stuTab === 'resv') renderStuResvCalendar();
     })
 
     // ── 학생 데이터 변경 → 교사·학생 양쪽 반영
@@ -2521,9 +2551,21 @@ function startRealtime() {
         toast('✅ 선생님이 내 정보를 업데이트했어요');
       }
     })
-    .subscribe(function(status) {
+    .subscribe(function(status, err) {
       if (status === 'SUBSCRIBED') {
-        console.log('Realtime connected');
+        console.log('✅ Realtime connected');
+      } else if (status === 'CHANNEL_ERROR') {
+        console.warn('Realtime error, reconnecting...', err);
+        setTimeout(function() {
+          stopRealtime();
+          startRealtime();
+        }, 2000);
+      } else if (status === 'TIMED_OUT') {
+        console.warn('Realtime timed out, reconnecting...');
+        setTimeout(function() {
+          stopRealtime();
+          startRealtime();
+        }, 1000);
       }
     });
 }
