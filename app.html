@@ -1,0 +1,3685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>진로진학 상담 · 청북고 3-9</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Malgun Gothic',sans-serif;background:var(--c-bg);color:var(--c-gray-900);font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-0.01em}
+
+/* ── 타이포그래피 시스템 ── */
+.t-display{font-size:24px;font-weight:800;letter-spacing:-0.5px;line-height:1.2}
+.t-heading{font-size:16px;font-weight:700;letter-spacing:-0.3px;line-height:1.4}
+.t-subheading{font-size:14px;font-weight:600;letter-spacing:-0.2px}
+.t-body{font-size:14px;font-weight:400;line-height:1.7}
+.t-label{font-size:11px;font-weight:600;letter-spacing:0.05em;color:#64748b;text-transform:uppercase}
+.t-data{font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+.t-caption{font-size:11px;font-weight:400;color:#94a3b8}
+.t-mono{font-family:'Pretendard',monospace;font-variant-numeric:tabular-nums}
+.hidden{display:none!important}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-family:'Pretendard',inherit;font-weight:700;transition:all .15s;white-space:nowrap;letter-spacing:-0.1px}
+.btn-primary{background:var(--c-primary-600);color:#fff;box-shadow:0 1px 3px rgba(91,78,240,.3)}.btn-primary:hover{background:var(--c-primary-700);box-shadow:0 3px 10px rgba(91,78,240,.35);transform:translateY(-1px)}
+.btn-secondary{background:var(--c-gray-100);color:var(--c-gray-700);border:1px solid var(--c-border)}.btn-secondary:hover{background:var(--c-gray-200);transform:translateY(-1px)}
+.btn-danger{background:var(--c-danger-50);color:var(--c-danger-700);border:1px solid var(--c-danger-100)}.btn-danger:hover{background:var(--c-danger-100);transform:translateY(-1px)}
+.btn-warn{background:var(--c-warning-50);color:var(--c-warning-700);border:1px solid var(--c-warning-100)}.btn-warn:hover{background:var(--c-warning-100);transform:translateY(-1px)}
+.btn-sm{padding:4px 10px;font-size:12px}
+.badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700}
+.dir-상향{background:var(--c-warning-50);color:var(--c-warning-700);font-weight:700}.dir-소신{background:#eff6ff;color:#1d4ed8;font-weight:700}
+.dir-적정{background:var(--c-success-50);color:var(--c-success-700);font-weight:700}.dir-하향{background:var(--c-danger-50);color:var(--c-danger-700);font-weight:700}
+.adm-종합{background:var(--c-primary-100);color:var(--c-primary-700);font-weight:700}.adm-교과{background:var(--c-success-100);color:var(--c-success-700);font-weight:700}
+.adm-논술{background:#fff7ed;color:#c2410c;font-weight:700}
+input,textarea,select{font-family:'Pretendard',inherit;font-size:13px;font-weight:400}
+input[type=text],input[type=password],input[type=tel],input[type=date],textarea,select{border:1px solid #d1d5db;border-radius:7px;padding:7px 10px;width:100%;outline:none;background:#fff;transition:border .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--c-primary-500);box-shadow:0 0 0 3px rgba(109,95,250,.1);outline:none}
+textarea{resize:vertical;line-height:1.6}
+.form-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:5px}
+.form-group{margin-bottom:12px}
+.card{background:var(--c-surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);border:1px solid var(--c-border);overflow:hidden}
+.card-body{padding:20px 22px}
+.sec-title{font-size:12px;font-weight:700;color:#475569;margin-bottom:12px;display:flex;align-items:center;gap:7px;letter-spacing:0.04em;text-transform:uppercase}
+.sec-title::before{content:'';display:inline-block;width:3px;height:13px;background:var(--c-primary-500);border-radius:2px}
+.divider{height:1px;background:#f0f0f0;margin:14px 0}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--c-gray-900);color:#f1f5f9;padding:12px 18px;border-radius:var(--radius-md);font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1}
+.saving-indicator{position:fixed;top:14px;right:20px;background:var(--c-success-500);color:#fff;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:8000;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 2px 8px rgba(16,185,129,.3)}
+.saving-indicator.show{opacity:1}
+/* 로딩 */
+#loadingScreen{position:fixed;inset:0;background:#f0f2f7;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.spinner{width:40px;height:40px;border:4px solid #e0e7ff;border-top-color:#4f46e5;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Layout */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:242px;background:#0f172a;color:#e2e8f0;display:flex;flex-direction:column;flex-shrink:0;box-shadow:4px 0 24px rgba(0,0,0,.18)}
+.sidebar-hd{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sidebar-hd h1{font-size:13px;font-weight:800;color:#f1f5f9;letter-spacing:-0.2px}
+.sidebar-hd p{font-size:11px;font-weight:500;color:#64748b;margin-top:2px;letter-spacing:0.01em}
+.sb-search{padding:10px 12px}
+.sb-search input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#e2e8f0;font-size:12px;border-radius:8px}
+.sb-search input::placeholder{color:#475569}
+.sb-nav{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;gap:3px;flex-wrap:wrap}
+.nb{flex:1;padding:5px 4px;border:none;background:transparent;color:#64748b;cursor:pointer;border-radius:8px;font-size:11px;font-family:'Pretendard',inherit;font-weight:700;transition:all .2s;min-width:36px;letter-spacing:-0.1px}
+.nb.active{background:rgba(109,95,250,.25);color:#a5b4fc;box-shadow:inset 0 0 0 1px rgba(109,95,250,.3)}
+.s-list{flex:1;overflow-y:auto}
+.s-list::-webkit-scrollbar{width:3px}
+.s-list::-webkit-scrollbar-thumb{background:#3d3d5e;border-radius:2px}
+.s-item{margin:2px 8px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:none;border-radius:10px;transition:all .2s cubic-bezier(.4,0,.2,1)}
+.s-item:hover{background:rgba(255,255,255,.05)}.s-item.active{background:linear-gradient(135deg,rgba(109,95,250,.22),rgba(124,58,237,.14));box-shadow:inset 0 0 0 1px rgba(109,95,250,.25)}
+.s-item .sno{font-size:10px;font-weight:600;color:#475569;width:24px;flex-shrink:0}
+.s-item .snm{font-size:13px;font-weight:700;color:#cbd5e1;flex:1;letter-spacing:-0.1px}.s-item.active .snm{color:#a5b4fc}
+.s-item .stg{font-size:10px;font-weight:600;background:rgba(109,95,250,.15);color:#818cf8;padding:2px 7px;border-radius:9px;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.s-item .gm{color:#60a5fa;font-size:10px}.s-item .gf{color:#f9a8d4;font-size:10px}
+.sb-foot{padding:12px;border-top:1px solid rgba(255,255,255,.06)}
+.sb-foot button{width:100%;padding:8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#64748b;border-radius:9px;cursor:pointer;font-size:12px;font-family:'Pretendard',inherit;font-weight:600;transition:all .2s}
+.sb-foot button:hover{background:rgba(255,255,255,.07);color:#94a3b8}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--c-bg)}
+.topbar{background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:12px 22px;border-bottom:1px solid rgba(226,232,240,.8);display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 1px 0 rgba(15,23,42,.04);flex-wrap:wrap}
+.topbar h2{font-size:17px;font-weight:800;color:#0f172a;letter-spacing:-0.4px}
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+.tab-bar{display:flex;background:var(--c-gray-100);border-radius:var(--radius-md);padding:3px;overflow-x:auto;border:1px solid var(--c-border)}
+.tab-btn{padding:6px 14px;border:none;background:transparent;cursor:pointer;border-radius:7px;font-size:12px;color:#64748b;font-family:inherit;font-weight:600;transition:all .15s;white-space:nowrap;letter-spacing:-0.1px}
+.tab-btn.active{background:var(--c-surface);color:var(--c-gray-900);box-shadow:0 1px 4px rgba(15,23,42,.1),0 0 0 1px rgba(15,23,42,.04);font-weight:800;letter-spacing:-0.2px}
+/* Landing/Login */
+#landingPage,#loginPage,#studentLoginPage{min-height:100dvh;min-height:-webkit-fill-available;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--c-bg);padding:20px 16px;overflow-y:auto}
+.lc{background:#fff;border-radius:16px;padding:32px 28px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,.1)}
+.lc h2{font-size:22px;font-weight:800;color:#0f172a;margin-bottom:6px;letter-spacing:-0.5px}
+.lc p{font-size:13px;font-weight:400;color:#64748b;margin-bottom:20px}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.role-card{border:1.5px solid var(--c-border);border-radius:var(--radius-lg);padding:20px 14px;cursor:pointer;text-align:center;transition:all .2s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-xs)}
+.role-card:hover{border-color:var(--c-primary-500);background:var(--c-primary-50);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.role-card .ri{font-size:30px;margin-bottom:7px}
+.role-card h3{font-size:13px;font-weight:800;color:#0f172a;letter-spacing:-0.2px}
+.role-card p{font-size:11px;font-weight:500;color:#94a3b8;margin-top:3px;margin-bottom:0}
+.err-msg{background:var(--c-danger-50);color:var(--c-danger-700);border:1px solid var(--c-danger-100);padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;margin-bottom:12px;display:none}
+/* Overview */
+.ov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.stat-card{background:var(--c-surface);border-radius:var(--radius-lg);padding:18px 20px;border:1px solid var(--c-border);box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
+.stat-card .sn{font-size:28px;font-weight:800;color:var(--c-primary-600);letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.stat-card .sl{font-size:11px;font-weight:500;color:#94a3b8;margin-top:4px;letter-spacing:0.02em}
+.roster-table{width:100%;border-collapse:collapse;font-size:13px}
+.roster-table th{background:var(--c-gray-50);color:var(--c-gray-500);font-weight:600;font-size:11px;padding:11px 13px;text-align:left;border-bottom:2px solid var(--c-border);white-space:nowrap;letter-spacing:0.04em;text-transform:uppercase}
+.roster-table td{padding:11px 13px;border-bottom:1px solid var(--c-gray-100);vertical-align:middle;font-size:13px;font-weight:400;color:var(--c-gray-700)}
+.roster-table tr:hover td{background:#fafbff}
+.link-code{font-family:'Pretendard',monospace;background:var(--c-gray-100);color:var(--c-primary-600);padding:3px 8px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid var(--c-border)}
+/* Detail */
+.dh{background:var(--c-surface);border-radius:var(--radius-lg);padding:20px 22px;margin-bottom:16px;display:flex;align-items:flex-start;gap:14px;box-shadow:var(--shadow-sm);border:1px solid var(--c-border);flex-wrap:wrap}
+.dh-info{flex:1;min-width:200px}
+.dh-name{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:#0f172a}
+.dh-meta{display:flex;gap:7px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.dh-num{font-size:11px;font-weight:600;color:#64748b;background:#f1f5f9;padding:3px 10px;border-radius:11px;letter-spacing:0.01em}
+.dh-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:11px;letter-spacing:-0.1px}
+.dh-actions{display:flex;gap:7px;align-items:flex-start;flex-shrink:0}
+.contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.contact-item label{font-size:11px;font-weight:700;color:#6b7280;display:block;margin-bottom:3px}
+.contact-item .cv{font-size:13px;color:#1f2937;font-weight:500}
+/* School table */
+.school-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.school-tbl thead th{background:#f8f9fa;color:#374151;font-weight:700;padding:8px 9px;text-align:center;border:1px solid #e5e7eb;white-space:nowrap}
+.school-tbl thead th:first-child,.school-tbl thead th:nth-child(2){text-align:left;padding-left:14px}
+.school-tbl tbody td{padding:11px 12px;border:none;border-bottom:1px solid var(--c-gray-100);vertical-align:middle;text-align:center;font-size:12px;color:var(--c-gray-700)}
+.school-tbl tbody td:first-child,.school-tbl tbody td:nth-child(2){text-align:left;padding-left:14px}
+.school-tbl tbody tr:hover td{background:#fafbff}
+td.school-name-cell{font-weight:700;color:#1f2937}
+td.dept-cell{color:#4b5563;font-size:12px}
+.note-chip{display:block;font-size:10px;color:#f59e0b;margin-top:2px}
+.score-diff{font-size:10px;display:block;margin-top:1px}
+.score-diff.over{color:#dc2626}.score-diff.under{color:#059669}
+/* 신호등 */
+.traffic-light{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px}
+.tl-green{background:var(--c-success-50);color:var(--c-success-700);border:1px solid #a7f3d0}.tl-yellow{background:var(--c-warning-50);color:var(--c-warning-700);border:1px solid #fde68a}.tl-red{background:var(--c-danger-50);color:var(--c-danger-700);border:1px solid #fecdd3}.tl-gray{background:var(--c-gray-100);color:var(--c-gray-500);border:1px solid var(--c-gray-200)}
+/* 상담기록 */
+.counsel-entry{background:var(--c-gray-50);border:1px solid var(--c-border);border-radius:var(--radius-md);padding:16px;margin-bottom:10px;position:relative;transition:box-shadow .2s}
+.counsel-entry-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.counsel-date-badge{background:var(--c-primary-600);color:#fff;padding:3px 11px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:0.02em}
+.counsel-round{font-size:11px;color:#6b7280;font-weight:600}
+.counsel-del{position:absolute;top:10px;right:10px;border:none;background:none;color:#d1d5db;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px}
+.counsel-del:hover{background:#fee2e2;color:#dc2626}
+.counsel-body{font-size:13px;font-weight:400;line-height:1.8;color:#334155;white-space:pre-wrap}
+/* 분석 */
+.a-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.a-item.full{grid-column:1/-1}
+
+/* 모달 */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--c-surface);border-radius:var(--radius-xl);width:100%;max-width:600px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(15,23,42,.2),0 4px 16px rgba(15,23,42,.1)}
+.modal-hd{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;position:sticky;top:0;background:#fff;z-index:1}
+.modal-hd h3{font-size:15px;font-weight:800;letter-spacing:-0.3px;color:#0f172a}
+.modal-close{border:none;background:none;font-size:18px;cursor:pointer;color:#6b7280;padding:3px 7px;border-radius:6px}
+.modal-close:hover{background:#f3f4f6}
+.modal-body{padding:16px 20px 20px}
+/* 확인 */
+.cf-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:center;justify-content:center}
+.cf-box{background:#fff;border-radius:12px;padding:22px;max-width:320px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center}
+.cf-box h3{font-size:15px;font-weight:700;margin-bottom:7px}
+.cf-box p{font-size:13px;color:#6b7280;margin-bottom:18px}
+.cf-box .br{display:flex;gap:10px;justify-content:center}
+/* 학생앱 */
+.stu-app{min-height:100vh;background:#f0f2f7;display:flex;flex-direction:column}
+.stu-topbar{background:var(--c-gray-900);color:#f1f5f9;padding:13px 22px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(15,23,42,.2)}
+.stu-topbar h1{font-size:14px;font-weight:700}
+.stu-name-badge{background:var(--c-primary-600);padding:4px 13px;border-radius:18px;font-size:12px;font-weight:700;box-shadow:0 2px 6px rgba(91,78,240,.3)}
+.stu-topbar .lo{margin-left:auto;font-size:12px;color:#8888aa;cursor:pointer}
+.stu-content{flex:1;padding:20px;max-width:860px;width:100%;margin:0 auto}
+.copy-btn{padding:4px 9px;border:1px solid #e5e7eb;background:#f9fafb;border-radius:6px;cursor:pointer;font-size:11px;color:#6b7280;font-family:inherit}
+.copy-btn:hover{background:#f3f4f6}
+/* 타임라인 */
+.timeline-wrap{position:relative;padding-left:28px}
+.timeline-wrap::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:#e5e7eb}
+.tl-item{position:relative;margin-bottom:14px}
+
+
+.tl-card-hd{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.tl-type-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px}
+.type-1차발표-bg{background:#ede9fe;color:#4f46e5}.type-면접-bg{background:#fef3c7;color:#92400e}.type-발표-bg{background:#d1fae5;color:#065f46}
+.tl-school{font-size:13px;font-weight:700;color:#1f2937}
+.tl-past{opacity:.5}
+/* 대시보드 */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:18px}
+
+
+.overlap-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f3f4f6;font-size:12px}
+.overlap-count{font-size:11px;font-weight:700;background:#ede9fe;color:#4f46e5;padding:2px 8px;border-radius:9px}
+/* 빠른입력 */
+.qi-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;min-height:300px}
+.qi-textarea{min-height:200px;font-size:13px;line-height:1.8;font-family:monospace;border:1px solid #d1d5db;border-radius:8px;padding:10px 12px;width:100%;outline:none;resize:none}
+.qi-textarea:focus{border-color:#4f46e5}
+.qi-example{background:#f8f9ff;border:1px solid #e0e7ff;border-radius:7px;padding:10px 12px;font-size:12px;color:#4338ca;margin-bottom:10px;line-height:1.8}
+.preview-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.preview-tbl th{background:#f8f9fa;padding:6px 8px;border:1px solid #e5e7eb;font-size:11px;font-weight:700;color:#6b7280;white-space:nowrap}
+.preview-tbl td{padding:6px 8px;border:1px solid #f0f0f0}
+.preview-tbl td input{border:none;background:transparent;font-size:12px;width:100%;padding:0;outline:none;min-width:50px}
+.preview-tbl .row-ok{background:#f0fdf4}.preview-tbl .row-warn{background:#fffbeb}
+
+/* ── 상담예약 캘린더 ── */
+.cal-wrap{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.cal-header h3{font-size:18px;font-weight:800;color:#0f172a;letter-spacing:-0.5px}
+.cal-nav{display:flex;gap:6px}
+.cal-nav button{width:30px;height:30px;border:1px solid #e5e7eb;background:#fff;border-radius:7px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.cal-nav button:hover{background:#f3f4f6}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{text-align:center;font-size:11px;font-weight:700;color:#94a3b8;padding:7px 0;letter-spacing:0.03em}
+.cal-dow:first-child{color:#ef4444}.cal-dow:last-child{color:#6b7280}
+.cal-day{border:1px solid #f0f0f0;border-radius:10px;padding:8px 7px;min-height:90px;background:#fff;transition:all .15s;vertical-align:top}
+.cal-day:hover{border-color:#c7d2fe;background:#fafbff}
+.cal-day.today{border-color:#4f46e5;background:#faf9ff}
+.cal-day.other-month{background:#f9fafb;opacity:.5}
+.cal-day.past{opacity:.4;pointer-events:none}
+.cal-day.holiday{background:#fff5f5}
+.cal-day-num{font-size:12px;font-weight:700;color:#374151;margin-bottom:5px}
+.cal-day.today .cal-day-num{color:#4f46e5}
+.cal-day-num.sun{color:#ef4444}.cal-day-num.sat{color:#6b7280}
+.cal-day.no-consult .cal-day-num::after{content:'';display:block;font-size:10px;color:#9ca3af;font-weight:400}
+.no-consult-label{font-size:10px;color:#9ca3af;margin-top:2px}
+.slot-btn{display:block;width:100%;text-align:left;border:none;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:700;cursor:pointer;margin-top:3px;font-family:inherit;transition:all .15s}
+.slot-available{background:#f0fdf4;color:#059669}.slot-available:hover{background:#dcfce7}
+.slot-full{background:#fee2e2;color:#dc2626;cursor:default;text-decoration:line-through}
+.slot-mine{background:#ede9fe;color:#4f46e5}.slot-mine:hover{background:#ddd6fe}
+.slot-pending{background:#fef3c7;color:#92400e}
+.slot-confirmed{background:#d1fae5;color:#065f46}
+.slot-teacher-set{background:#dbeafe;color:#1d4ed8}
+/* 예약 목록 */
+.resv-item{background:var(--c-gray-50);border:1px solid var(--c-border);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;transition:box-shadow .2s}
+.resv-item:hover{box-shadow:var(--shadow-sm);}
+.resv-date{font-size:13px;font-weight:700;color:#1f2937;min-width:100px}
+.resv-slot{font-size:12px;color:#6b7280}
+.resv-name{font-size:13px;font-weight:600;color:#4f46e5;min-width:60px}
+.resv-status{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.status-pending{background:var(--c-warning-50);color:var(--c-warning-700);border:1px solid var(--c-warning-100)}
+.status-confirmed{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.status-teacher{background:#dbeafe;color:#1d4ed8}
+/* 알림 배지 */
+.notif-badge{position:relative;display:inline-flex}
+.notif-dot{position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:#ef4444;color:#fff;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.notif-panel{position:fixed;top:56px;right:16px;width:300px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:5000;border:1px solid #e5e7eb;max-height:400px;overflow-y:auto}
+.notif-panel-hd{padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.notif-panel-hd h4{font-size:13px;font-weight:700}
+.notif-clear{font-size:11px;color:#6b7280;cursor:pointer;border:none;background:none;font-family:inherit}
+.notif-item{padding:10px 16px;border-bottom:1px solid #f9fafb;font-size:12px;line-height:1.5}
+.notif-item:last-child{border-bottom:none}
+.notif-item .ni-time{font-size:10px;color:#9ca3af;margin-top:2px}
+.notif-empty{padding:20px;text-align:center;color:#d1d5db;font-size:13px}
+.notif-clickable:hover{background:#f0f7ff}
+
+/* ══ 모바일/태블릿 반응형 ══ */
+.hamburger{display:none;align-items:center;justify-content:center;width:36px;height:36px;border:none;background:transparent;font-size:22px;cursor:pointer;color:#374151;border-radius:7px;flex-shrink:0}
+.hamburger:hover{background:#f3f4f6}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(2px);z-index:499}
+.sb-overlay.show{display:block}
+
+@media(max-width:768px){
+  /* 사이드바 슬라이드 */
+  .app{overflow:visible}
+  .hamburger{display:flex}
+  .sidebar{position:fixed;left:-250px;top:0;bottom:0;height:100dvh;z-index:500;transition:left .25s ease;overflow-y:auto}
+  .sidebar.open{left:0}
+  .main{width:100%}
+
+  /* 탑바 */
+  .topbar{padding:10px 12px;gap:6px;flex-wrap:nowrap}
+  .topbar h2{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+  #topbarActions{gap:4px}
+  #topbarActions .btn{padding:5px 8px;font-size:11px}
+
+  /* 콘텐츠 */
+  .content{padding:12px 14px}
+
+  /* 통계 카드 2열 */
+  .ov-grid{grid-template-columns:1fr 1fr}
+
+  /* 학생 상세 헤더 */
+  .dh{flex-direction:column;gap:8px}
+  .dh-actions{flex-direction:row;flex-wrap:wrap}
+  .dh-name{font-size:17px}
+
+  /* 탭바 스크롤 */
+  .tab-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .tab-bar::-webkit-scrollbar{display:none}
+  .tab-btn{white-space:nowrap;flex-shrink:0;font-size:11px;padding:5px 9px}
+
+  /* 연락처 1열 */
+  .contact-grid{grid-template-columns:1fr}
+
+  /* 생기부 1열 */
+  .a-grid{grid-template-columns:1fr}
+  .a-item.full{grid-column:1}
+
+  /* 희망대학 표 - 스크롤 */
+  .school-tbl{font-size:11px}
+  .school-tbl th,.school-tbl td{padding:5px 6px}
+
+  /* 캘린더 */
+  .cal-day{min-height:70px;padding:5px 4px}
+  .cal-day-num{font-size:11px}
+  .slot-btn{font-size:9px;padding:2px 4px}
+  .cal-wrap{padding:12px 10px}
+  .cal-header h3{font-size:15px}
+
+  /* 모달 하단 시트 */
+  .modal-overlay{align-items:flex-end;padding:0}
+  .modal{border-radius:16px 16px 0 0;max-height:90dvh;max-width:100%!important;width:100%}
+
+  /* 알림 패널 */
+  .notif-panel{width:calc(100vw - 32px);right:8px;top:52px}
+
+  /* 대시보드 1열 */
+  .dash-grid{grid-template-columns:1fr}
+
+  /* 빠른입력 1열 */
+  .qi-layout{grid-template-columns:1fr}
+  .qi-textarea{min-height:120px}
+
+  /* 학생앱 */
+  .stu-content{padding:12px 14px}
+  .stu-topbar{padding:10px 14px;gap:6px}
+  .stu-topbar h1{font-size:12px}
+  .stu-name-badge{font-size:11px;padding:3px 8px}
+  .resv-item{flex-wrap:wrap;gap:6px}
+  .resv-date{min-width:auto}
+
+  /* 로그인 */
+  .lc{padding:24px 18px}
+  .role-grid{gap:8px}
+  .role-card{padding:14px 10px}
+  .role-card .ri{font-size:24px}
+
+  /* 버튼 */
+  .btn{padding:7px 11px;font-size:12px}
+  .btn-sm{padding:4px 9px;font-size:11px}
+
+  /* 예비지원대학 */
+  .roster-table{font-size:11px}
+  .roster-table th,.roster-table td{padding:6px 7px}
+}
+
+@media(max-width:480px){
+  .ov-grid{grid-template-columns:1fr}
+  .topbar h2{max-width:90px}
+  .cal-grid{gap:2px}
+  .cal-day{min-height:60px;padding:4px 3px}
+  .slot-btn{font-size:8px;padding:1px 3px}
+}
+
+@media(min-width:769px) and (max-width:1024px){
+  .sidebar{width:200px}
+  .cal-day{min-height:80px}
+  .school-tbl{font-size:12px}
+}
+
+/* ══ 컬러 시스템 ══ */
+:root {
+  --c-primary-50:  #f5f3ff;
+  --c-primary-100: #ede9fe;
+  --c-primary-200: #ddd6fe;
+  --c-primary-500: #6d5ffa;
+  --c-primary-600: #5b4ef0;
+  --c-primary-700: #4a3de0;
+
+  --c-success-50:  #f0fdf6;
+  --c-success-100: #dcfce7;
+  --c-success-500: #10b981;
+  --c-success-700: #047857;
+
+  --c-warning-50:  #fffbeb;
+  --c-warning-100: #fef3c7;
+  --c-warning-500: #f59e0b;
+  --c-warning-700: #b45309;
+
+  --c-danger-50:   #fff1f2;
+  --c-danger-100:  #ffe4e6;
+  --c-danger-500:  #f43f5e;
+  --c-danger-700:  #be123c;
+
+  --c-gray-50:  #f8fafc;
+  --c-gray-100: #f1f5f9;
+  --c-gray-200: #e2e8f0;
+  --c-gray-300: #cbd5e1;
+  --c-gray-400: #94a3b8;
+  --c-gray-500: #64748b;
+  --c-gray-700: #334155;
+  --c-gray-800: #1e293b;
+  --c-gray-900: #0f172a;
+
+  --c-bg:      #f0f4f8;
+  --c-surface: #ffffff;
+  --c-border:  #e2e8f0;
+
+  --shadow-xs: 0 1px 2px rgba(15,23,42,.04);
+  --shadow-sm: 0 1px 4px rgba(15,23,42,.06), 0 2px 8px rgba(15,23,42,.04);
+  --shadow-md: 0 4px 16px rgba(15,23,42,.08), 0 1px 4px rgba(15,23,42,.04);
+  --shadow-lg: 0 8px 32px rgba(15,23,42,.12), 0 2px 8px rgba(15,23,42,.06);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
+
+/* ══ 테이블 개선 — 선 최소화, 행 호버 강조 ══ */
+.school-tbl thead th:first-child { border-radius: 0; }
+.school-tbl thead th:last-child  { border-radius: 0; }
+.school-tbl tbody tr:last-child td { border-bottom: none; }
+.school-tbl tbody tr { transition: background .12s; }
+.school-tbl tbody tr:hover td { background: var(--c-primary-50); }
+td.school-name-cell { font-weight: 700; color: var(--c-gray-900); }
+td.dept-cell { color: var(--c-gray-500); font-size: 12px; }
+
+/* 로스터 테이블 행 호버 */
+.roster-table tbody tr { transition: background .12s; }
+.roster-table tbody tr:hover td { background: var(--c-primary-50); }
+.roster-table tbody tr:last-child td { border-bottom: none; }
+
+/* ══ 통계 카드 호버 ══ */
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+.stat-card .stat-icon {
+  font-size: 22px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* ══ 분석 아이템 개선 ══ */
+.a-item {
+  background: var(--c-gray-50);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  border: 1px solid var(--c-border);
+  transition: box-shadow .15s, border-color .15s;
+}
+.a-item:hover { box-shadow: var(--shadow-sm); border-color: var(--c-primary-200); }
+.a-item label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.a-item .at {
+  font-size: 13px;
+  color: var(--c-gray-700);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+.a-item .ae {
+  font-size: 12px;
+  color: var(--c-gray-300);
+  font-style: italic;
+}
+
+/* ══ 상담기록 카드 호버 ══ */
+.counsel-entry:hover { box-shadow: var(--shadow-sm); }
+
+/* ══ 대시보드 차트 카드 ══ */
+.chart-card {
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  border: 1px solid var(--c-border);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .2s;
+}
+.chart-card:hover { box-shadow: var(--shadow-md); }
+.chart-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-gray-700);
+  margin-bottom: 16px;
+  letter-spacing: -0.1px;
+}
+
+/* 막대 차트 개선 */
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.bar-lbl { font-size: 11px; font-weight: 600; color: var(--c-gray-500); width: 70px; text-align: right; flex-shrink: 0; }
+.bar-wrap { flex: 1; background: var(--c-gray-100); border-radius: 6px; height: 20px; overflow: hidden; }
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 7px;
+}
+.bar-val { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.9); }
+
+/* 중복 지원 아이템 */
+.overlap-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--c-gray-100);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-gray-700);
+}
+.overlap-item:last-child { border-bottom: none; }
+.overlap-count {
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--c-primary-100);
+  color: var(--c-primary-600);
+  padding: 2px 9px;
+  border-radius: 9px;
+}
+
+/* ══ 예비 지원 대학 카드형 ══ */
+.reserve-chip {
+  background: var(--c-gray-50);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: 9px 13px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: border-color .15s;
+}
+.reserve-chip:hover { border-color: var(--c-primary-200); }
+.reserve-chip b { font-size: 13px; font-weight: 700; color: var(--c-gray-800); }
+
+/* ══ 폼 그룹 개선 ══ */
+input[type=text],input[type=password],input[type=tel],input[type=date],textarea,select {
+  border: 1.5px solid var(--c-gray-200);
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+  width: 100%;
+  outline: none;
+  background: var(--c-surface);
+  transition: border .15s, box-shadow .15s;
+  color: var(--c-gray-900);
+  font-size: 13px;
+}
+input[type=text]:hover,input[type=password]:hover,input[type=tel]:hover,input[type=date]:hover,textarea:hover,select:hover {
+  border-color: var(--c-gray-300);
+}
+
+/* ══ 섹션 구분선 ══ */
+.divider { height: 1px; background: var(--c-gray-100); margin: 16px 0; }
+
+/* ══ 학생 앱 콘텐츠 배경 ══ */
+.stu-app { min-height: 100vh; background: var(--c-bg); display: flex; flex-direction: column; }
+.stu-content { flex: 1; padding: 20px; max-width: 900px; width: 100%; margin: 0 auto; }
+
+/* ══ 스크롤바 스타일 ══ */
+.content::-webkit-scrollbar { width: 5px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--c-gray-200); border-radius: 3px; }
+.content::-webkit-scrollbar-thumb:hover { background: var(--c-gray-300); }
+.s-list::-webkit-scrollbar { width: 3px; }
+.s-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+
+/* ══ 로스터 테이블 래퍼 ══ */
+.table-wrap {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--c-border);
+}
+
+/* ══ 점수 차이 표시 개선 ══ */
+.score-diff { font-size: 10px; font-weight: 700; display: block; margin-top: 2px; }
+.score-diff.over  { color: var(--c-danger-500); }
+.score-diff.under { color: var(--c-success-500); }
+
+/* ══ 알림 패널 개선 ══ */
+.notif-panel {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--c-border);
+}
+.notif-item { border-bottom: 1px solid var(--c-gray-50); transition: background .12s; }
+.notif-item:hover { background: var(--c-gray-50); }
+.notif-clickable:hover { background: var(--c-primary-50) !important; }
+
+/* ══ 모달 헤더/바디 개선 ══ */
+.modal-hd {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--c-gray-100);
+  background: var(--c-surface);
+}
+.modal-body { padding: 20px 22px 24px; }
+.modal-close {
+  border: none;
+  background: var(--c-gray-100);
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--c-gray-500);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all .15s;
+}
+.modal-close:hover { background: var(--c-gray-200); color: var(--c-gray-700); }
+
+/* ══ 확인 다이얼로그 ══ */
+.cf-box {
+  background: var(--c-surface);
+  border-radius: var(--radius-xl);
+  padding: 26px 24px;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  border: 1px solid var(--c-border);
+}
+.cf-box h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.3px; color: var(--c-gray-900); }
+.cf-box p  { font-size: 13px; color: var(--c-gray-500); margin-bottom: 20px; line-height: 1.6; }
+
+/* ══ 상담예약 예약 아이템 개선 ══ */
+.resv-name { font-size: 14px; font-weight: 700; color: var(--c-primary-600); min-width: 60px; }
+.resv-date { font-size: 13px; font-weight: 700; color: var(--c-gray-800); min-width: 100px; }
+.resv-slot { font-size: 11px; font-weight: 500; color: var(--c-gray-400); margin-top: 2px; }
+.resv-status {
+  padding: 3px 11px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ══ 타임라인 개선 ══ */
+.tl-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: 13px 16px;
+  box-shadow: var(--shadow-xs);
+  transition: all .2s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: hidden;
+}
+.tl-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+.tl-item .tl-card.type-1차발표::before { background: var(--c-primary-500); }
+.tl-item .tl-card.type-면접::before   { background: var(--c-warning-500); }
+.tl-item .tl-card.type-발표::before   { background: var(--c-success-500); }
+.tl-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateX(3px);
+  border-color: var(--c-primary-200);
+}
+.tl-type-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 8px;
+  letter-spacing: 0.02em;
+}
+.tl-school { font-size: 13px; font-weight: 700; color: var(--c-gray-900); }
+
+/* ══ 퀵 인풋 개선 ══ */
+.qi-example {
+  background: var(--c-primary-50);
+  border: 1px solid var(--c-primary-100);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--c-primary-700);
+  margin-bottom: 12px;
+  line-height: 1.8;
+}
+.qi-textarea {
+  border: 1.5px solid var(--c-gray-200);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  line-height: 1.8;
+  transition: border .15s;
+}
+.qi-textarea:focus { border-color: var(--c-primary-500); }
+
+/* ══ 비고 박스 ══ */
+.note-box {
+  background: var(--c-warning-50);
+  border: 1px solid var(--c-warning-100);
+  border-left: 3px solid var(--c-warning-500);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--c-warning-700);
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* ══ 학생 앱 탭바 개선 ══ */
+.stu-tab-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.stu-tab-wrap .tab-bar { flex: 1; margin-bottom: 0; }
+
+/* ══════════════════════════════════════════════
+   4. 캘린더 슬롯 + 애니메이션 + 컴포넌트 디테일
+══════════════════════════════════════════════ */
+
+/* ── 캘린더 전체 ── */
+.cal-wrap {
+  background: var(--c-surface);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--c-border);
+}
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.cal-header h3 { font-size: 20px; font-weight: 800; color: var(--c-gray-900); letter-spacing: -0.5px; }
+.cal-nav button {
+  width: 34px; height: 34px;
+  border: 1.5px solid var(--c-border);
+  background: var(--c-surface);
+  border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-gray-500);
+  transition: all .15s;
+}
+.cal-nav button:hover { background: var(--c-primary-50); border-color: var(--c-primary-200); color: var(--c-primary-600); }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
+.cal-dow {
+  text-align: center; font-size: 11px; font-weight: 700;
+  color: var(--c-gray-400); padding: 8px 0;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.cal-dow:first-child { color: #f43f5e; }
+
+/* ── 날짜 셀 ── */
+.cal-day {
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: 9px 8px;
+  min-height: 88px;
+  background: var(--c-surface);
+  transition: border-color .15s, box-shadow .15s;
+  vertical-align: top;
+  position: relative;
+}
+.cal-day:hover:not(.past):not(.other-month) {
+  border-color: var(--c-primary-200);
+  box-shadow: 0 2px 8px rgba(109,95,250,.08);
+}
+.cal-day.today {
+  border-color: var(--c-primary-400);
+  background: var(--c-primary-50);
+  box-shadow: 0 0 0 3px rgba(109,95,250,.1);
+}
+.cal-day.other-month { background: var(--c-gray-50); opacity: .45; }
+.cal-day.past { opacity: .38; pointer-events: none; background: var(--c-gray-50); }
+.cal-day.holiday { background: #fff5f5; }
+.cal-day-num {
+  font-size: 12px; font-weight: 700;
+  color: var(--c-gray-700); margin-bottom: 6px;
+  line-height: 1;
+}
+.cal-day.today .cal-day-num { color: var(--c-primary-600); }
+.cal-day-num.sun { color: #f43f5e; }
+.cal-day-num.sat { color: var(--c-gray-400); }
+.no-consult-label {
+  font-size: 10px; font-weight: 500;
+  color: var(--c-gray-400); margin-top: 4px;
+}
+
+/* ── 슬롯 버튼 (핵심 개선) ── */
+.slot-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+  border-radius: 7px;
+  padding: 4px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+  font-family: 'Pretendard', inherit;
+  transition: all .18s cubic-bezier(.4,0,.2,1);
+  border: 1.5px solid transparent;
+  letter-spacing: -0.1px;
+  position: relative;
+  overflow: hidden;
+}
+.slot-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background .15s;
+}
+.slot-btn:hover::after { background: rgba(255,255,255,.15); }
+
+/* 예약 가능 — 초록 */
+.slot-available {
+  background: var(--c-success-50);
+  color: var(--c-success-700);
+  border-color: #a7f3d0;
+}
+.slot-available::before { content: '✓ '; }
+.slot-available:hover {
+  background: var(--c-success-500);
+  color: #fff;
+  border-color: var(--c-success-500);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(16,185,129,.28);
+}
+
+/* 예약 마감 — 빨강 */
+.slot-full {
+  background: var(--c-danger-50);
+  color: var(--c-danger-500);
+  border-color: #fecdd3;
+  cursor: not-allowed;
+  opacity: .75;
+}
+.slot-full::before { content: '✕ '; }
+
+/* 내 예약 — 보라 */
+.slot-mine {
+  background: var(--c-primary-100);
+  color: var(--c-primary-700);
+  border-color: var(--c-primary-200);
+}
+.slot-mine::before { content: '★ '; }
+.slot-mine:hover {
+  background: var(--c-primary-500);
+  color: #fff;
+  border-color: var(--c-primary-500);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(109,95,250,.28);
+}
+
+/* 신청 대기 — 노랑 */
+.slot-pending {
+  background: var(--c-warning-50);
+  color: var(--c-warning-700);
+  border-color: #fde68a;
+  animation: pulse-warn 2s ease-in-out infinite;
+}
+.slot-pending::before { content: '⏳ '; }
+
+/* 확정 — 진초록 */
+.slot-confirmed {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  font-weight: 800;
+}
+.slot-confirmed::before { content: '✓ '; }
+
+/* 대기 펄스 애니메이션 */
+@keyframes pulse-warn {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,.3); }
+  50%       { box-shadow: 0 0 0 4px rgba(245,158,11,.0); }
+}
+
+/* D-DAY 뱃지 */
+.dday-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.dday-today { background: #f43f5e; color: #fff; animation: pulse-red .9s ease-in-out infinite; }
+.dday-soon  { background: var(--c-primary-100); color: var(--c-primary-700); }
+.dday-past  { color: var(--c-gray-400); font-weight: 500; }
+@keyframes pulse-red {
+  0%,100% { box-shadow: 0 0 0 0 rgba(244,63,94,.5); }
+  50%      { box-shadow: 0 0 0 5px rgba(244,63,94,.0); }
+}
+
+/* ── 사이드바 Shimmer ── */
+.s-item {
+  position: relative;
+  overflow: hidden;
+}
+.s-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.04) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform .5s ease;
+}
+.s-item:hover::before { transform: translateX(100%); }
+
+/* ── 버튼 클릭 리플 ── */
+.btn { position: relative; overflow: hidden; }
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,.25) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.btn:active::after { opacity: 1; }
+
+/* ── 역할 카드 진입 애니메이션 ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+#landingPage .lc { animation: fadeInUp .35s ease; }
+
+/* ── 통계 카드 진입 ── */
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.stat-card { animation: fadeInScale .3s ease; }
+
+/* ── 모달 진입 ── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal { animation: slideUp .25s cubic-bezier(.4,0,.2,1); }
+
+/* ── 토스트 애니메이션 ── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.toast.show { animation: toastIn .2s ease; }
+
+/* ── 알림 패널 진입 ── */
+@keyframes dropDown {
+  from { opacity: 0; transform: translateY(-8px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.notif-panel:not(.hidden) { animation: dropDown .2s cubic-bezier(.4,0,.2,1); }
+
+/* ── 상담기록 진입 ── */
+.counsel-entry {
+  animation: fadeInUp .2s ease;
+}
+
+/* ── 학생 리스트 아이템 ── */
+.s-item { animation: none; }
+
+/* ── 스켈레톤 로딩 (폴링 중 표시용) ── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--c-gray-100) 25%, var(--c-gray-50) 50%, var(--c-gray-100) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+  height: 14px;
+}
+
+/* ── 스크롤 최상단 fade ── */
+.content { scroll-behavior: smooth; }
+
+/* ── 신호등 개선 ── */
+.traffic-light {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 700;
+  padding: 3px 9px; border-radius: 10px;
+  letter-spacing: -0.1px;
+}
+
+/* ── 태그 배지 개선 ── */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 10px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+/* ── 예약 현황 카드 ── */
+.resv-status {
+  padding: 3px 11px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* ── 예약 타임라인 점 ── */
+.tl-dot {
+  position: absolute; left: -23px; top: 6px;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 2.5px solid var(--c-bg);
+  box-shadow: 0 0 0 2px currentColor;
+  transition: transform .2s;
+}
+.tl-item:hover .tl-dot { transform: scale(1.2); }
+.tl-dot.type-1차발표 { color: var(--c-primary-500); background: var(--c-primary-500); }
+.tl-dot.type-면접    { color: var(--c-warning-500); background: var(--c-warning-500); }
+.tl-dot.type-발표    { color: var(--c-success-500); background: var(--c-success-500); }
+
+/* ── 링크 코드 hover ── */
+.link-code:hover { background: var(--c-primary-50); cursor: default; }
+
+
+
+/* ══ 희망대학 표 배지/텍스트 정렬 수정 ══ */
+.school-tbl .badge {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.school-tbl tbody td {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.school-tbl tbody td:first-child {
+  white-space: normal; /* 대학명은 줄바꿈 허용 */
+  min-width: 100px;
+}
+.school-tbl tbody td:nth-child(2) {
+  white-space: normal; /* 학과도 줄바꿈 허용 */
+  min-width: 80px;
+}
+/* 면접 있음/없음 뱃지 */
+.school-tbl .int-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 9px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+/* 신호등 줄바꿈 방지 */
+.traffic-light {
+  white-space: nowrap;
+  min-width: 52px;
+  justify-content: center;
+}
+/* note-chip 처리 */
+.note-chip {
+  display: block;
+  font-size: 10px;
+  color: var(--c-warning-500);
+  margin-top: 3px;
+  font-weight: 600;
+  white-space: normal;
+}
+/* 날짜 표시 */
+.school-tbl .date-mini {
+  font-size: 10px;
+  color: var(--c-gray-400);
+  margin-top: 3px;
+  font-weight: 500;
+  white-space: normal;
+  line-height: 1.5;
+}
+/* 관리 버튼 셀 */
+.school-tbl td:last-child {
+  white-space: nowrap;
+  text-align: center;
+}
+/* 점수 셀 */
+.school-tbl .score-cell {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+/* ══ 모바일/태블릿 반응형 ══ */
+.hamburger{display:none;align-items:center;justify-content:center;width:38px;height:38px;border:none;background:transparent;font-size:22px;cursor:pointer;color:var(--c-gray-600);border-radius:var(--radius-sm);flex-shrink:0;transition:background .15s}
+.hamburger:hover{background:var(--c-gray-100)}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(2px);z-index:499}
+.sb-overlay.show{display:block}
+
+/* ── 태블릿 (769~1024px) ── */
+@media(min-width:769px) and (max-width:1024px){
+  .sidebar{width:210px}
+  .content{padding:16px 18px}
+  .cal-day{min-height:82px}
+  .school-tbl{font-size:12px}
+  .ov-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* ── 모바일 (≤768px) ── */
+@media(max-width:768px){
+  /* 앱 레이아웃 */
+  .app{overflow:visible;flex-direction:column}
+  .hamburger{display:flex}
+
+  /* 사이드바 — 오버레이 슬라이드 */
+  .sidebar{
+    position:fixed;left:-260px;top:0;bottom:0;
+    height:100dvh;width:260px;
+    z-index:500;
+    transition:left .28s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;
+  }
+  .sidebar.open{left:0;box-shadow:8px 0 32px rgba(15,23,42,.25)}
+  .main{width:100%;min-width:0}
+
+  /* 탑바 */
+  .topbar{
+    padding:10px 14px;gap:8px;
+    flex-wrap:nowrap;
+    position:sticky;top:0;z-index:100;
+  }
+  .topbar h2{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;min-width:0}
+  #topbarActions{gap:4px;flex-shrink:0}
+  #topbarActions .btn{padding:6px 9px;font-size:11px}
+  #topbarActions .btn-sm{padding:5px 8px;font-size:11px}
+
+  /* 컨텐츠 */
+  .content{padding:14px 14px;overflow-x:hidden}
+
+  /* 통계 카드 */
+  .ov-grid{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .stat-card{padding:14px 16px}
+  .stat-card .sn{font-size:24px}
+  .stat-card .stat-icon{font-size:18px;margin-bottom:6px}
+
+  /* 학생 상세 헤더 */
+  .dh{flex-direction:column;gap:10px;padding:14px 16px}
+  .dh-name{font-size:18px}
+  .dh-actions{flex-direction:row;flex-wrap:wrap;gap:6px}
+
+  /* 탭바 */
+  .tab-bar{
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;flex-wrap:nowrap;
+    border-radius:var(--radius-sm);
+  }
+  .tab-bar::-webkit-scrollbar{display:none}
+  .tab-btn{white-space:nowrap;flex-shrink:0;font-size:11px;padding:6px 10px}
+
+  /* 희망대학 표 — 가로 스크롤 */
+  .card-body{padding:14px 16px}
+  .school-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .school-tbl{font-size:11px;min-width:640px}
+  .school-tbl thead th{padding:8px 8px;font-size:10px}
+  .school-tbl tbody td{padding:9px 8px;font-size:11px}
+  .badge{font-size:10px;padding:3px 7px;min-width:36px}
+  .int-badge{font-size:10px;padding:2px 6px}
+  .traffic-light{font-size:10px;padding:3px 6px;min-width:44px}
+
+  /* 연락처 */
+  .contact-grid{grid-template-columns:1fr}
+
+  /* 생기부 */
+  .a-grid{grid-template-columns:1fr}
+  .a-item.full{grid-column:1}
+
+  /* 상담기록 */
+  .counsel-entry{padding:12px}
+
+  /* 캘린더 */
+  .cal-wrap{padding:14px 12px;border-radius:var(--radius-lg)}
+  .cal-header{margin-bottom:14px}
+  .cal-header h3{font-size:16px}
+  .cal-grid{gap:3px}
+  .cal-day{min-height:66px;padding:6px 4px;border-radius:var(--radius-sm)}
+  .cal-day-num{font-size:11px;margin-bottom:4px}
+  .slot-btn{font-size:9px;padding:3px 4px;border-radius:5px;margin-top:3px}
+  .slot-btn::before{display:none}
+  .cal-dow{font-size:10px;padding:5px 0}
+
+  /* 모달 — 하단 시트 */
+  .modal-overlay{align-items:flex-end;padding:0}
+  .modal{
+    border-radius:20px 20px 0 0;
+    max-height:92dvh;
+    max-width:100%!important;
+    width:100%;
+  }
+  .modal-hd{padding:16px 18px}
+  .modal-body{padding:16px 18px 32px}
+
+  /* 알림 패널 */
+  .notif-panel{
+    position:fixed;
+    top:auto;bottom:0;left:0;right:0;
+    width:100%;
+    border-radius:20px 20px 0 0;
+    max-height:70dvh;
+  }
+
+  /* 대시보드 */
+  .dash-grid{grid-template-columns:1fr;gap:10px}
+
+  /* 빠른입력 */
+  .qi-layout{grid-template-columns:1fr}
+  .qi-textarea{min-height:110px}
+
+  /* 학생앱 */
+  .stu-app{min-height:100dvh}
+  .stu-content{padding:14px}
+  .stu-topbar{padding:11px 14px;gap:8px}
+  .stu-topbar h1{font-size:13px}
+  .stu-name-badge{font-size:11px;padding:3px 10px}
+
+  /* 예약 아이템 */
+  .resv-item{flex-wrap:wrap;gap:8px;padding:12px 14px}
+  .resv-date{min-width:auto;font-size:12px}
+  .resv-name{font-size:13px}
+  .resv-slot{font-size:10px}
+
+  /* 로스터 테이블 */
+  .roster-table{font-size:12px}
+  .roster-table th,.roster-table td{padding:8px 9px}
+  .table-wrap{margin:0 -16px;border-radius:0;border-left:none;border-right:none}
+
+  /* 로그인 */
+  .lc{padding:26px 20px;border-radius:var(--radius-xl)}
+  .lc h2{font-size:20px}
+  .role-grid{gap:10px}
+  .role-card{padding:16px 12px;border-radius:var(--radius-lg)}
+  .role-card .ri{font-size:26px}
+
+  /* 버튼 터치 최적화 */
+  .btn{padding:9px 13px;font-size:13px;min-height:40px}
+  .btn-sm{padding:6px 10px;font-size:12px;min-height:34px}
+
+  /* 폼 */
+  input[type=text],input[type=password],input[type=tel],input[type=date],textarea,select{
+    font-size:16px; /* iOS 줌 방지 */
+    padding:10px 13px;
+    min-height:44px;
+  }
+  textarea{font-size:14px;min-height:auto}
+
+  /* 확인 다이얼로그 */
+  .cf-overlay{padding:0 16px}
+  .cf-box{border-radius:var(--radius-xl);padding:24px 20px;max-width:100%;width:100%}
+}
+
+/* ── 소형 모바일 (≤390px) ── */
+@media(max-width:390px){
+  .topbar h2{max-width:100px;font-size:13px}
+  .ov-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .stat-card{padding:12px 13px}
+  .stat-card .sn{font-size:22px}
+  .cal-grid{gap:2px}
+  .cal-day{min-height:58px;padding:5px 3px}
+  .slot-btn{font-size:8px;padding:2px 3px}
+  .tab-btn{font-size:10px;padding:5px 8px}
+  .dh-name{font-size:16px}
+  .lc{padding:22px 16px}
+  .lc h2{font-size:18px}
+}
+
+/* ══ Apps Script 모바일 강제 적용 ══ */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+body {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 랜딩 페이지 — 화면 가득 채우기 */
+#landingPage, #loginPage, #studentLoginPage {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  padding: 20px 16px;
+}
+
+/* 랜딩 카드 — 모바일에서 더 크게 */
+@media(max-width:768px) {
+  #landingPage .lc,
+  #loginPage .lc,
+  #studentLoginPage .lc {
+    max-width: 100%;
+    padding: 28px 22px;
+    border-radius: 20px;
+  }
+  .lc h2 { font-size: 22px; }
+  .role-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .role-card {
+    padding: 20px 14px;
+    border-radius: 16px;
+  }
+  .role-card .ri { font-size: 32px; margin-bottom: 8px; }
+  .role-card h3 { font-size: 15px; }
+  .role-card p  { font-size: 12px; }
+
+  /* 앱 전체 높이 */
+  .app { height: 100dvh; height: -webkit-fill-available; }
+  .stu-app { min-height: 100dvh; min-height: -webkit-fill-available; }
+  .main { height: 100dvh; height: -webkit-fill-available; }
+  .content { height: calc(100dvh - 52px); overflow-y: auto; }
+
+  /* 탑바 높이 고정 */
+  .topbar { min-height: 52px; }
+
+  /* 학생앱 탑바 */
+  .stu-topbar { min-height: 52px; }
+  .stu-content {
+    height: calc(100dvh - 52px);
+    overflow-y: auto;
+    padding: 14px;
+  }
+
+  /* 사이드바 오버레이 높이 */
+  .sidebar { height: 100dvh; height: -webkit-fill-available; }
+}
+
+/* ── 터치 친화적 요소 ── */
+@media(max-width:768px) {
+  /* 클릭 영역 최소 44px */
+  .role-card { min-height: 100px; }
+  .btn { min-height: 44px; touch-action: manipulation; }
+  .btn-sm { min-height: 36px; }
+  .tab-btn { min-height: 36px; touch-action: manipulation; }
+  .nb { min-height: 32px; touch-action: manipulation; }
+  .s-item { min-height: 44px; }
+  .slot-btn { min-height: 30px; }
+  select { min-height: 44px; }
+
+  /* 모달 — 안전 영역 (iPhone 홈바) */
+  .modal {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .modal-body {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+
+  /* 탑바 안전 영역 */
+  .topbar, .stu-topbar {
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+}
+
+@media(max-width:480px) {
+  .ov-grid { grid-template-columns: 1fr 1fr !important; }
+  .stat-card { padding: 14px !important; }
+}
+
+@media(max-width:768px) {
+  .stu-tab-wrap {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .stu-tab-wrap .tab-bar {
+    width: 100%;
+  }
+  /* 탭 버튼들 균등 배분 */
+  #studentContent .tab-bar { justify-content: flex-start; }
+  #studentContent .tab-btn { flex-shrink: 0; }
+}
+
+/* ══ 학생별 지원 전략 분석 리포트 ══ */
+.analysis-wrap { display: flex; flex-direction: column; gap: 14px; }
+.analysis-student-tabs {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+}
+.ast-btn {
+  padding: 6px 14px;
+  border: 1.5px solid var(--c-border);
+  background: var(--c-gray-50);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-gray-600);
+  cursor: pointer;
+  font-family: 'Pretendard', inherit;
+  transition: all .15s;
+}
+.ast-btn:hover { border-color: var(--c-primary-300); color: var(--c-primary-600); background: var(--c-primary-50); }
+.ast-btn.active { background: var(--c-primary-600); border-color: var(--c-primary-600); color: #fff; }
+.analysis-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.analysis-card-hd {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--c-gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.analysis-name { font-size: 18px; font-weight: 800; color: var(--c-gray-900); letter-spacing: -0.4px; }
+.analysis-sub { font-size: 12px; color: var(--c-gray-500); margin-top: 3px; font-weight: 500; }
+.risk-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.risk-safe   { background: var(--c-success-50); color: var(--c-success-700); border: 1px solid #a7f3d0; }
+.risk-warn   { background: var(--c-warning-50); color: var(--c-warning-700); border: 1px solid #fde68a; }
+.risk-danger { background: var(--c-danger-50);  color: var(--c-danger-700);  border: 1px solid #fecdd3; }
+.metrics-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 0;
+  border-bottom: 1px solid var(--c-gray-100);
+}
+.metric-cell {
+  padding: 16px;
+  text-align: center;
+  border-right: 1px solid var(--c-gray-100);
+}
+.metric-cell:last-child { border-right: none; }
+.metric-big { font-size: 28px; font-weight: 800; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.metric-big.green { color: var(--c-success-700); }
+.metric-big.amber { color: var(--c-warning-700); }
+.metric-big.red   { color: var(--c-danger-700); }
+.metric-big.blue  { color: var(--c-primary-600); }
+.metric-big.gray  { color: var(--c-gray-500); }
+.metric-lbl { font-size: 11px; font-weight: 600; color: var(--c-gray-500); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.strategy-section { padding: 16px 22px; border-bottom: 1px solid var(--c-gray-100); }
+.strategy-section-title { font-size: 11px; font-weight: 700; color: var(--c-gray-500); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.strategy-bar-wrap { display: flex; height: 30px; border-radius: 8px; overflow: hidden; gap: 2px; }
+.strategy-seg {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  transition: flex .3s;
+  min-width: 0;
+  border-radius: 6px;
+}
+.strategy-seg span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 6px; }
+.strategy-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.sl-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--c-gray-600); }
+.sl-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.univ-table-section { padding: 0 22px 16px; }
+.univ-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px; }
+.univ-table th {
+  text-align: left; padding: 8px 10px;
+  font-size: 10px; font-weight: 700; color: var(--c-gray-500);
+  border-bottom: 2px solid var(--c-border);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.univ-table td { padding: 10px 10px; border-bottom: 1px solid var(--c-gray-100); vertical-align: middle; }
+.univ-table tr:last-child td { border-bottom: none; }
+.univ-table tr:hover td { background: var(--c-primary-50); }
+.univ-tl-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.insight-section {
+  margin: 0 22px 18px;
+  background: var(--c-primary-50);
+  border: 1px solid var(--c-primary-100);
+  border-left: 3px solid var(--c-primary-500);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 12px 14px;
+}
+.insight-title { font-size: 11px; font-weight: 700; color: var(--c-primary-600); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+.insight-item { font-size: 12px; color: var(--c-gray-700); line-height: 1.7; padding-left: 12px; position: relative; }
+.insight-item::before { content: '•'; position: absolute; left: 0; color: var(--c-primary-500); font-weight: 700; }
+.chart-section { padding: 16px 22px; border-top: 1px solid var(--c-gray-100); }
+.diff-chart-wrap { position: relative; }
+.no-school-msg { text-align: center; color: var(--c-gray-400); padding: 40px; font-size: 14px; font-style: italic; }
+
+@media(max-width:768px) {
+  .metrics-grid-4 { grid-template-columns: repeat(2,1fr); }
+  .metric-cell:nth-child(2) { border-right: none; }
+  .metric-cell:nth-child(3) { border-top: 1px solid var(--c-gray-100); }
+  .metric-cell:nth-child(4) { border-top: 1px solid var(--c-gray-100); border-right: none; }
+  .metric-big { font-size: 24px; }
+  .analysis-card-hd { padding: 14px 16px 12px; }
+  .strategy-section, .univ-table-section, .chart-section, .insight-section { padding-left: 16px; padding-right: 16px; }
+  .univ-table-section { padding-left: 0; padding-right: 0; overflow-x: auto; }
+  .univ-table { min-width: 500px; }
+}
+
+/* ══ 분석 모달 ══ */
+.analysis-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,.55);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.analysis-modal {
+  background: var(--c-surface);
+  border-radius: var(--radius-xl);
+  width: 100%; max-width: 820px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(15,23,42,.22);
+  animation: slideUp .25s cubic-bezier(.4,0,.2,1);
+}
+.analysis-modal-hd {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--c-gray-100);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0;
+  background: var(--c-surface);
+  z-index: 1;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+.analysis-modal-body { padding: 20px 24px 28px; }
+.analysis-modal-close {
+  width: 32px; height: 32px;
+  border: none; background: var(--c-gray-100);
+  border-radius: 50%; cursor: pointer;
+  font-size: 16px; color: var(--c-gray-500);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.analysis-modal-close:hover { background: var(--c-gray-200); color: var(--c-gray-700); }
+@media(max-width:768px){
+  .analysis-modal-overlay { padding: 0; align-items: flex-end; }
+  .analysis-modal { max-width: 100%; border-radius: 20px 20px 0 0; max-height: 92dvh; }
+  .analysis-modal-body { padding: 16px 16px 32px; }
+  .analysis-modal-hd { padding: 16px 16px 12px; border-radius: 20px 20px 0 0; }
+}
+
+/* ══ 타임 관리 ══ */
+.slot-manage-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  background: var(--c-gray-50);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  transition: box-shadow .15s;
+}
+.slot-manage-item:hover { box-shadow: var(--shadow-sm); }
+.slot-num {
+  width: 28px; height: 28px;
+  background: var(--c-primary-100);
+  color: var(--c-primary-700);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; flex-shrink: 0;
+}
+.slot-info { flex: 1; }
+.slot-name-input {
+  font-size: 13px; font-weight: 700;
+  color: var(--c-gray-900);
+  border: none; background: transparent;
+  padding: 0; width: 80px;
+  outline: none; cursor: pointer;
+}
+.slot-name-input:focus {
+  border-bottom: 2px solid var(--c-primary-500);
+  cursor: text;
+}
+.slot-time-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.slot-time-input {
+  font-size: 12px; font-weight: 600;
+  color: var(--c-gray-600);
+  border: 1.5px solid var(--c-border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  width: auto;
+  min-width: 130px;
+  outline: none;
+  font-family: 'Pretendard', inherit;
+  transition: border .15s;
+  cursor: pointer;
+  background: var(--c-surface);
+}
+.slot-time-input:focus { border-color: var(--c-primary-500); }
+.slot-sep { font-size: 12px; color: var(--c-gray-400); }
+.slot-add-btn {
+  width: 100%;
+  padding: 10px;
+  border: 2px dashed var(--c-border);
+  background: transparent;
+  border-radius: var(--radius-md);
+  color: var(--c-gray-500);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  font-family: 'Pretendard', inherit;
+  transition: all .15s;
+  margin-top: 4px;
+}
+.slot-add-btn:hover {
+  border-color: var(--c-primary-300);
+  color: var(--c-primary-600);
+  background: var(--c-primary-50);
+}
+.slot-warning {
+  background: var(--c-warning-50);
+  border: 1px solid var(--c-warning-100);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--c-warning-700);
+  margin-bottom: 12px;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ══════════════════════════════════════════════
+// 상담 타임 관리
+// ══════════════════════════════════════════════
+function showManageSlots() {
+  renderManageSlotsModal();
+}
+
+function renderManageSlotsModal() {
+  var slotItems = CONSULT_SLOTS.map(function(s, i){
+    return '<div class="slot-manage-item" data-sid="'+s.id+'">'
+      +'<div class="slot-num">'+(i+1)+'</div>'
+      +'<div class="slot-info">'
+      +'<input class="slot-name-input" type="text" value="'+esc(s.label)+'" data-field="label" data-idx="'+i+'" placeholder="타임명">'
+      +'<div class="slot-time-row">'
+      +'<select class="slot-time-input" data-field="startTime" data-idx="'+i+'">'+timeOptions(s.startTime)+'</select>'
+      +'<span class="slot-sep">~</span>'
+      +'<select class="slot-time-input" data-field="endTime" data-idx="'+i+'">'+timeOptions(s.endTime)+'</select>'
+      +'</div>'
+      +'</div>'
+      +(CONSULT_SLOTS.length > 1
+        ? '<button class="btn btn-danger btn-sm" data-delidx="'+i+'">🗑</button>'
+        : '')
+      +'</div>';
+  }).join('');
+
+  // 현재 예약 있는 슬롯 확인
+  var hasResvSlots = RESERVATIONS.length > 0;
+
+  openModalSm('⏱ 상담 타임 관리',
+    (hasResvSlots ? '<div class="slot-warning">⚠️ 예약이 있는 상태에서 타임을 수정하면 기존 예약 표시에 영향을 줄 수 있어요.</div>' : '')
+    +'<div id="slotList">'+slotItems+'</div>'
+    +'<button class="slot-add-btn" id="btnAddSlot">+ 타임 추가</button>'
+    +'<div style="display:flex;gap:8px;margin-top:16px">'
+    +'<button class="btn btn-secondary" style="flex:1" onclick="closeModal()">취소</button>'
+    +'<button class="btn btn-primary" style="flex:1" id="btnSaveSlots">💾 저장</button>'
+    +'</div>'
+  );
+
+  // 이벤트 바인딩
+  // 필드 변경
+  document.querySelectorAll('.slot-name-input, .slot-time-input').forEach(function(inp){
+    inp.addEventListener('change', function(){
+      var idx = parseInt(this.dataset.idx);
+      var field = this.dataset.field;
+      CONSULT_SLOTS[idx][field] = this.value.trim();
+    });
+  });
+
+  // 삭제
+  document.querySelectorAll('[data-delidx]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var idx = parseInt(this.dataset.delidx);
+      var slot = CONSULT_SLOTS[idx];
+      // 해당 슬롯에 예약이 있으면 경고
+      var hasResv = RESERVATIONS.some(function(r){ return r.slot === slot.id; });
+      if(hasResv) {
+        toast('❌ 이 타임에 예약이 있어서 삭제할 수 없어요');
+        return;
+      }
+      CONSULT_SLOTS.splice(idx, 1);
+      renderManageSlotsModal();
+    });
+  });
+
+  // 추가
+  on('btnAddSlot', 'click', function(){
+    var newId = Math.max.apply(null, CONSULT_SLOTS.map(function(s){return s.id;})) + 1;
+    var lastSlot = CONSULT_SLOTS[CONSULT_SLOTS.length - 1];
+    // 마지막 슬롯 종료 시간을 기본으로
+    CONSULT_SLOTS.push({
+      id: newId,
+      label: (CONSULT_SLOTS.length + 1) + '타임',
+      startTime: lastSlot ? lastSlot.endTime : '17:00',
+      endTime: lastSlot ? addHour(lastSlot.endTime) : '18:00'
+    });
+    renderManageSlotsModal();
+  });
+
+  // 저장
+  on('btnSaveSlots', 'click', function(){
+    // 유효성 검사
+    var valid = CONSULT_SLOTS.every(function(s){
+      return s.label && s.startTime && s.endTime && s.startTime < s.endTime;
+    });
+    if(!valid) { toast('❌ 타임명과 시간을 올바르게 입력해주세요 (시작 < 종료)'); return; }
+    buildSlotLabels();
+    saveSlots();
+    closeModal();
+    toast('✅ 상담 타임이 저장됐어요');
+    renderResvCalendar();
+  });
+}
+
+function addHour(timeStr) {
+  var parts = (timeStr||'17:00').split(':');
+  var h = parseInt(parts[0]) + 1;
+  if(h >= 24) h = 23;
+  var m = parts[1] || '00';
+  // 10분 단위로 맞추기
+  var mInt = Math.round(parseInt(m)/10)*10;
+  if(mInt >= 60) { h = Math.min(h+1, 23); mInt = 0; }
+  return (h < 10 ? '0' : '') + h + ':' + (mInt === 0 ? '00' : mInt);
+}
+
+// renderSlotBtn에서 CONSULT_SLOTS 기반으로 슬롯 렌더링
+function getSlotStatus(dateStr, slotId, isTeacher) {
+  // 마감 처리된 슬롯 확인
+  if(BLOCKED_SLOTS[dateStr] && BLOCKED_SLOTS[dateStr].indexOf(slotId) !== -1) return 'full';
+  var resv = RESERVATIONS.find(function(r){ return r.date===dateStr && r.slot===slotId; });
+  if(!resv) return 'available';
+  if(resv.status==='confirmed') return 'confirmed';
+  if(resv.status==='pending') return 'pending';
+  if(resv.status==='teacher') return 'confirmed';
+  return 'available';
+}
+
+function getSlotResv(dateStr, slotId) {
+  return RESERVATIONS.find(function(r){ return r.date===dateStr && r.slot===slotId; });
+}
+</script>
+<script>
+// ══════════════════════════════════════════════
+// 분석 모달 (교사용 — 학생 상세에서 열기)
+// ══════════════════════════════════════════════
+function showAnalysisModal(num) {
+  var s = DB.find(function(x){ return x.student_num===num; });
+  if(!s) return;
+
+  // 기존 모달 제거
+  var existing = document.getElementById('analysisModalOverlay');
+  if(existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.className = 'analysis-modal-overlay';
+  overlay.id = 'analysisModalOverlay';
+
+  var html = buildAnalysisHTML(s);
+
+  overlay.innerHTML = '<div class="analysis-modal" id="analysisModalBox">'
+    + '<div class="analysis-modal-hd">'
+    +   '<div><div class="analysis-name">'+s.name+' <span style="font-size:13px;font-weight:500;color:var(--c-gray-500)">지원 전략 분석</span></div></div>'
+    +   '<button class="analysis-modal-close" id="btnCloseAnalysisModal">✕</button>'
+    + '</div>'
+    + '<div class="analysis-modal-body">'+html+'</div>'
+    + '</div>';
+
+  document.body.appendChild(overlay);
+
+  // 닫기 이벤트
+  document.getElementById('btnCloseAnalysisModal').addEventListener('click', function(){
+    overlay.remove();
+    currentTab = 'schools';
+    showStudent(num);
+  });
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay){ overlay.remove(); currentTab='schools'; showStudent(num); }
+  });
+
+  // 차트 렌더링
+  setTimeout(function(){ renderAnalysisChart(s, 'analysisModalChart'); }, 80);
+}
+
+// ══════════════════════════════════════════════
+// 분석 모달 (학생용)
+// ══════════════════════════════════════════════
+function showStudentAnalysisModal(num) {
+  var s = DB.find(function(x){ return x.student_num===num; });
+  if(!s) return;
+
+  var existing = document.getElementById('analysisModalOverlay');
+  if(existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.className = 'analysis-modal-overlay';
+  overlay.id = 'analysisModalOverlay';
+
+  var html = buildAnalysisHTML(s);
+
+  overlay.innerHTML = '<div class="analysis-modal" id="analysisModalBox">'
+    + '<div class="analysis-modal-hd">'
+    +   '<div><div class="analysis-name">내 지원 전략 분석</div>'
+    +   '<div class="analysis-sub">희망학과: '+(s.hope_dept||'미정')+'</div></div>'
+    +   '<button class="analysis-modal-close" id="btnCloseAnalysisModal">✕</button>'
+    + '</div>'
+    + '<div class="analysis-modal-body">'+html+'</div>'
+    + '</div>';
+
+  document.body.appendChild(overlay);
+
+  document.getElementById('btnCloseAnalysisModal').addEventListener('click', function(){
+    overlay.remove();
+    stuTab = 'schools';
+    renderStudentApp();
+  });
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay){ overlay.remove(); stuTab='schools'; renderStudentApp(); }
+  });
+
+  setTimeout(function(){ renderAnalysisChart(s, 'analysisModalChart'); }, 80);
+}
+
+// ── 분석 HTML 빌드 (교사/학생 공용) ──
+function buildAnalysisHTML(s) {
+  var hs = s.hope_schools || [];
+  if(!hs.length) return '<div style="text-align:center;color:var(--c-gray-400);padding:40px;font-style:italic">희망 대학이 등록되지 않았습니다</div>';
+
+  var dirCount = {상향:0,소신:0,적정:0,하향:0,미정:0};
+  var diffs = [], hasCsat=0, interviewCnt=0;
+  hs.forEach(function(h){
+    var d=h.direction||'미정'; if(dirCount[d]!==undefined) dirCount[d]++; else dirCount['미정']++;
+    var u=parseFloat(h.uni_score), t=parseFloat(h.stu_score);
+    if(!isNaN(u)&&!isNaN(t)) diffs.push(t-u);
+    if(h.csat_min&&h.csat_min!=='없음') hasCsat++;
+    if(h.interview==='있음') interviewCnt++;
+  });
+  var avgDiff = diffs.length ? diffs.reduce(function(a,b){return a+b;},0)/diffs.length : null;
+  var upRatio = ((dirCount['상향']||0)+(dirCount['소신']||0)) / hs.length;
+  var riskLevel = upRatio>0.65?'danger':upRatio>0.4?'warn':'safe';
+  var riskMap = {
+    danger:{label:'⚠️ 상향 과다 — 하향 보완 필요',cls:'risk-danger'},
+    warn:  {label:'📋 균형 보통 — 전략 점검 권장',cls:'risk-warn'},
+    safe:  {label:'✅ 안정적 — 전략 균형적',cls:'risk-safe'}
+  };
+  var dirColors={상향:'#EF9F27',소신:'#378ADD',적정:'#639922',하향:'#E24B4A',미정:'#888780'};
+
+  // 전략 바
+  var segs = Object.entries(dirCount).filter(function(e){return e[1]>0;}).map(function(e){
+    var pct=Math.round(e[1]/hs.length*100);
+    return '<div class="strategy-seg" style="flex:'+pct+';background:'+dirColors[e[0]]+'"><span>'+e[0]+' '+e[1]+'</span></div>';
+  }).join('');
+  var legend = Object.entries(dirCount).filter(function(e){return e[1]>0;}).map(function(e){
+    return '<div class="sl-item"><div class="sl-dot" style="background:'+dirColors[e[0]]+'"></div>'+e[0]+' '+e[1]+'개 ('+Math.round(e[1]/hs.length*100)+'%)</div>';
+  }).join('');
+
+  // 대학 테이블
+  var rows = hs.map(function(h){
+    var u=parseFloat(h.uni_score), t=parseFloat(h.stu_score);
+    var diff=(!isNaN(u)&&!isNaN(t))?(t-u):null;
+    var tlColor=diff===null?'var(--c-gray-300)':diff<=-0.3?'#639922':diff<=0.3?'#EF9F27':'#E24B4A';
+    var diffHtml=diff!==null?'<span style="font-weight:700;color:'+(diff>0.3?'var(--c-danger-600)':diff<-0.3?'var(--c-success-600)':'var(--c-warning-600)')+'">'+(diff>0?'+':'')+diff.toFixed(2)+'</span>':'<span style="color:var(--c-gray-400)">-</span>';
+    var dc=dirColors[h.direction||'미정'];
+    var intH=h.interview==='있음'?'<span style="font-size:10px;font-weight:700;background:var(--c-warning-50);color:var(--c-warning-700);padding:2px 7px;border-radius:8px;border:1px solid var(--c-warning-100)">면접</span>':'<span style="font-size:10px;color:var(--c-gray-400)">없음</span>';
+    var csatH=(h.csat_min&&h.csat_min!=='없음')?'<span style="font-size:10px;font-weight:700;background:var(--c-danger-50);color:var(--c-danger-700);padding:2px 7px;border-radius:8px;border:1px solid var(--c-danger-100)">'+h.csat_min+'</span>':'<span style="font-size:10px;color:var(--c-gray-400)">없음</span>';
+    return '<tr>'
+      +'<td><span style="width:10px;height:10px;border-radius:50%;background:'+tlColor+';display:inline-block"></span></td>'
+      +'<td><b style="font-size:13px;color:var(--c-gray-900)">'+h.school+'</b><div style="font-size:11px;color:var(--c-gray-500)">'+(h.dept||'')+(h.sub_type?' · '+h.sub_type:'')+'</div></td>'
+      +'<td><span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;background:'+dc+'22;color:'+dc+'">'+(h.direction||'-')+'</span></td>'
+      +'<td style="font-variant-numeric:tabular-nums;font-weight:600;color:var(--c-gray-700)">'+(h.uni_score||'-')+'</td>'
+      +'<td style="font-variant-numeric:tabular-nums;font-weight:600;color:var(--c-gray-700)">'+(h.stu_score||'-')+'</td>'
+      +'<td>'+diffHtml+'</td>'
+      +'<td>'+intH+'</td>'
+      +'<td>'+csatH+'</td>'
+      +'</tr>';
+  }).join('');
+
+  // 상담 포인트
+  var insights=[];
+  if(avgDiff!==null&&avgDiff>0.2) insights.push('평균 내신이 커트라인보다 <b>'+avgDiff.toFixed(2)+'등급 낮아요.</b> 하향 안전망을 강화하세요.');
+  if(dirCount['하향']===0) insights.push('하향 안전 대학이 없어요. 최소 1~2곳 추가를 권장해요.');
+  if(hasCsat>0) insights.push('수능 최저가 있는 대학이 <b>'+hasCsat+'곳</b>이에요. 수능 대비를 병행해야 해요.');
+  if(interviewCnt>0) insights.push('면접 전형이 <b>'+interviewCnt+'곳</b>이에요. 면접 준비를 서두르세요.');
+  if(!insights.length) insights.push('전반적으로 균형 잡힌 지원 전략이에요.');
+  var insightHtml='<div class="insight-section" style="margin:16px 0 0">'
+    +'<div class="insight-title">💡 상담 포인트</div>'
+    +insights.map(function(t){return'<div class="insight-item">'+t+'</div>';}).join('')
+    +'</div>';
+
+  var diffColor=avgDiff===null?'gray':avgDiff>0.3?'red':avgDiff>0?'amber':'green';
+
+  return '<div style="display:flex;flex-direction:column;gap:16px">'
+    // 위험도 + 지표
+    +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'
+    +'<span class="risk-badge '+riskMap[riskLevel].cls+'">'+riskMap[riskLevel].label+'</span></div>'
+    +'<div class="metrics-grid-4">'
+    +'<div class="metric-cell"><div class="metric-big blue">'+hs.length+'</div><div class="metric-lbl">총 지원 대학</div></div>'
+    +'<div class="metric-cell"><div class="metric-big '+(interviewCnt>0?'amber':'green')+'">'+interviewCnt+'</div><div class="metric-lbl">면접 전형</div></div>'
+    +'<div class="metric-cell"><div class="metric-big '+(hasCsat>0?'amber':'green')+'">'+hasCsat+'</div><div class="metric-lbl">수능 최저</div></div>'
+    +'<div class="metric-cell"><div class="metric-big '+diffColor+'">'+(avgDiff!==null?(avgDiff>0?'+':'')+avgDiff.toFixed(2):'N/A')+'</div><div class="metric-lbl">평균내신차</div></div>'
+    +'</div>'
+    // 전략 바
+    +'<div><div class="strategy-section-title">지원 전략 구성</div>'
+    +'<div class="strategy-bar-wrap">'+segs+'</div>'
+    +'<div class="strategy-legend">'+legend+'</div></div>'
+    // 대학 테이블
+    +'<div style="overflow-x:auto"><table class="univ-table"><thead><tr>'
+    +'<th></th><th>대학/학과</th><th>유형</th><th>대학내신</th><th>학생내신</th><th>차이</th><th>면접</th><th>수능최저</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>'
+    // 인사이트
+    +insightHtml
+    // 차트
+    +'<div><div class="strategy-section-title" style="margin-bottom:8px">대학별 내신 차이</div>'
+    +'<div style="height:'+(Math.max(140,hs.length*46+50))+'px;position:relative">'
+    +'<canvas id="analysisModalChart" role="img" aria-label="대학별 내신 차이">대학별 내신 차이 차트</canvas>'
+    +'</div></div>'
+    +'</div>';
+}
+
+// ── 차트 렌더링 (모달용) ──
+function renderAnalysisChart(s, canvasId) {
+  if(typeof Chart === 'undefined') return;
+  var ctx = document.getElementById(canvasId);
+  if(!ctx) return;
+  var hs = s.hope_schools||[];
+  var labels = hs.map(function(h){return h.school;});
+  var data = hs.map(function(h){
+    var u=parseFloat(h.uni_score), t=parseFloat(h.stu_score);
+    return(!isNaN(u)&&!isNaN(t))?parseFloat((t-u).toFixed(2)):0;
+  });
+  var colors = data.map(function(d){return d<=-0.3?'#639922':d<=0.3?'#EF9F27':'#E24B4A';});
+  new Chart(ctx,{
+    type:'bar',
+    data:{labels:labels,datasets:[{label:'내신차이',data:data,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return(c.raw>0?'+':'')+c.raw.toFixed(2)+' 등급';}}}}  ,
+      scales:{
+        x:{grid:{color:'rgba(128,128,128,.1)'},ticks:{font:{size:11},callback:function(v){return(v>0?'+':'')+v.toFixed(1);}},border:{dash:[4,4]}},
+        y:{grid:{display:false},ticks:{font:{size:12}}}
+      }
+    }
+  });
+}
+
+
+// ══════════════════════════════════════════════
+// 학생별 지원 전략 분석 리포트 (사이드바 전체 화면)
+// ══════════════════════════════════════════════
+var _analysisStudentIdx = 0;
+var _analysisChart = null;
+
+
+function setNavActive(key) {
+  ['navAll','navDash','navCal','navAnalysis','navResv','navManage'].forEach(function(id){
+    var e=el(id); if(e) e.classList.remove('active');
+  });
+  if(el(key)) el(key).classList.add('active');
+}
+function showAnalysisReport() {
+  currentNum = null;
+  navMode = 'analysis';
+  renderSidebar();
+  setNavActive('navAnalysis');
+  el('topbarTitle').textContent = '📊 지원 전략 분석';
+  el('topbarActions').innerHTML = '<button class="btn btn-secondary btn-sm" id="btnRefreshAnalysis">🔄</button>';
+  on('btnRefreshAnalysis', 'click', function(){ showAnalysisReport(); toast('🔄 새로고침됨'); });
+  _analysisStudentIdx = 0;
+  renderAnalysisReport();
+}
+
+function renderAnalysisReport() {
+  if(_analysisChart){ _analysisChart.destroy(); _analysisChart = null; }
+  if(!DB.length){
+    el('teacherContent').innerHTML = '<div class="card card-body" style="text-align:center;color:var(--c-gray-400);padding:60px">등록된 학생이 없습니다</div>';
+    return;
+  }
+
+  // 탭 렌더링
+  var tabsHtml = '<div class="analysis-student-tabs">'
+    + DB.map(function(s,i){
+        return '<button class="ast-btn'+(i===_analysisStudentIdx?' active':'')+'" data-aidx="'+i+'">'+s.name+'</button>';
+      }).join('')
+    + '</div>';
+
+  var s = DB[_analysisStudentIdx];
+  var hs = s.hope_schools || [];
+
+  if(!hs.length){
+    el('teacherContent').innerHTML = tabsHtml + '<div class="analysis-card"><div class="no-school-msg">희망 대학이 등록되지 않았습니다</div></div>';
+    bindAnalysisTabs();
+    return;
+  }
+
+  // 분석 계산
+  var dirCount = {상향:0,소신:0,적정:0,하향:0,미정:0};
+  var diffs = [], hasCsat = 0, interviewCnt = 0;
+  hs.forEach(function(h){
+    var d = h.direction || '미정';
+    if(dirCount[d] !== undefined) dirCount[d]++; else dirCount['미정']++;
+    var u = parseFloat(h.uni_score), t = parseFloat(h.stu_score);
+    if(!isNaN(u) && !isNaN(t)) diffs.push({school:h.school, diff:t-u});
+    if(h.csat_min && h.csat_min !== '없음') hasCsat++;
+    if(h.interview === '있음') interviewCnt++;
+  });
+  var avgDiff = diffs.length ? diffs.reduce(function(a,b){return a+b.diff;},0)/diffs.length : null;
+  var upCount = (dirCount['상향']||0) + (dirCount['소신']||0);
+  var upRatio = upCount / hs.length;
+  var riskLevel = upRatio > 0.65 ? 'danger' : upRatio > 0.4 ? 'warn' : 'safe';
+  var riskMap = {
+    danger:{label:'⚠️ 상향 과다 — 하향 보완 필요', cls:'risk-danger'},
+    warn:  {label:'📋 균형 보통 — 전략 점검 권장', cls:'risk-warn'},
+    safe:  {label:'✅ 안정적 — 전략 균형적', cls:'risk-safe'}
+  };
+
+  // 전략 바
+  var dirColors = {상향:'#EF9F27',소신:'#378ADD',적정:'#639922',하향:'#E24B4A',미정:'#888780'};
+  var segs = Object.entries(dirCount).filter(function(e){return e[1]>0;}).map(function(e){
+    var pct = Math.round(e[1]/hs.length*100);
+    return '<div class="strategy-seg" style="flex:'+pct+';background:'+dirColors[e[0]]+'"><span>'+e[0]+' '+e[1]+'</span></div>';
+  }).join('');
+  var legend = Object.entries(dirCount).filter(function(e){return e[1]>0;}).map(function(e){
+    var pct = Math.round(e[1]/hs.length*100);
+    return '<div class="sl-item"><div class="sl-dot" style="background:'+dirColors[e[0]]+'"></div>'+e[0]+' '+e[1]+'개 ('+pct+'%)</div>';
+  }).join('');
+
+  // 대학 테이블
+  var univRows = hs.map(function(h,i){
+    var u = parseFloat(h.uni_score), t = parseFloat(h.stu_score);
+    var diff = (!isNaN(u)&&!isNaN(t)) ? (t-u) : null;
+    var tlColor = diff===null?'var(--c-gray-300)':diff<=-0.3?'#639922':diff<=0.3?'#EF9F27':'#E24B4A';
+    var diffHtml = diff!==null
+      ? '<span style="font-weight:700;color:'+(diff>0.3?'var(--c-danger-600)':diff<-0.3?'var(--c-success-600)':'var(--c-warning-600)')+'">'+(diff>0?'+':'')+diff.toFixed(2)+'</span>'
+      : '<span style="color:var(--c-gray-400)">-</span>';
+    var dirC = dirColors[h.direction||'미정'];
+    var intHtml = h.interview==='있음'
+      ? '<span style="font-size:10px;font-weight:700;background:var(--c-warning-50);color:var(--c-warning-700);padding:2px 7px;border-radius:8px;border:1px solid var(--c-warning-100)">면접</span>'
+      : '<span style="font-size:10px;color:var(--c-gray-400)">없음</span>';
+    var csatHtml = (h.csat_min&&h.csat_min!=='없음')
+      ? '<span style="font-size:10px;font-weight:700;background:var(--c-danger-50);color:var(--c-danger-700);padding:2px 7px;border-radius:8px;border:1px solid var(--c-danger-100)">'+h.csat_min+'</span>'
+      : '<span style="font-size:10px;color:var(--c-gray-400)">없음</span>';
+    return '<tr>'
+      +'<td><span class="univ-tl-dot" style="background:'+tlColor+'"></span></td>'
+      +'<td><b style="font-size:13px;color:var(--c-gray-900)">'+h.school+'</b><div style="font-size:11px;color:var(--c-gray-500)">'+( h.dept||'')+' '+(h.sub_type?'· '+h.sub_type:'')+'</div></td>'
+      +'<td><span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;background:'+dirC+'22;color:'+dirC+'">'+( h.direction||'-')+'</span></td>'
+      +'<td style="font-variant-numeric:tabular-nums;font-weight:600;color:var(--c-gray-700)">'+(h.uni_score||'-')+'</td>'
+      +'<td style="font-variant-numeric:tabular-nums;font-weight:600;color:var(--c-gray-700)">'+(h.stu_score||'-')+'</td>'
+      +'<td>'+diffHtml+'</td>'
+      +'<td>'+intHtml+'</td>'
+      +'<td>'+csatHtml+'</td>'
+      +'</tr>';
+  }).join('');
+
+  // 상담 포인트
+  var insights = [];
+  if(avgDiff!==null && avgDiff > 0.2) insights.push('평균 내신이 커트라인보다 <b>'+avgDiff.toFixed(2)+'등급 낮아요.</b> 하향 안전망을 강화하세요.');
+  if(dirCount['하향']===0 && dirCount['미정']===0) insights.push('하향 안전 대학이 없어요. 최소 1~2곳 추가를 권장해요.');
+  if(hasCsat > 0) insights.push('수능 최저가 있는 대학이 <b>'+hasCsat+'곳</b>이에요. 수능 대비를 병행해야 해요.');
+  if(interviewCnt > 0) insights.push('면접 전형이 <b>'+interviewCnt+'곳</b>이에요. 면접 준비를 서두르세요.');
+  if((dirCount['상향']||0) >= hs.length) insights.push('모든 대학이 상향이에요. 전략 재검토가 필요해요.');
+  if(!insights.length) insights.push('전반적으로 균형 잡힌 지원 전략이에요. 추가 상담 포인트가 없어요.');
+
+  var insightHtml = '<div class="insight-section">'
+    +'<div class="insight-title">💡 상담 포인트</div>'
+    + insights.map(function(t){ return '<div class="insight-item">'+t+'</div>'; }).join('')
+    +'</div>';
+
+  // 내신 차이 메트릭 색상
+  var diffColor = avgDiff===null?'gray':avgDiff>0.3?'red':avgDiff>0?'amber':'green';
+
+  el('teacherContent').innerHTML = tabsHtml
+    + '<div class="analysis-card">'
+    // 헤더
+    + '<div class="analysis-card-hd">'
+    +   '<div><div class="analysis-name">'+s.name+'<span style="font-size:13px;font-weight:500;color:var(--c-gray-500);margin-left:8px">'+s.student_num+'</span></div>'
+    +   '<div class="analysis-sub">희망: '+(s.hope_dept||'미정')+' &nbsp;·&nbsp; 희망진로: '+(s.career_hope||'미정')+'</div></div>'
+    +   '<span class="risk-badge '+riskMap[riskLevel].cls+'">'+riskMap[riskLevel].label+'</span>'
+    + '</div>'
+    // 4개 지표
+    + '<div class="metrics-grid-4">'
+    +   '<div class="metric-cell"><div class="metric-big blue">'+hs.length+'</div><div class="metric-lbl">총 지원 대학</div></div>'
+    +   '<div class="metric-cell"><div class="metric-big '+(interviewCnt>0?'amber':'green')+'">'+interviewCnt+'</div><div class="metric-lbl">면접 전형</div></div>'
+    +   '<div class="metric-cell"><div class="metric-big '+(hasCsat>0?'amber':'green')+'">'+hasCsat+'</div><div class="metric-lbl">수능 최저</div></div>'
+    +   '<div class="metric-cell"><div class="metric-big '+diffColor+'">'+(avgDiff!==null?(avgDiff>0?'+':'')+avgDiff.toFixed(2):'N/A')+'</div><div class="metric-lbl">평균 내신차</div></div>'
+    + '</div>'
+    // 전략 바
+    + '<div class="strategy-section">'
+    +   '<div class="strategy-section-title">지원 전략 구성</div>'
+    +   '<div class="strategy-bar-wrap">'+segs+'</div>'
+    +   '<div class="strategy-legend">'+legend+'</div>'
+    + '</div>'
+    // 대학 테이블
+    + '<div class="univ-table-section"><div style="overflow-x:auto">'
+    +   '<table class="univ-table"><thead><tr>'
+    +   '<th></th><th>대학 / 학과</th><th>유형</th><th>대학내신</th><th>학생내신</th><th>차이</th><th>면접</th><th>수능최저</th>'
+    +   '</tr></thead><tbody>'+univRows+'</tbody></table>'
+    + '</div></div>'
+    // 상담 포인트
+    + insightHtml
+    // 차트
+    + '<div class="chart-section">'
+    +   '<div class="strategy-section-title" style="margin-bottom:10px">대학별 내신 차이</div>'
+    +   '<div class="legend-row" style="margin-bottom:8px">'
+    +     '<div class="sl-item"><div class="sl-dot" style="background:#639922;border-radius:50%"></div>유리 (−0.3↑)</div>'
+    +     '<div class="sl-item"><div class="sl-dot" style="background:#EF9F27;border-radius:50%"></div>비슷 (±0.3)</div>'
+    +     '<div class="sl-item"><div class="sl-dot" style="background:#E24B4A;border-radius:50%"></div>불리 (+0.3↑)</div>'
+    +   '</div>'
+    +   '<div class="diff-chart-wrap" style="height:'+(Math.max(160, hs.length*52+60))+'px"><canvas id="analysisChart" role="img" aria-label="대학별 내신 차이 막대 차트">대학별 내신 차이 데이터</canvas></div>'
+    + '</div>'
+    + '</div>';
+
+  bindAnalysisTabs();
+
+  // 차트 렌더링
+  setTimeout(function(){
+    var ctx = el('analysisChart');
+    if(!ctx || typeof Chart === 'undefined') return;
+    var labels = hs.map(function(h){ return h.school; });
+    var data2 = hs.map(function(h){
+      var u=parseFloat(h.uni_score), t=parseFloat(h.stu_score);
+      return (!isNaN(u)&&!isNaN(t)) ? parseFloat((t-u).toFixed(2)) : 0;
+    });
+    var colors2 = data2.map(function(d){ return d<=-0.3?'#639922':d<=0.3?'#EF9F27':'#E24B4A'; });
+    _analysisChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '내신 차이 (학생 − 대학)',
+          data: data2,
+          backgroundColor: colors2,
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: function(c){ return (c.raw>0?'+':'')+c.raw.toFixed(2)+' 등급'; } } }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(128,128,128,.1)' },
+            ticks: { font:{size:11}, callback: function(v){ return (v>0?'+':'')+v.toFixed(1); } },
+            border: { dash:[4,4] }
+          },
+          y: { grid: { display:false }, ticks: { font:{size:12} } }
+        }
+      }
+    });
+  }, 80);
+}
+
+function bindAnalysisTabs() {
+  document.querySelectorAll('.ast-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      _analysisStudentIdx = parseInt(this.dataset.aidx);
+      renderAnalysisReport();
+    });
+  });
+}
+</script>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div style="font-size:40px;margin-bottom:8px">🎓</div>
+  <div class="spinner"></div>
+  <p style="color:#6b7280;font-size:14px">데이터를 불러오는 중…</p>
+</div>
+<div class="saving-indicator" id="savingIndicator">☁️ 저장 중…</div>
+
+<!-- LANDING -->
+<div id="landingPage" class="hidden">
+  <div class="lc">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:38px;margin-bottom:8px">🎓</div>
+      <h2>진로진학 상담 관리</h2>
+      <p>청북고등학교 3학년 9반 · 2026</p>
+    </div>
+    <div class="role-grid">
+      <div class="role-card" id="btnTeacherLogin"><div class="ri">👩‍🏫</div><h3>교사</h3><p>전체 관리·편집</p></div>
+      <div class="role-card" id="btnStudentLogin"><div class="ri">🧑‍🎓</div><h3>학생</h3><p>내 정보 보기·편집</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- TEACHER LOGIN -->
+<div id="loginPage" class="hidden">
+  <div class="lc">
+    <div style="font-size:30px;margin-bottom:10px">👩‍🏫</div>
+    <h2>교사 로그인</h2><p>관리자 비밀번호를 입력하세요</p>
+    <div id="loginError" class="err-msg">비밀번호가 올바르지 않습니다.</div>
+    <div class="form-group"><label class="form-label">비밀번호</label>
+      <input type="password" id="teacherPwd" placeholder="비밀번호">
+    </div>
+    <button class="btn btn-primary" style="width:100%" id="loginBtn">로그인</button>
+    <div style="margin-top:12px;text-align:center"><span style="font-size:12px;color:#9ca3af;cursor:pointer" id="btnBackFromTeacher">← 뒤로</span></div>
+    <div style="margin-top:8px;text-align:center;font-size:11px;color:#d1d5db">초기 비밀번호: <b>1234</b></div>
+  </div>
+</div>
+
+<!-- STUDENT LOGIN -->
+<div id="studentLoginPage" class="hidden">
+  <div class="lc">
+    <div style="font-size:30px;margin-bottom:10px">🧑‍🎓</div>
+    <h2>학생 로그인</h2><p>학번과 개인 PIN을 입력하세요</p>
+    <div id="stuLoginError" class="err-msg"></div>
+    <div class="form-group"><label class="form-label">학번</label>
+      <input type="text" id="stuNum" placeholder="예: 30901" maxlength="10">
+    </div>
+    <div class="form-group"><label class="form-label">PIN 번호</label>
+      <input type="password" id="stuPin" placeholder="4자리 PIN" maxlength="6">
+    </div>
+    <button class="btn btn-primary" style="width:100%" id="btnStudentDoLogin">로그인</button>
+    <div style="margin-top:12px;text-align:center"><span style="font-size:12px;color:#9ca3af;cursor:pointer" id="btnBackFromStudent">← 뒤로</span></div>
+    <div style="margin-top:8px;text-align:center;font-size:11px;color:#d1d5db">PIN은 담임 선생님께 문의하세요</div>
+  </div>
+</div>
+
+<!-- TEACHER APP -->
+<div id="teacherApp" class="app hidden">
+  <div class="sidebar">
+    <div class="sidebar-hd"><h1>📋 진학상담 관리</h1><p>청북고 3-9 · 2026</p></div>
+    <div class="sb-search"><input type="text" id="sideSearch" placeholder="이름·학번 검색…"></div>
+    <div class="sb-nav">
+      <button class="nb active" id="navAll">전체</button>
+      <button class="nb" id="navDash">현황</button>
+      <button class="nb" id="navCal">일정</button>
+      <button class="nb" id="navResv">예약</button><button class="nb" id="navManage">관리</button>
+    </div>
+    <div class="s-list" id="sideList"></div>
+    <div class="sb-foot"><button id="btnLogout">🚪 로그아웃</button></div>
+  </div>
+  <div class="main">
+    <div class="topbar" id="teacherTopbar">
+      <button class="hamburger" id="hamburgerBtn">☰</button>
+      <h2 id="topbarTitle">📊 개요</h2>
+      <div style="margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;align-items:center" id="topbarActions"></div><button id="btnNotif" class="notif-badge" style="border:none;background:none;cursor:pointer;padding:4px" title="알림"><span style="font-size:18px">🔔</span><span class="notif-dot hidden" id="notifDot">0</span></button>
+    </div>
+    <div class="content" id="teacherContent"></div>
+  </div>
+</div>
+<div class="sb-overlay" id="sbOverlay"></div>
+
+<!-- STUDENT APP -->
+<div id="studentApp" class="stu-app hidden">
+  <div class="stu-topbar">
+    <div style="font-size:18px">🎓</div><h1>진로진학 상담</h1>
+    <div class="stu-name-badge" id="stuNameBadge">학생</div>
+    <button id="btnStuNotif" class="notif-badge" style="border:none;background:none;cursor:pointer;padding:4px;margin-right:4px" title="알림"><span style="font-size:18px">🔔</span><span class="notif-dot hidden" id="stuNotifDot">0</span></button><span class="lo" id="btnStuLogout">로그아웃</span>
+  </div>
+  <div class="stu-content" id="studentContent"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-hd"><h3 id="modalTitle">편집</h3><button class="modal-close" id="modalCloseBtn">✕</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="cf-overlay hidden" id="cfOverlay">
+  <div class="cf-box">
+    <h3 id="cfTitle">확인</h3><p id="cfMsg"></p>
+    <div class="br">
+      <button class="btn btn-secondary" id="cfNo">취소</button>
+      <button class="btn btn-danger" id="cfYes">삭제</button>
+    </div>
+  </div>
+</div>
+<div class="notif-panel hidden" id="notifPanel">
+  <div class="notif-panel-hd"><h4>🔔 알림</h4><button class="notif-clear" id="btnClearNotif">모두 읽음</button></div>
+  <div id="notifList"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var SAMPLE_DB = [
+  {student_num:'30901',name:'강영찬',gender:'남',phone:'010-7443-0597',mom_phone:'010-4009-0597',dad_phone:'010-3379-0597',career_hope:'기계공학자',hope_dept:'기계공학과',special1:'',remark:'면접 준비 필요',counseling_notes:'',counseling_records:[{date:'2026-04-15',content:'1차 희망대학 상담. 한양대 에리카 기계공학과 중심으로 지원 계획 수립.'}],hope_schools:[{school:'한양대에리카',dept:'기계공학과',direction:'상향',admission_type:'학생부종합',sub_type:'일반',interview:'있음',uni_score:'2.46',stu_score:'2.8',capacity:'15명',csat_min:'없음',note:'',first_date:'2026-10-01',interview_date:'2026-11-15',final_date:'2026-12-12'},{school:'국민대',dept:'기계공학부',direction:'소신',admission_type:'학생부교과',sub_type:'일반학생',interview:'없음',uni_score:'2.7',stu_score:'2.8',capacity:'20명',csat_min:'없음',note:'',first_date:'2026-10-02',interview_date:'',final_date:'2026-12-15'}],reserve_schools:[{school:'인하대',dept:'기계공학과'}],pin:'9943',analysis:{attendance:'무결석',behavior:'성실하고 모둠 활동에 적극적으로 참여함.',autonomous:'학급회장으로 활동하며 리더십을 발휘함.',club:'로보틱스 동아리 부장으로 팀을 이끔.',volunteer:'지역사회 봉사 20시간 참여.',career_activity:'공학 캠프 참가 및 진로 탐색.',subject_special:'물리학 세특 우수. 역학 단원 깊이 있는 탐구 수행.',overall_eval:'공학 분야 역량이 우수하며 목표의식이 뚜렷함.',academic:'3.0/4.5',career:'4.0/4.5',community:'3.5/4.5'}},
+  {student_num:'30902',name:'경다은',gender:'여',phone:'010-5093-2949',mom_phone:'010-5413-2949',dad_phone:'010-2502-2949',career_hope:'의사',hope_dept:'의학과',special1:'',remark:'의대 준비 철저히 할 것',counseling_notes:'',counseling_records:[{date:'2026-03-20',content:'의대 지원 계획 논의. 수능 최저 기준 확인 필요.'},{date:'2026-04-10',content:'모의고사 성적 분석. 국어 보완 필요. 면접 준비 시작 권유.'}],hope_schools:[{school:'아주대',dept:'의학과',direction:'적정',admission_type:'학생부종합',sub_type:'일반',interview:'있음',uni_score:'1.5',stu_score:'1.5',capacity:'10명',csat_min:'3합 4',note:'',first_date:'2026-10-01',interview_date:'2026-11-20',final_date:'2026-12-13'},{school:'성균관대',dept:'의예과',direction:'상향',admission_type:'학생부종합',sub_type:'글로벌',interview:'있음',uni_score:'1.2',stu_score:'1.5',capacity:'20명',csat_min:'4합 5',note:'최저 충족 필수',first_date:'2026-10-01',interview_date:'2026-11-18',final_date:'2026-12-10'}],reserve_schools:[{school:'단국대천안',dept:'의예과'},{school:'을지대',dept:'의학과'}],pin:'4859',analysis:{attendance:'무결석',behavior:'리더십이 뛰어나고 배려심이 깊음.',autonomous:'학생부회장 역임.',club:'의생명과학 동아리 활동.',volunteer:'병원 봉사 15시간.',career_activity:'의료 직업 체험 및 의사 인터뷰.',subject_special:'생명과학 세특 최우수. 세포 분열 심화 탐구.',overall_eval:'의대 진학 역량 충분. 면접 준비 강화 필요.',academic:'4.5/4.5',career:'4.5/4.5',community:'4.0/4.5'}},
+  {student_num:'30903',name:'김민혁',gender:'남',phone:'010-4604-1564',mom_phone:'010-4769-1564',dad_phone:'010-6455-1564',career_hope:'소프트웨어 개발자',hope_dept:'컴퓨터공학과',special1:'',remark:'',counseling_notes:'',counseling_records:[],hope_schools:[{school:'인하대',dept:'컴퓨터공학과',direction:'소신',admission_type:'학생부종합',sub_type:'인하미래인재',interview:'없음',uni_score:'2.8',stu_score:'3.0',capacity:'25명',csat_min:'없음',note:'',first_date:'2026-10-05',interview_date:'',final_date:'2026-12-16'}],reserve_schools:[],pin:'3067',analysis:{attendance:'1일 결석',behavior:'창의적이고 문제해결능력이 우수함.',autonomous:'',club:'코딩 동아리 활동.',volunteer:'',career_activity:'SW 마이스터고 캠프 참가.',subject_special:'정보 세특 최우수. 알고리즘 심화 프로젝트 수행.',overall_eval:'SW 분야 역량 우수. 추가 지원 대학 검토 필요.',academic:'3.5/4.5',career:'4.0/4.5',community:'3.0/4.5'}}
+];
+var DB = [
+  {student_num:'30901',name:'강영찬',gender:'남',phone:'010-7443-0597',mom_phone:'010-4009-0597',dad_phone:'010-3379-0597',career_hope:'기계공학자',hope_dept:'기계공학과',special1:'',remark:'',counseling_notes:'',counseling_records:[],hope_schools:[{school:'한양대에리카',dept:'기계공학과',direction:'상향',admission_type:'학생부종합',sub_type:'일반',interview:'있음',uni_score:'2.46',stu_score:'2.8',capacity:'15명',csat_min:'없음',note:'',first_date:'2026-10-01',interview_date:'2026-11-15',final_date:'2026-12-12'}],reserve_schools:[],pin:'9943',analysis:{attendance:'무결석',behavior:'성실하고 모둠 활동에 적극적임.',autonomous:'학급회장으로 활동함.',club:'로보틱스 동아리 부장.',volunteer:'지역사회 봉사 20시간.',career_activity:'공학 캠프 참가.',subject_special:'물리학 세특 우수.',overall_eval:'우수한 역량 보유.',academic:'3.0/4.5',career:'4.0/4.5',community:'3.5/4.5'}},
+  {student_num:'30902',name:'경다은',gender:'여',phone:'010-5093-2949',mom_phone:'010-5413-2949',dad_phone:'010-2502-2949',career_hope:'의사',hope_dept:'의학과',special1:'',remark:'의대 준비 중',counseling_notes:'',counseling_records:[{date:'2026-04-10',content:'의대 지원 전략 상담. 수능 최저 기준 확인 필요.'}],hope_schools:[{school:'아주대',dept:'의학과',direction:'적정',admission_type:'학생부종합',sub_type:'일반',interview:'있음',uni_score:'1.5',stu_score:'1.5',capacity:'10명',csat_min:'3합 4',note:'',first_date:'2026-10-01',interview_date:'2026-11-20',final_date:'2026-12-13'}],reserve_schools:[{school:'단국대천안',dept:'의예과'}],pin:'4859',analysis:{attendance:'무결석',behavior:'리더십이 뛰어남.',autonomous:'부회장 역임.',club:'의생명과학 동아리.',volunteer:'병원 봉사 15시간.',career_activity:'의료 직업 체험.',subject_special:'생명과학 세특 최우수.',overall_eval:'의대 진학 역량 충분.',academic:'4.5/4.5',career:'4.5/4.5',community:'4.0/4.5'}},
+  {student_num:'30903',name:'김민혁',gender:'남',phone:'010-4604-1564',mom_phone:'010-4769-1564',dad_phone:'010-6455-1564',career_hope:'소프트웨어 개발자',hope_dept:'컴퓨터공학과',special1:'',remark:'',counseling_notes:'',counseling_records:[],hope_schools:[{school:'인하대',dept:'컴퓨터공학과',direction:'소신',admission_type:'학생부종합',sub_type:'인하미래인재',interview:'없음',uni_score:'2.8',stu_score:'3.0',capacity:'25명',csat_min:'없음',note:'',first_date:'',interview_date:'',final_date:''}],reserve_schools:[],pin:'3067',analysis:{attendance:'1일 결석',behavior:'창의적이고 문제해결능력 우수.',autonomous:'',club:'코딩 동아리.',volunteer:'',career_activity:'SW 캠프 참가.',subject_special:'정보 세특 최우수.',overall_eval:'SW 분야 역량 우수.',academic:'3.5/4.5',career:'4.0/4.5',community:'3.0/4.5'}}
+];
+var currentNum = null, currentTab = 'schools', navMode = 'all';
+var role = null, stuSession = null, stuTab = 'schools', cfResolve = null;
+var _parsedRows = [], _saveTimer = null;
+var _pollTimer = null;
+var RESERVATIONS = []; // {id, date, slot, studentNum, studentName, status, createdAt}
+var NOTIFICATIONS = []; // {id, msg, time, read, target} target: teacher or studentNum
+var _notifTimer = null;
+
+// ── 초기화 ──────────────────────────────────────
+window.onload = function() {
+  // 모바일 뷰포트 높이 보정 (iOS Safari 등)
+  function setVh() {
+    var vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', vh + 'px');
+  }
+  setVh();
+  window.addEventListener('resize', setVh);
+  window.addEventListener('orientationchange', function(){ setTimeout(setVh, 200); });
+
+  bindEvents();
+  if (typeof google !== 'undefined' && google.script) {
+    google.script.run
+      .withSuccessHandler(function(arr) {
+        DB = (arr && arr.length) ? arr : SAMPLE_DB;
+        hide('loadingScreen');
+        showPage('landing');
+      })
+      .withFailureHandler(function() {
+        DB = SAMPLE_DB;
+        hide('loadingScreen');
+        showPage('landing');
+      })
+      .load();
+    // 예약 데이터 로드
+    loadSlots();
+  loadDateOverrides();
+  loadBlockedSlots();
+  loadResvData();
+  } else {
+    DB = SAMPLE_DB;
+    loadDateOverrides();
+    loadBlockedSlots();
+    loadResvData();
+    hide('loadingScreen');
+    showPage('landing');
+  }
+};
+
+// ── 이벤트 바인딩 (onclick 대신 addEventListener) ──
+function bindEvents() {
+  on('btnTeacherLogin', 'click', function(){ showPage('teacherLogin'); });
+  on('btnStudentLogin', 'click', function(){ showPage('studentLogin'); });
+  on('btnBackFromTeacher', 'click', function(){ showPage('landing'); });
+  on('btnBackFromStudent', 'click', function(){ showPage('landing'); });
+  on('loginBtn', 'click', teacherLogin);
+  on('btnStudentDoLogin', 'click', studentLogin);
+  on('btnLogout', 'click', logout);
+  on('btnStuLogout', 'click', logout);
+  on('modalCloseBtn', 'click', closeModal);
+  on('modalOverlay', 'click', function(e){ if(e.target===el('modalOverlay')) closeModal(); });
+  on('cfNo', 'click', function(){ resolveCf(false); });
+  on('cfYes', 'click', function(){ resolveCf(true); });
+  on('sideSearch', 'input', renderSidebar);
+  on('navAll', 'click', function(){ closeSidebar(); setNav('all'); });
+  on('navDash', 'click', function(){ closeSidebar(); setNav('dash'); });
+  on('navCal', 'click', function(){ closeSidebar(); setNav('cal'); });
+  on('hamburgerBtn', 'click', toggleSidebar);
+  on('sbOverlay', 'click', toggleSidebar);
+  on('navResv', 'click', function(){ closeSidebar(); setNav('resv'); });
+  on('navManage', 'click', function(){ closeSidebar(); setNav('manage'); });
+  on('btnNotif', 'click', toggleNotifPanel);
+  on('btnStuNotif', 'click', toggleNotifPanel);
+  on('btnClearNotif', 'click', clearNotifs);
+  on('teacherPwd', 'keydown', function(e){ if(e.key==='Enter') teacherLogin(); });
+  on('stuNum', 'keydown', function(e){ if(e.key==='Enter') studentLogin(); });
+  on('stuPin', 'keydown', function(e){ if(e.key==='Enter') studentLogin(); });
+}
+
+function on(id, evt, fn) { var e=el(id); if(e) e.addEventListener(evt, fn); }
+function el(id){ return document.getElementById(id); }
+function hide(id){ var e=el(id); if(e) e.style.display='none'; }
+
+// ── 저장 ──────────────────────────────────────
+function scheduleSave() {
+  clearTimeout(_saveTimer);
+  var ind = el('savingIndicator');
+  ind.textContent = '☁️ 저장 중…'; ind.classList.add('show');
+  _saveTimer = setTimeout(function() {
+    if (typeof google !== 'undefined' && google.script) {
+      google.script.run
+        .withSuccessHandler(function(){ ind.classList.remove('show'); toast('☁️ 저장됨'); })
+        .withFailureHandler(function(){ ind.classList.remove('show'); toast('❌ 저장 실패'); })
+        .save(DB);
+    } else { ind.classList.remove('show'); toast('💾 저장됨'); }
+  }, 300); // 딜레이 줄여서 빠르게 저장
+}
+
+// ── 페이지 라우팅 ──────────────────────────────────────
+function showPage(p) {
+  ['landingPage','loginPage','studentLoginPage','teacherApp','studentApp'].forEach(function(id){
+    var e=el(id); if(e){ e.classList.add('hidden'); }
+  });
+  if (p==='landing') { el('landingPage').classList.remove('hidden'); }
+  else if (p==='teacherLogin') { el('loginPage').classList.remove('hidden'); el('teacherPwd').value=''; el('loginError').style.display='none'; setTimeout(function(){el('teacherPwd').focus();},80); }
+  else if (p==='studentLogin') { el('studentLoginPage').classList.remove('hidden'); el('stuNum').value=''; el('stuPin').value=''; el('stuLoginError').style.display='none'; setTimeout(function(){el('stuNum').focus();},80); }
+  else if (p==='teacher') { el('teacherApp').classList.remove('hidden'); renderSidebar(); showOverview(); startPolling(); }
+  else if (p==='student') { el('studentApp').classList.remove('hidden'); renderStudentApp(); startPolling(); }
+}
+
+// ── 인증 ──────────────────────────────────────
+function teacherLogin() {
+  var pwd = el('teacherPwd').value;
+  var btn = el('loginBtn'); btn.disabled=true; btn.textContent='확인 중…';
+  if (typeof google !== 'undefined' && google.script) {
+    google.script.run
+      .withSuccessHandler(function(ok) { btn.disabled=false; btn.textContent='로그인'; if(ok){role='teacher';showPage('teacher');}else{el('loginError').style.display='block';} })
+      .withFailureHandler(function() { btn.disabled=false; btn.textContent='로그인'; toast('❌ 오류'); })
+      .checkPwd(pwd);
+  } else {
+    btn.disabled=false; btn.textContent='로그인';
+    if(pwd==='1234'){role='teacher';showPage('teacher');}else{el('loginError').style.display='block';}
+  }
+}
+function studentLogin() {
+  var num=el('stuNum').value.trim(), pin=el('stuPin').value.trim();
+  var errEl=el('stuLoginError');
+  var s=DB.find(function(x){return x.student_num===num;});
+  if(!s){errEl.textContent='학번을 찾을 수 없습니다.';errEl.style.display='block';return;}
+  if(s.pin!==pin){errEl.textContent='PIN이 올바르지 않습니다.';errEl.style.display='block';return;}
+  role='student'; stuSession={student_num:num}; el('stuNameBadge').textContent=s.name; showPage('student');
+}
+function logout(){ role=null; stuSession=null; stopPolling(); showPage('landing'); }
+
+// ── 사이드바 ──────────────────────────────────────
+function setNav(m) {
+  navMode=m;
+  ['navAll','navDash','navCal','navAnalysis','navResv','navManage'].forEach(function(id){var e=el(id);if(e)e.classList.remove('active');});
+  var map={all:'navAll',dash:'navDash',cal:'navCal',resv:'navResv',manage:'navManage'};
+  if(el(map[m]))el(map[m]).classList.add('active');
+  if(m==='manage') showManage();
+  else if(m==='dash') showDashboard();
+  else if(m==='cal') showCalendar();
+  else if(m==='resv') showResvCalendar();
+  else{renderSidebar();showOverview();}
+}
+function renderSidebar() {
+  var q=(el('sideSearch')||{value:''}).value.toLowerCase();
+  var list=el('sideList'); list.innerHTML='';
+  var filtered=DB.filter(function(s){return s.name.toLowerCase().indexOf(q)>=0||s.student_num.indexOf(q)>=0||(s.hope_dept||'').toLowerCase().indexOf(q)>=0;});
+  if(!filtered.length){list.innerHTML='<div style="padding:14px;text-align:center;color:#6666aa;font-size:12px">검색 결과 없음</div>';return;}
+  filtered.forEach(function(s){
+    var div=document.createElement('div');
+    div.className='s-item'+(currentNum===s.student_num?' active':'');
+    var tag=(s.hope_dept||'').split(',')[0].trim().slice(0,7);
+    div.innerHTML='<span class="sno">'+s.student_num.slice(-2)+'</span><span class="snm">'+s.name+'</span><span class="'+(s.gender==='남'?'gm':'gf')+'">'+(s.gender==='남'?'♂':'♀')+'</span>'+(tag?'<span class="stg">'+tag+'</span>':'');
+    div.addEventListener('click', function(){ closeSidebar(); showStudent(s.student_num); });
+    list.appendChild(div);
+  });
+}
+
+// ── 개요 ──────────────────────────────────────
+function showOverview() {
+  currentNum=null; currentTab='schools'; renderSidebar();
+  setNavActive('navAll');
+  el('topbarTitle').textContent='📊 개요';
+  el('topbarActions').innerHTML='<button class="btn btn-secondary btn-sm" id="btnRefreshOverview" title="새로고침">🔄</button><button class="btn btn-secondary btn-sm" id="btnExport">📥 내보내기</button><button class="btn btn-warn btn-sm" id="btnImport">📤 엑셀 업로드</button><button class="btn btn-primary btn-sm" id="btnAddStudent">+ 학생 추가</button>';
+  on('btnRefreshOverview','click',function(){ loadResvData(); showOverview(); toast('🔄 새로고침됨'); });
+  on('btnExport','click',exportExcel);
+  on('btnImport','click',showImportExcel);
+  on('btnAddStudent','click',showAddStudent);
+  el('teacherContent').innerHTML=
+    '<div class="ov-grid">'
+    +'<div class="stat-card"><span class="stat-icon">🎓</span><div class="sn">'+DB.length+'</div><div class="sl">전체 학생</div></div>'
+    +'<div class="stat-card"><span class="stat-icon">🏫</span><div class="sn">'+DB.reduce(function(a,s){return(s.hope_schools||[]).length+a;},0)+'</div><div class="sl">총 지원 대학 수</div></div>'
+    +'<div class="stat-card"><span class="stat-icon">📋</span><div class="sn">'+DB.filter(function(s){return(s.analysis||{}).attendance;}).length+'</div><div class="sl">생기부 분석 완료</div></div>'
+    +'</div>'
+    +'<div class="card card-body"><div class="sec-title">학생 명단 및 연락처</div><div class="table-wrap" style="overflow-x:auto"><table class="roster-table"><thead><tr><th>학번</th><th>이름</th><th>성별</th><th>학생</th><th>어머니</th><th>아버지</th><th>희망학과</th><th>지원수</th><th>PIN</th><th>작업</th></tr></thead><tbody id="rosterBody"></tbody></table></div></div>'
+    +'<div style="font-size:11px;color:#9ca3af;text-align:center;margin-top:12px">💡 ↺ 버튼으로 PIN 재발급</div>';
+  renderRoster();
+}
+function renderRoster() {
+  var tbody=el('rosterBody'); if(!tbody) return; tbody.innerHTML='';
+  DB.forEach(function(s){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+s.student_num+'</td>'
+      +'<td><b style="cursor:pointer;color:#4f46e5" data-num="'+s.student_num+'">'+s.name+'</b></td>'
+      +'<td style="text-align:center">'+(s.gender||'-')+'</td>'
+      +'<td>'+(s.phone||'-')+'</td><td>'+(s.mom_phone||'-')+'</td><td>'+(s.dad_phone||'-')+'</td>'
+      +'<td>'+(s.hope_dept||'<span style="color:#d1d5db">-</span>')+'</td>'
+      +'<td style="text-align:center">'+((s.hope_schools||[]).length)+'개</td>'
+      +'<td><span class="link-code">'+s.pin+'</span></td>'
+      +'<td><button class="btn btn-secondary btn-sm" data-edit="'+s.student_num+'">편집</button> <button class="btn btn-danger btn-sm" data-del="'+s.student_num+'">삭제</button> <button class="copy-btn" data-pin="'+s.student_num+'">↺PIN</button></td>';
+    tr.querySelector('[data-num]').addEventListener('click',function(){ showStudent(this.dataset.num); });
+    tr.querySelector('[data-edit]').addEventListener('click',function(){ showStudent(this.dataset.edit); });
+    tr.querySelector('[data-del]').addEventListener('click',function(){ deleteStudent(this.dataset.del); });
+    tr.querySelector('[data-pin]').addEventListener('click',function(){ resetPin(this.dataset.pin); });
+    tbody.appendChild(tr);
+  });
+}
+function copyLink(num){ var s=DB.find(function(x){return x.student_num===num;}); navigator.clipboard.writeText('학번: '+num+' / PIN: '+s.pin).then(function(){toast('📋 복사됨!');}).catch(function(){toast('학번: '+num+' / PIN: '+s.pin);}); }
+function resetPin(num){ var s=DB.find(function(x){return x.student_num===num;}); s.pin=String(Math.floor(1000+Math.random()*9000)); scheduleSave(); toast('✅ '+s.name+' 새 PIN: '+s.pin); showOverview(); }
+
+// ── 엑셀 내보내기 ──────────────────────────────────────
+function exportExcel(){
+  var rows=[['학번','이름','성별','희망진로','희망학과','학생연락처','어머니','아버지','지원대학수','PIN']];
+  DB.forEach(function(s){ rows.push([s.student_num,s.name,s.gender||'',s.career_hope||'',s.hope_dept||'',s.phone||'',s.mom_phone||'',s.dad_phone||'',(s.hope_schools||[]).length,s.pin]); });
+  var csv='\uFEFF'+rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='진학상담_'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); toast('📥 다운로드됨');
+}
+
+// ── 엑셀 업로드 ──────────────────────────────────────
+function showImportExcel(){
+  openModalSm('📤 학생 명단 엑셀 업로드',
+    '<div style="font-size:12px;color:#6b7280;background:#f0f7ff;border:1px solid #dbeafe;border-radius:8px;padding:10px 13px;margin-bottom:12px">'
+    +'📋 형식: <b>학번 / 이름 / 성별 / 휴대폰 / 어머니 / 아버지</b> (1행: 헤더)<br>⚠️ 학번이 같으면 건너뜁니다.</div>'
+    +'<div class="form-group"><label class="form-label">엑셀 파일 (.xlsx 또는 .csv)</label>'
+    +'<input type="file" id="xlsxFile" accept=".xlsx,.xls,.csv" style="border:none;padding:0"></div>'
+    +'<button class="btn btn-primary" style="width:100%" id="btnDoImport">📤 업로드</button>'
+    +'<div id="importResult" style="margin-top:10px;font-size:13px"></div>');
+  on('btnDoImport','click',importExcel);
+}
+function importExcel(){
+  var file=el('xlsxFile').files[0]; if(!file){toast('❌ 파일 선택');return;}
+  var resultEl=el('importResult'); resultEl.innerHTML='⏳ 처리 중…';
+  if(file.name.endsWith('.csv')){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var lines=e.target.result.split('\n').filter(function(l){return l.trim();});
+      var added=0,skipped=0;
+      lines.slice(1).forEach(function(line){
+        var cols=line.split(',').map(function(c){return c.replace(/^"|"$/g,'').trim();});
+        if(!cols[0]||!cols[1])return;
+        if(DB.find(function(x){return x.student_num===cols[0];})){skipped++;return;}
+        DB.push(makeStudent(cols[0],cols[1],cols[2]||'',cols[3]||'',cols[4]||'',cols[5]||''));
+        added++;
+      });
+      scheduleSave(); renderSidebar();
+      resultEl.innerHTML='<span style="color:#059669;font-weight:700">✅ '+added+'명 추가</span>'+(skipped?' / '+skipped+'명 중복 건너뜀':'');
+    };
+    reader.readAsText(file,'utf-8'); return;
+  }
+  if(typeof XLSX==='undefined'){
+    var sc=document.createElement('script');
+    sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    sc.onload=function(){doImportXlsx(file,resultEl);};
+    sc.onerror=function(){resultEl.innerHTML='<span style="color:#dc2626">❌ 라이브러리 로드 실패. CSV로 변환 후 시도하세요.</span>';};
+    document.head.appendChild(sc);
+  } else { doImportXlsx(file,resultEl); }
+}
+function doImportXlsx(file,resultEl){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:'array'});
+      var rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+      var added=0,skipped=0;
+      rows.slice(1).forEach(function(cols){
+        var num=String(cols[0]||'').trim(),name=String(cols[1]||'').trim();
+        if(!num||!name)return;
+        if(DB.find(function(x){return x.student_num===num;})){skipped++;return;}
+        DB.push(makeStudent(num,name,String(cols[2]||'').trim(),String(cols[3]||'').trim(),String(cols[4]||'').trim(),String(cols[5]||'').trim()));
+        added++;
+      });
+      scheduleSave(); renderSidebar(); closeModal(); toast('✅ '+added+'명 추가'+(skipped?' ('+skipped+'명 중복)':''));
+      showOverview();
+    }catch(err){resultEl.innerHTML='<span style="color:#dc2626">❌ 파일 읽기 실패</span>';}
+  };
+  reader.readAsArrayBuffer(file);
+}
+function makeStudent(num,name,gender,phone,mom,dad){
+  return{student_num:num,name:name,gender:gender,phone:phone,mom_phone:mom,dad_phone:dad,career_hope:'',hope_dept:'',special1:'',remark:'',counseling_notes:'',counseling_records:[],hope_schools:[],reserve_schools:[],pin:String(Math.floor(1000+Math.random()*9000)),analysis:{attendance:'',behavior:'',autonomous:'',club:'',volunteer:'',career_activity:'',subject_special:'',overall_eval:'',academic:'',career:'',community:''}};
+}
+
+// ── 신호등 ──────────────────────────────────────
+function getTrafficLight(h){
+  var u=parseFloat(h.uni_score),t=parseFloat(h.stu_score);
+  if(isNaN(u)||isNaN(t))return{cls:'gray',icon:'⚪',label:'정보없음',text:'tl-gray'};
+  var diff=t-u;
+  if(diff<=-0.3)return{cls:'green',icon:'🟢',label:'유리',text:'tl-green'};
+  if(diff<=0.3)return{cls:'yellow',icon:'🟡',label:'비슷',text:'tl-yellow'};
+  return{cls:'red',icon:'🔴',label:'불리',text:'tl-red'};
+}
+
+// ── 대시보드 ──────────────────────────────────────
+function showDashboard(){
+  setNavActive('navDash');
+  currentNum=null; setNavActive('navDash'); el('topbarTitle').textContent='📈 반 전체 현황'; el('topbarActions').innerHTML='';
+  var allSchools=[]; DB.forEach(function(s){(s.hope_schools||[]).forEach(function(h){var e=Object.assign({},h);e.sname=s.name;e.snum=s.student_num;allSchools.push(e);});});
+  var admMap={},dirMap={},schoolCount={};
+  allSchools.forEach(function(h){
+    var ak=h.admission_type||'미정'; admMap[ak]=(admMap[ak]||0)+1;
+    var dk=h.direction||'미정'; dirMap[dk]=(dirMap[dk]||0)+1;
+    if(h.school) schoolCount[h.school]=(schoolCount[h.school]||0)+1;
+  });
+  var admTotal=Object.values(admMap).reduce(function(a,b){return a+b;},0)||1;
+  var dirTotal=Object.values(dirMap).reduce(function(a,b){return a+b;},0)||1;
+  var admColors={'학생부종합':'#4f46e5','학생부교과':'#10b981','논술 위주':'#f59e0b','실기 위주':'#ef4444','미정':'#9ca3af'};
+  var dirColors={'상향':'#f59e0b','소신':'#3b82f6','적정':'#10b981','하향':'#ef4444','미정':'#9ca3af'};
+  function makeBars(map,total,colors){
+    return Object.entries(map).sort(function(a,b){return b[1]-a[1];}).map(function(e){
+      var pct=Math.round(e[1]/total*100),color=colors[e[0]]||'#8b5cf6';
+      return'<div class="bar-row"><div class="bar-lbl">'+e[0].replace('학생부','')+'</div><div class="bar-wrap"><div class="bar-fill" style="width:'+pct+'%;background:'+color+'"><span class="bar-val">'+e[1]+'명</span></div></div><div style="font-size:11px;color:#6b7280;width:30px">'+pct+'%</div></div>';
+    }).join('');
+  }
+  var tlStats={green:0,yellow:0,red:0,gray:0};
+  allSchools.forEach(function(h){tlStats[getTrafficLight(h).cls]++;});
+  // 대학별 지원 학생 상세 정보 수집
+  var schoolDetail = {}; // {대학명: [{dept, sub_type, name}]}
+  allSchools.forEach(function(h){
+    if(!h.school) return;
+    if(!schoolDetail[h.school]) schoolDetail[h.school] = [];
+    schoolDetail[h.school].push({dept: h.dept||'학과미정', sub_type: h.sub_type||'', name: h.sname});
+  });
+  var overlapList=Object.entries(schoolCount).filter(function(e){return e[1]>1;}).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
+  el('teacherContent').innerHTML=
+    '<div class="dash-grid">'
+    +'<div class="chart-card"><h4>📚 전형 유형 분포</h4>'+makeBars(admMap,admTotal,admColors)+'</div>'
+    +'<div class="chart-card"><h4>🎯 지원 전략 분포</h4>'+makeBars(dirMap,dirTotal,dirColors)+'</div>'
+    +'<div class="chart-card"><h4>🚦 합격 가능성 현황</h4><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">'
+    +'<div style="text-align:center;background:#d1fae5;border-radius:8px;padding:10px"><div style="font-size:22px;font-weight:800;color:#065f46">'+tlStats.green+'</div><div style="font-size:11px;color:#065f46">🟢 유리</div></div>'
+    +'<div style="text-align:center;background:#fef3c7;border-radius:8px;padding:10px"><div style="font-size:22px;font-weight:800;color:#92400e">'+tlStats.yellow+'</div><div style="font-size:11px;color:#92400e">🟡 비슷</div></div>'
+    +'<div style="text-align:center;background:#fee2e2;border-radius:8px;padding:10px"><div style="font-size:22px;font-weight:800;color:#991b1b">'+tlStats.red+'</div><div style="font-size:11px;color:#991b1b">🔴 불리</div></div>'
+    +'<div style="text-align:center;background:#f3f4f6;border-radius:8px;padding:10px"><div style="font-size:22px;font-weight:800;color:#6b7280">'+tlStats.gray+'</div><div style="font-size:11px;color:#6b7280">⚪ 정보없음</div></div>'
+    +'</div></div>'
+    +'<div class="chart-card"><h4>🏫 중복 지원 대학</h4>'+(overlapList.length?overlapList.map(function(e){
+    var school=e[0];
+    var students=schoolDetail[school]||[];
+    var stuDetail=students.map(function(s){
+      return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--c-gray-100)">'
+        +'<span style="font-size:11px;color:var(--c-primary-600);font-weight:700;min-width:52px">'+s.name+'</span>'
+        +'<span style="font-size:11px;color:var(--c-gray-700)">'+s.dept+'</span>'
+        +(s.sub_type?'<span style="font-size:10px;color:var(--c-gray-400);background:var(--c-gray-100);padding:1px 6px;border-radius:6px;white-space:nowrap">'+s.sub_type+'</span>':'')
+        +'</div>';
+    }).join('');
+    return '<div class="overlap-item" style="flex-direction:column;align-items:flex-start;gap:4px;padding:10px 0">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;width:100%">'
+      +'<span style="font-weight:700;font-size:13px;color:var(--c-gray-800)">'+school+'</span>'
+      +'<span class="overlap-count">'+e[1]+'명</span>'
+      +'</div>'
+      +'<div style="width:100%">'+stuDetail+'</div>'
+      +'</div>';
+  }).join(''):'<div style="color:#d1d5db;font-size:12px;padding:8px 0">중복 없음</div>')+'</div>'
+    +'</div>';
+}
+
+// ── 입시 일정 캘린더 ──────────────────────────────────────
+function showCalendar(){
+  setNavActive('navCal');
+  currentNum=null; setNavActive('navCal'); el('topbarTitle').textContent='📅 입시 일정'; el('topbarActions').innerHTML='';
+  var today=new Date(); today.setHours(0,0,0,0);
+  var events=[];
+  DB.forEach(function(s){
+    (s.hope_schools||[]).forEach(function(h){
+      if(!h.school)return;
+      [['first_date','1차발표'],['interview_date','면접'],['final_date','발표']].forEach(function(t){
+        if(h[t[0]]) events.push({date:h[t[0]],type:t[1],school:h.school,dept:h.dept||'',student:s.name,num:s.student_num});
+      });
+    });
+  });
+  events.sort(function(a,b){return a.date.localeCompare(b.date);});
+  if(!events.length){el('teacherContent').innerHTML='<div class="card card-body" style="text-align:center;color:#d1d5db;padding:40px">📅 등록된 일정이 없습니다.<br><br>각 학생 희망대학 편집에서 날짜를 입력하세요.</div>';return;}
+  var upcoming=events.filter(function(e){return new Date(e.date)>=today;});
+  var past=events.filter(function(e){return new Date(e.date)<today;}).reverse();
+  var dayNames=['일','월','화','수','목','금','토'];
+  function renderEvt(evts,isPast){
+    return evts.map(function(e){
+      var d=new Date(e.date);
+      var dday=Math.round((d-today)/(1000*60*60*24));
+      var ddayH=dday===0?'<span class="dday-badge dday-today">D-DAY</span>':dday<0?'<span class="dday-badge dday-past">'+Math.abs(dday)+'일 전</span>':'<span class="dday-badge dday-soon">D-'+dday+'</span>';
+      return'<div class="tl-item'+(isPast?' tl-past':'')+'"><div class="tl-dot type-'+e.type+'"></div><div class="tl-card type-'+e.type+'"><div class="tl-card-hd"><span class="tl-type-badge type-'+e.type+'-bg">'+e.type+'</span><span class="tl-school">'+e.school+'</span><span style="font-size:11px;color:#6b7280">'+e.dept+'</span><span style="margin-left:auto;font-size:11px;color:#6b7280">'+e.student+'</span></div><div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:#4f46e5;font-weight:600">📅 '+e.date+' ('+dayNames[d.getDay()]+')</span>'+ddayH+'</div></div></div>';
+    }).join('');
+  }
+  el('teacherContent').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+    +'<div><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:10px">다가오는 일정 '+upcoming.length+'개</div><div class="timeline-wrap">'+(upcoming.length?renderEvt(upcoming,false):'<div style="color:#d1d5db;padding:20px;text-align:center">없음</div>')+'</div></div>'
+    +'<div><div style="font-size:12px;font-weight:700;color:#9ca3af;margin-bottom:10px">지나간 일정 '+past.length+'개</div><div class="timeline-wrap">'+(past.length?renderEvt(past,true):'<div style="color:#d1d5db;padding:20px;text-align:center">없음</div>')+'</div></div>'
+    +'</div>';
+}
+
+// ── 학생 상세 ──────────────────────────────────────
+
+function toggleSidebar(){
+  var sb=document.querySelector('.sidebar');
+  var ov=el('sbOverlay');
+  if(!sb||!ov)return;
+  var isOpen=sb.classList.toggle('open');
+  ov.classList.toggle('show',isOpen);
+}
+function closeSidebar(){
+  if(window.innerWidth>768)return;
+  var sb=document.querySelector('.sidebar');
+  var ov=el('sbOverlay');
+  if(sb)sb.classList.remove('open');
+  if(ov)ov.classList.remove('show');
+}
+
+function refreshAfterSchoolEdit(num) {
+  if(role==='student') { stuTab='schools'; renderStudentApp(); }
+  else { showStudent(num); }
+}
+
+function showStudent(num){
+  currentNum=num; navMode='all'; renderSidebar();
+  setNavActive('navAll');
+  var s=DB.find(function(x){return x.student_num===num;});
+  el('topbarTitle').innerHTML='<span style="color:#6b7280;cursor:pointer;font-size:13px" id="btnBackOverview">개요</span><span style="color:#d1d5db;margin:0 5px">/</span>'+s.name;
+  on('btnBackOverview','click',showOverview);
+  el('topbarActions').innerHTML='<button class="btn btn-secondary btn-sm" id="btnRefreshDetail" title="새로고침">🔄</button><div class="tab-bar" id="detailTabBar"></div>';
+  on('btnRefreshDetail','click',function(){ loadResvData(); showStudent(num); toast('🔄 새로고침됨'); });
+  var tabs=[['schools','희망대학'],['report','📊 분석'],['contact','연락처'],['record','생기부'],['counsel','상담기록']];
+  var tabBar=el('detailTabBar');
+  tabs.forEach(function(t){
+    var btn=document.createElement('button');
+    btn.className='tab-btn'+(currentTab===t[0]?' active':'');
+    btn.textContent=t[1];
+    btn.addEventListener('click',function(){ currentTab=t[0]; setNavActive('navAll'); showStudent(num); });
+    tabBar.appendChild(btn);
+  });
+  renderDetail(s);
+}
+function renderDetail(s){
+  var tcEl2=el('teacherContent');
+  var hdr='<div class="dh"><div class="dh-info"><div class="dh-name">'+s.name+'</div><div class="dh-meta"><span class="dh-num">'+s.student_num+'</span><span class="dh-num">'+(s.gender||'')+'</span>'+(s.career_hope?'<span class="dh-badge" style="background:#ededff;color:#4f46e5">🎯 '+s.career_hope+'</span>':'')+(s.hope_dept?'<span class="dh-badge" style="background:#f0fdf4;color:#16a34a">📚 '+s.hope_dept+'</span>':'')+'</div></div><div class="dh-actions"><button class="btn btn-secondary btn-sm" id="btnEditBasic">✏️ 기본정보</button></div></div>';
+  if(currentTab==='schools') tcEl2.innerHTML=hdr+renderSchoolsTab(s,true);
+  else if(currentTab==='report'){ tcEl2.innerHTML=hdr+renderSchoolsTab(s,true); currentTab='schools'; showAnalysisModal(s.student_num); return; }
+  else if(currentTab==='contact') tcEl2.innerHTML=hdr+renderContactTab(s,true);
+  else if(currentTab==='record') tcEl2.innerHTML=hdr+renderAnalysisTab(s,true);
+  else tcEl2.innerHTML=hdr+renderCounselTab(s,true);
+  on('btnEditBasic','click',function(){ showEditBasic(s.student_num); });
+  // 탭별 이벤트 바인딩
+  if(currentTab==='schools') bindSchoolEvents(s);
+  else if(currentTab==='contact') on('btnEditContact','click',function(){ showEditContact(s.student_num); });
+  else if(currentTab==='record') bindAnalysisEvents(s);
+  else bindCounselEvents(s);
+}
+
+// ── 희망대학 탭 ──────────────────────────────────────
+function renderSchoolsTab(s,isTeacher,isStudent){
+  var hs=s.hope_schools||[];
+  var canEdit=isTeacher||isStudent;
+  var rows=hs.map(function(h,i){
+    var dirK=h.direction&&h.direction.indexOf('상향')>=0?'상향':h.direction&&h.direction.indexOf('소신')>=0?'소신':h.direction&&h.direction.indexOf('적정')>=0?'적정':h.direction&&h.direction.indexOf('하향')>=0?'하향':'';
+    var admK=h.admission_type&&h.admission_type.indexOf('종합')>=0?'종합':h.admission_type&&h.admission_type.indexOf('교과')>=0?'교과':h.admission_type&&h.admission_type.indexOf('논술')>=0?'논술':'';
+    var u=parseFloat(h.uni_score||0),t=parseFloat(h.stu_score||0);
+    var diffH=''; if(u&&t){var d=(t-u).toFixed(2);diffH='<span class="score-diff '+(parseFloat(d)>0?'over':'under')+'">'+(parseFloat(d)>0?'+':'')+d+'</span>';}
+    var tl=getTrafficLight(h);
+    var intH=h.interview==='있음'?'<span class="int-badge" style="background:#fff7ed;color:#ea580c;border:1px solid #fed7aa">있음</span>':h.interview==='없음'?'<span class="int-badge" style="background:#f0fdf6;color:#047857;border:1px solid #a7f3d0">없음</span>':'<span style="color:var(--c-gray-400)">-</span>';
+    var dateH=''; if(h.first_date||h.interview_date||h.final_date){dateH='<div class="date-mini">'+(h.first_date?'1차:'+h.first_date.slice(5)+' ':'')+''+(h.interview_date?'면접:'+h.interview_date.slice(5)+' ':'')+''+(h.final_date?'최종:'+h.final_date.slice(5):'')+'</div>';}
+    var editBtn=canEdit?'<button class="btn btn-secondary btn-sm" data-editschool="'+i+'">✏️</button> <button class="btn btn-danger btn-sm" data-delschool="'+i+'">🗑</button>':'';
+    return'<tr><td class="school-name-cell">'+h.school+(h.note?'<span class="note-chip">⚠ '+h.note+'</span>':'')+dateH+'</td>'
+      +'<td class="dept-cell">'+(h.dept||'-')+'</td>'
+      +'<td>'+(dirK?'<span class="badge dir-'+dirK+'">'+h.direction+'</span>':h.direction||'-')+'</td>'
+      +'<td>'+(admK?'<span class="badge adm-'+admK+'">'+h.admission_type+'</span>':h.admission_type||'-')+'</td>'
+      +'<td>'+(h.sub_type||'-')+'</td><td>'+intH+'</td>'
+      +'<td>'+(h.uni_score||'-')+'</td>'
+      +'<td>'+(h.stu_score||'-')+diffH+'</td>'
+      +'<td><span class="traffic-light '+tl.text+'">'+tl.icon+' '+tl.label+'</span></td>'
+      +'<td>'+(h.capacity||'-')+'</td><td>'+(h.csat_min||'-')+'</td>'
+      +'<td>'+editBtn+'</td></tr>';
+  }).join('');
+
+  // 예비 지원 대학 - 항상 표시, 교사/학생 모두 추가 가능
+  var reserveItems=(s.reserve_schools||[]).map(function(r,i){
+    return'<div style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:7px 12px;font-size:12px;display:flex;align-items:center;gap:8px">'
+      +'<div><b>'+r.school+'</b>'+(r.dept?'<div style="font-size:11px;color:#6b7280">'+r.dept+'</div>':'')+'</div>'
+      +(canEdit?'<button class="btn btn-danger btn-sm" data-delreserve="'+i+'">🗑</button>':'')
+      +'</div>';
+  }).join('');
+  var resH='<div class="card card-body" style="margin-top:12px"><div class="sec-title">예비 지원 대학</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:8px">'+(reserveItems||'<div style="color:#d1d5db;font-size:12px">없음</div>')+'</div>'
+    +(canEdit?'<button class="btn btn-secondary btn-sm" style="margin-top:8px" id="btnAddReserve">+ 예비 추가</button>':'')
+    +'</div>';
+
+  var remH=s.remark?'<div class="card card-body" style="margin-top:12px"><div class="sec-title">📌 상담 비고</div><div class="note-box">'+esc(s.remark)+'</div>'+(isTeacher?'<button class="btn btn-secondary btn-sm" style="margin-top:8px" id="btnEditRemark">✏️ 비고 편집</button>':'')+'</div>':isTeacher?'<button class="btn btn-secondary btn-sm" style="margin-top:10px" id="btnEditRemark">📌 비고 추가</button>':'';
+
+  var addBtns='';
+  if(isTeacher) addBtns='<button class="btn btn-warn btn-sm" id="btnQuickInput">⚡ 빠른 입력</button><button class="btn btn-primary btn-sm" id="btnAddSchool">+ 대학 추가</button>';
+  else if(isStudent) addBtns='<button class="btn btn-primary btn-sm" id="btnAddSchool">+ 대학 추가</button>';
+
+  return'<div class="card"><div style="padding:20px 22px 12px"><div class="sec-title" style="margin-bottom:0">희망 대학 비교표</div></div><div class="school-tbl-wrap" style="overflow-x:auto"><table class="school-tbl"><thead><tr><th>대학</th><th>학과</th><th>유형</th><th>전형</th><th>세부유형</th><th>면접</th><th>대학내신(70% cut)</th><th>학생내신</th><th>신호등</th><th>모집인원</th><th>수능최저</th><th>관리</th></tr></thead><tbody>'+(rows||'<tr><td colspan="12" style="text-align:center;color:#d1d5db;padding:20px">등록된 희망 대학이 없습니다</td></tr>')+'</tbody></table></div>'+(addBtns?'<div style="padding:12px 22px 20px;display:flex;gap:8px">'+addBtns+'</div>':'<div style="padding-bottom:8px"></div>')+'</div>'+resH+remH;
+}
+function bindSchoolEvents(s){
+  on('btnQuickInput','click',function(){ showQuickInput(s.student_num); });
+  on('btnAddSchool','click',function(){ showAddSchool(s.student_num); });
+  on('btnAddReserve','click',function(){ showAddReserve(s.student_num); });
+  on('btnEditRemark','click',function(){ editRemark(s.student_num); });
+  el('teacherContent').querySelectorAll('[data-editschool]').forEach(function(btn){
+    btn.addEventListener('click',function(){ showEditSchool(s.student_num,parseInt(this.dataset.editschool)); });
+  });
+  el('teacherContent').querySelectorAll('[data-delschool]').forEach(function(btn){
+    btn.addEventListener('click',function(){ deleteSchool(s.student_num,parseInt(this.dataset.delschool)); });
+  });
+  el('teacherContent').querySelectorAll('[data-delreserve]').forEach(function(btn){
+    btn.addEventListener('click',function(){ deleteReserve(s.student_num,parseInt(this.dataset.delreserve)); });
+  });
+}
+
+// ── 대학 폼 ──────────────────────────────────────
+function schoolFormHtml(h){
+  h=h||{};
+  return'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px">'
+    +'<div class="form-group"><label class="form-label">대학명</label><input type="text" id="fs" value="'+esc(h.school||'')+'"></div>'
+    +'<div class="form-group"><label class="form-label">학과</label><input type="text" id="fd" value="'+esc(h.dept||'')+'"></div>'
+    +'<div class="form-group"><label class="form-label">지원유형</label><select id="fdir">'+['상향','소신','적정','하향',''].map(function(v){return'<option value="'+v+'"'+((h.direction||'')===v?' selected':'')+'>'+( v||'-')+'</option>';}).join('')+'</select></div>'
+    +'<div class="form-group"><label class="form-label">전형</label><select id="fadm">'+['학생부종합','학생부교과','논술 위주','실기 위주',''].map(function(v){return'<option value="'+v+'"'+((h.admission_type||'')===v?' selected':'')+'>'+( v||'-')+'</option>';}).join('')+'</select></div>'
+    +'<div class="form-group"><label class="form-label">세부유형</label><input type="text" id="fsub" value="'+esc(h.sub_type||'')+'"></div>'
+    +'<div class="form-group"><label class="form-label">면접 유무</label><select id="fint"><option value="">미정</option><option value="있음"'+(h.interview==='있음'?' selected':'')+'>있음</option><option value="없음"'+(h.interview==='없음'?' selected':'')+'>없음</option></select></div>'
+    +'<div class="form-group"><label class="form-label">대학내신(70% cut)</label><input type="text" id="funi" value="'+esc(h.uni_score||'')+'" placeholder="예: 2.5"></div>'
+    +'<div class="form-group"><label class="form-label">학생내신</label><input type="text" id="fstu" value="'+esc(h.stu_score||'')+'"></div>'
+    +'<div class="form-group"><label class="form-label">모집인원</label><input type="text" id="fcap" value="'+esc(h.capacity||'')+'"></div>'
+    +'<div class="form-group"><label class="form-label">수능최저</label><input type="text" id="fcsat" value="'+esc(h.csat_min||'')+'"></div>'
+    +'<div class="form-group"><label class="form-label">특이사항</label><input type="text" id="fnote" value="'+esc(h.note||'')+'"></div>'
+    +'</div>'
+    +'<div class="divider"></div><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">📅 일정</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px">'
+    +'<div class="form-group"><label class="form-label">1차 발표일</label><input type="date" id="ffirst" value="'+esc(h.first_date||'')+'"></div>'
+    +'<div class="form-group"><label class="form-label">면접일</label><input type="date" id="fintd" value="'+esc(h.interview_date||'')+'"></div>'
+    +'<div class="form-group"><label class="form-label">최종 합격 발표일</label><input type="date" id="ffinal" value="'+esc(h.final_date||'')+'"></div>'
+    +'</div>';
+}
+function collectSchool(){
+  return{school:el('fs').value.trim(),dept:el('fd').value.trim(),direction:el('fdir').value,admission_type:el('fadm').value,sub_type:el('fsub').value.trim(),interview:el('fint').value,uni_score:el('funi').value.trim(),stu_score:el('fstu').value.trim(),capacity:el('fcap').value.trim(),csat_min:el('fcsat').value.trim(),note:el('fnote').value.trim(),first_date:el('ffirst').value,interview_date:el('fintd').value,final_date:el('ffinal').value};
+}
+function showAddSchool(num){ openModalSm('희망 대학 추가',schoolFormHtml(null)+'<button class="btn btn-primary" style="width:100%;margin-top:8px" id="btnSaveNewSchool">+ 추가</button>'); on('btnSaveNewSchool','click',function(){ addSchool(num); }); }
+function addSchool(num){ var s=DB.find(function(x){return x.student_num===num;}),h=collectSchool(); if(!h.school){toast('❌ 대학명 입력');return;} if(!s.hope_schools)s.hope_schools=[]; s.hope_schools.push(h); scheduleSave();
+  if(role==='student'){ addNotif('📚 '+s.name+' 학생이 '+h.school+' '+h.dept+'을(를) 희망대학에 추가했습니다.','teacher','school:'+s.student_num); }
+  else { addNotif('📚 '+s.name+' 학생의 희망대학에 '+h.school+' '+h.dept+'이(가) 추가되었습니다.', s.student_num, 'school:'+s.student_num); }
+  closeModal(); refreshAfterSchoolEdit(num); }
+function showEditSchool(num,idx){ var s=DB.find(function(x){return x.student_num===num;}),h=s.hope_schools[idx]; openModalSm(h.school+' 편집',schoolFormHtml(h)+'<button class="btn btn-primary" style="width:100%;margin-top:8px" id="btnSaveSchool">💾 저장</button>'); on('btnSaveSchool','click',function(){ saveSchool(num,idx); }); }
+function saveSchool(num,idx){ var s=DB.find(function(x){return x.student_num===num;}); var h=collectSchool(); s.hope_schools[idx]=h; scheduleSave();
+  if(role==='student'){ addNotif('✏️ '+s.name+' 학생이 '+h.school+' 정보를 수정했습니다.','teacher','school:'+s.student_num); }
+  else { addNotif('✏️ '+s.name+' 학생의 '+h.school+' 정보가 수정되었습니다.', s.student_num); }
+  closeModal(); refreshAfterSchoolEdit(num); }
+function deleteSchool(num,idx){ confirm2('대학 삭제','이 대학을 삭제할까요?').then(function(ok){ if(!ok)return; DB.find(function(x){return x.student_num===num;}).hope_schools.splice(idx,1); scheduleSave(); toast('✅ 삭제됨'); refreshAfterSchoolEdit(num); }); }
+function showAddReserve(num){ openModalSm('예비 대학 추가','<div class="form-group"><label class="form-label">대학명</label><input type="text" id="rs"></div><div class="form-group"><label class="form-label">학과</label><input type="text" id="rd"></div><button class="btn btn-primary" style="width:100%" id="btnSaveReserve">+ 추가</button>'); on('btnSaveReserve','click',function(){ addReserve(num); }); }
+function addReserve(num){ var s=DB.find(function(x){return x.student_num===num;}),school=el('rs').value.trim(); if(!school){toast('❌ 대학명 입력');return;} if(!s.reserve_schools)s.reserve_schools=[]; s.reserve_schools.push({school:school,dept:el('rd').value.trim()}); scheduleSave(); closeModal(); showStudent(num); }
+function deleteReserve(num,idx){ DB.find(function(x){return x.student_num===num;}).reserve_schools.splice(idx,1); scheduleSave(); toast('✅ 삭제됨'); refreshAfterSchoolEdit(num); }
+function editRemark(num){ var s=DB.find(function(x){return x.student_num===num;}); openModalSm('비고 편집','<div class="form-group"><label class="form-label">비고</label><textarea id="mRemark" style="min-height:90px">'+esc(s.remark||'')+'</textarea></div><button class="btn btn-primary" style="width:100%" id="btnSaveRemark">💾 저장</button>'); on('btnSaveRemark','click',function(){ DB.find(function(x){return x.student_num===num;}).remark=el('mRemark').value.trim(); scheduleSave(); closeModal(); showStudent(num); }); }
+
+// ── 연락처 탭 ──────────────────────────────────────
+function renderContactTab(s,isTeacher){
+  var ph=function(v){return v?'<a href="tel:'+v+'">'+v+'</a>':'-';};
+  return'<div class="card card-body"><div class="sec-title">연락처 정보'+(isTeacher?'<button class="btn btn-secondary btn-sm" style="margin-left:auto" id="btnEditContact">✏️ 편집</button>':'')+'</div><div class="contact-grid"><div class="contact-item"><label>학생 휴대폰</label><div class="cv">'+ph(s.phone)+'</div></div><div class="contact-item"><label>어머니</label><div class="cv">'+ph(s.mom_phone)+'</div></div><div class="contact-item"><label>아버지</label><div class="cv">'+ph(s.dad_phone)+'</div></div></div></div>';
+}
+function showEditContact(num){ var s=DB.find(function(x){return x.student_num===num;}); openModalSm('연락처 편집','<div class="form-group"><label class="form-label">학생 휴대폰</label><input type="tel" id="cPhone" value="'+esc(s.phone||'')+'"></div><div class="form-group"><label class="form-label">어머니</label><input type="tel" id="cMom" value="'+esc(s.mom_phone||'')+'"></div><div class="form-group"><label class="form-label">아버지</label><input type="tel" id="cDad" value="'+esc(s.dad_phone||'')+'"></div><button class="btn btn-primary" style="width:100%" id="btnSaveContact">💾 저장</button>'); on('btnSaveContact','click',function(){ s.phone=el('cPhone').value.trim(); s.mom_phone=el('cMom').value.trim(); s.dad_phone=el('cDad').value.trim(); scheduleSave(); closeModal(); showStudent(num); }); }
+
+// ── 생기부 탭 ──────────────────────────────────────
+function renderAnalysisTab(s,isTeacher){
+  var a=s.analysis||{};
+  var flds=[['attendance','📅 출결'],['behavior','🌟 행동특성 및 종합의견'],['autonomous','🏫 자율활동'],['club','🎯 동아리'],['volunteer','🤝 봉사'],['career_activity','🔭 진로활동'],['subject_special','📖 과목별 세특'],['academic','📊 학업역량'],['career','🎓 진로역량'],['community','👥 공동체역량'],['overall_eval','✅ 종합평가']];
+  var items=flds.map(function(pair,fi){var k=pair[0],lbl=pair[1];return'<div class="a-item'+(fi===1||fi===6||fi===10?' full':'')+'"><label>'+lbl+(isTeacher?'<button class="btn btn-secondary btn-sm" style="padding:2px 8px" data-akey="'+k+'" data-albl="'+lbl+'">✏️</button>':'')+'</label>'+(a[k]?'<div class="at">'+esc(a[k])+'</div>':'<div class="ae">기록 없음</div>')+'</div>';}).join('');
+  return'<div class="card card-body"><div class="a-grid">'+items+'</div></div>';
+}
+function bindAnalysisEvents(s){
+  el('teacherContent').querySelectorAll('[data-akey]').forEach(function(btn){
+    btn.addEventListener('click',function(){ editAnalysis(s.student_num,this.dataset.akey,this.dataset.albl); });
+  });
+}
+function editAnalysis(num,key,label){ var s=DB.find(function(x){return x.student_num===num;}),val=(s.analysis||{})[key]||''; openModalSm(label+' 편집','<div class="form-group"><label class="form-label">'+label+'</label><textarea id="mAnalysis" style="min-height:130px">'+esc(val)+'</textarea></div><button class="btn btn-primary" style="width:100%" id="btnSaveAnalysis">💾 저장</button>'); on('btnSaveAnalysis','click',function(){ if(!s.analysis)s.analysis={}; s.analysis[key]=el('mAnalysis').value.trim(); scheduleSave(); closeModal(); showStudent(num); }); }
+
+// ── 상담기록 탭 ──────────────────────────────────────
+function renderCounselTab(s,isTeacher){
+  var records=s.counseling_records||[];
+  var recordsHtml=records.length?records.map(function(r,i){return'<div class="counsel-entry"><div class="counsel-entry-hd"><span class="counsel-date-badge">📅 '+r.date+'</span><span class="counsel-round">'+(i+1)+'회차</span></div><div class="counsel-body">'+esc(r.content)+'</div>'+(isTeacher?'<button class="counsel-del" data-delcounsel="'+i+'">✕</button>':'')+'</div>';}).join(''):'<div style="color:#d1d5db;font-style:italic;text-align:center;padding:20px">상담 기록 없음</div>';
+  var addForm=isTeacher?'<div class="card card-body" style="margin-top:12px"><div class="sec-title">새 상담 기록 추가</div><div style="display:grid;grid-template-columns:160px 1fr;gap:10px;align-items:start"><div class="form-group" style="margin:0"><label class="form-label">날짜</label><input type="date" id="counselDate" value="'+new Date().toISOString().slice(0,10)+'"></div><div class="form-group" style="margin:0"><label class="form-label">상담 내용</label><textarea id="counselContent" style="min-height:80px" placeholder="상담 내용을 입력하세요…"></textarea></div></div><button class="btn btn-primary" style="margin-top:10px" id="btnAddCounsel">➕ 기록 추가</button></div>':'';
+  return'<div class="card card-body"><div class="sec-title">💬 상담 누가 기록 <span style="font-size:11px;color:#9ca3af;font-weight:400">총 '+records.length+'회</span></div>'+recordsHtml+'</div>'+addForm;
+}
+function bindCounselEvents(s){
+  on('btnAddCounsel','click',function(){ addCounselRecord(s.student_num); });
+  el('teacherContent').querySelectorAll('[data-delcounsel]').forEach(function(btn){
+    btn.addEventListener('click',function(){ deleteCounselRecord(s.student_num,parseInt(this.dataset.delcounsel)); });
+  });
+}
+function addCounselRecord(num){ var date=el('counselDate').value,content=el('counselContent').value.trim(); if(!date||!content){toast('❌ 날짜와 내용 입력');return;} var s=DB.find(function(x){return x.student_num===num;}); if(!s.counseling_records)s.counseling_records=[]; s.counseling_records.push({date:date,content:content}); s.counseling_records.sort(function(a,b){return a.date.localeCompare(b.date);}); scheduleSave(); toast('✅ 기록 추가됨'); showStudent(num); }
+function deleteCounselRecord(num,idx){ confirm2('기록 삭제','이 상담 기록을 삭제할까요?').then(function(ok){ if(!ok)return; DB.find(function(x){return x.student_num===num;}).counseling_records.splice(idx,1); scheduleSave(); toast('✅ 삭제됨'); showStudent(num); }); }
+
+// ── 기본정보 편집 ──────────────────────────────────────
+function showEditBasic(num){
+  var s=DB.find(function(x){return x.student_num===num;});
+  openModalSm('기본 정보 편집','<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px"><div class="form-group"><label class="form-label">이름</label><input type="text" id="mName" value="'+esc(s.name)+'"></div><div class="form-group"><label class="form-label">학번</label><input type="text" id="mNum" value="'+esc(s.student_num)+'"></div><div class="form-group"><label class="form-label">성별</label><select id="mGender"><option '+(s.gender==='남'?'selected':'')+'>남</option><option '+(s.gender==='여'?'selected':'')+'>여</option></select></div><div class="form-group"><label class="form-label">희망 진로</label><input type="text" id="mCareer" value="'+esc(s.career_hope||'')+'"></div><div class="form-group"><label class="form-label">희망 학과</label><input type="text" id="mDept" value="'+esc(s.hope_dept||'')+'"></div></div><button class="btn btn-primary" style="width:100%;margin-top:8px" id="btnSaveBasic">💾 저장</button>');
+  on('btnSaveBasic','click',function(){ s.name=el('mName').value.trim()||s.name; s.student_num=el('mNum').value.trim()||s.student_num; s.gender=el('mGender').value; s.career_hope=el('mCareer').value.trim(); s.hope_dept=el('mDept').value.trim(); scheduleSave(); closeModal(); showStudent(s.student_num); });
+}
+
+// ── 빠른 입력 ──────────────────────────────────────
+function showQuickInput(num){
+  var s=DB.find(function(x){return x.student_num===num;});
+  openModal('⚡ 빠른 입력 — '+s.name,
+    '<div class="qi-example"><b>입력 예시:</b><br>한양대에리카 기계공학과 상향 학생부종합 일반 2.46 2.8 15명 없음<br><span style="color:#7c3aed;font-size:11px">※ 한 줄에 대학 하나씩</span></div>'
+    +'<div class="qi-layout"><div style="display:flex;flex-direction:column"><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">📝 입력</div><textarea class="qi-textarea" id="qiInput" placeholder="여기에 입력…"></textarea><div id="qiStatus" style="font-size:12px;color:#6b7280;margin-top:6px"></div></div>'
+    +'<div style="display:flex;flex-direction:column"><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">👀 미리보기</div><div style="overflow-x:auto;flex:1" id="qiPreview"><div style="color:#d1d5db;font-size:13px;margin-top:20px;text-align:center">입력하면 표시됩니다</div></div></div></div>'
+    +'<div style="margin-top:14px;display:flex;gap:9px;justify-content:flex-end"><button class="btn btn-secondary" id="btnQiCancel">취소</button><button class="btn btn-primary" id="btnQiAdd" disabled>✅ 추가하기</button></div>');
+  on('btnQiCancel','click',closeModal);
+  on('qiInput','input',liveParseQI);
+  on('btnQiAdd','click',function(){ confirmQuickInput(num); });
+}
+function liveParseQI(){
+  var text=el('qiInput').value;
+  var lines=text.split('\n').filter(function(l){return l.trim();});
+  _parsedRows=lines.map(parseSchoolLine).filter(Boolean);
+  var statusEl=el('qiStatus'),previewEl=el('qiPreview'),addBtn=el('btnQiAdd');
+  if(!_parsedRows.length){previewEl.innerHTML='<div style="color:#d1d5db;font-size:13px;margin-top:20px;text-align:center">입력 대기중…</div>';statusEl.innerHTML='';addBtn.disabled=true;return;}
+  var ok=_parsedRows.filter(function(r){return r.school;}).length;
+  statusEl.innerHTML='<span style="color:#059669;font-weight:700">✓ '+ok+'개 인식됨</span>';
+  addBtn.disabled=(ok===0);
+  var fields=['school','dept','direction','admission_type','sub_type','uni_score','stu_score','capacity','csat_min'];
+  var headers=['대학','학과','유형','전형','세부유형','대학내신','학생내신','모집인원','수능최저'];
+  previewEl.innerHTML='<table class="preview-tbl"><thead><tr>'+headers.map(function(h){return'<th>'+h+'</th>';}).join('')+'</tr></thead><tbody>'+_parsedRows.map(function(r){return'<tr class="'+(r.school?'row-ok':'row-warn')+'">'+fields.map(function(f){return'<td>'+esc(r[f]||'')+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table>';
+}
+function confirmQuickInput(num){ var valid=_parsedRows.filter(function(r){return r.school.trim();}); if(!valid.length){toast('❌ 인식된 대학 없음');return;} var s=DB.find(function(x){return x.student_num===num;}); if(!s.hope_schools)s.hope_schools=[]; valid.forEach(function(r){s.hope_schools.push(r);}); scheduleSave(); closeModal(); toast('✅ '+valid.length+'개 추가됨'); showStudent(num); }
+function parseSchoolLine(raw){
+  var line=raw.trim(); if(!line)return null;
+  var r={school:'',dept:'',direction:'',admission_type:'',sub_type:'',interview:'',uni_score:'',stu_score:'',capacity:'',csat_min:'',note:'',first_date:'',interview_date:'',final_date:''};
+  var dirM=line.match(/상향|소신|적정|하향/); if(dirM)r.direction=dirM[0];
+  if(/학생부종합|학종/.test(line))r.admission_type='학생부종합';
+  else if(/학생부교과/.test(line))r.admission_type='학생부교과';
+  else if(/논술/.test(line))r.admission_type='논술 위주';
+  else if(/종합/.test(line))r.admission_type='학생부종합';
+  else if(/교과/.test(line))r.admission_type='학생부교과';
+  var subKws=[['기회균형','기회균형'],['고른기회','고른기회'],['농어촌','농어촌'],['지역균형','지역균형'],['지균','지역균형'],['자기추천','자기추천'],['교과우수','교과우수'],['일반학생','일반학생'],['일반','일반']];
+  for(var i=0;i<subKws.length;i++){if(line.indexOf(subKws[i][0])>=0){r.sub_type=subKws[i][1];break;}}
+  if(/면접\s*있/i.test(line))r.interview='있음';
+  else if(/면접\s*없/i.test(line)||/비면접/.test(line))r.interview='없음';
+  var csatM=line.match(/없음|\d+합\s*\d+/); if(csatM)r.csat_min=csatM[0].replace(/\s/g,'');
+  var capM=line.match(/(\d+)\s*명/); if(capM)r.capacity=capM[1]+'명';
+  var scoreRx=/\d+\.\d+/g,scores=[],sm; while((sm=scoreRx.exec(line))!==null)scores.push(sm[0]);
+  if(scores.length>=2){r.uni_score=scores[0];r.stu_score=scores[1];}else if(scores.length===1){r.uni_score=scores[0];}
+  var deptM=line.match(/[가-힣a-zA-Z]{1,20}(?:학과|학부|전공|계열)/); if(deptM)r.dept=deptM[0];
+  var uniM=line.match(/[가-힣a-zA-Z]+(?:대학교|대학|대)(?:에리카|미래캠|천안|아산|글로컬|상록|성심)?/); if(uniM)r.school=uniM[0];
+  return r;
+}
+
+// ── 학생 추가/삭제 ──────────────────────────────────────
+function showAddStudent(){
+  openModalSm('학생 추가','<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px"><div class="form-group"><label class="form-label">학번</label><input type="text" id="aNum" placeholder="30931"></div><div class="form-group"><label class="form-label">이름</label><input type="text" id="aName"></div><div class="form-group"><label class="form-label">성별</label><select id="aGen"><option>남</option><option>여</option></select></div><div class="form-group"><label class="form-label">학생 연락처</label><input type="tel" id="aPhone"></div><div class="form-group"><label class="form-label">어머니</label><input type="tel" id="aMom"></div><div class="form-group"><label class="form-label">아버지</label><input type="tel" id="aDad"></div></div><button class="btn btn-primary" style="width:100%;margin-top:8px" id="btnDoAddStudent">+ 추가</button>');
+  on('btnDoAddStudent','click',addStudent);
+}
+function addStudent(){ var num=el('aNum').value.trim(),name=el('aName').value.trim(); if(!num||!name){toast('❌ 학번과 이름 입력');return;} if(DB.find(function(x){return x.student_num===num;})){toast('❌ 이미 존재하는 학번');return;} DB.push(makeStudent(num,name,el('aGen').value,el('aPhone').value.trim(),el('aMom').value.trim(),el('aDad').value.trim())); scheduleSave(); closeModal(); renderSidebar(); showOverview(); }
+function deleteStudent(num){ var s=DB.find(function(x){return x.student_num===num;}); confirm2(s.name+' 삭제',s.name+'의 모든 데이터가 삭제됩니다.').then(function(ok){ if(!ok)return; DB=DB.filter(function(x){return x.student_num!==num;}); scheduleSave(); renderSidebar(); showOverview(); }); }
+
+// ── 관리 ──────────────────────────────────────
+function showManage(){
+  currentNum=null; setNavActive('navManage'); el('topbarTitle').textContent='⚙️ 관리'; el('topbarActions').innerHTML='';
+  el('teacherContent').innerHTML='<div class="card card-body" style="margin-bottom:14px"><div class="sec-title">비밀번호 변경</div><div style="display:flex;gap:10px;align-items:flex-end;max-width:420px"><div style="flex:1"><label class="form-label">새 비밀번호</label><input type="password" id="np1" placeholder="새 비밀번호"></div><div style="flex:1"><label class="form-label">확인</label><input type="password" id="np2" placeholder="재입력"></div><button class="btn btn-primary" id="btnChangePwd">변경</button></div></div>';
+  on('btnChangePwd','click',changePwd);
+}
+function changePwd(){ var p1=el('np1').value,p2=el('np2').value; if(!p1){toast('❌ 비밀번호 입력');return;} if(p1!==p2){toast('❌ 불일치');return;} if(typeof google!=='undefined'&&google.script){google.script.run.withSuccessHandler(function(){toast('✅ 변경됨');}).setPwd(p1);}else{toast('✅ 변경됨');} }
+
+// ── 학생앱 ──────────────────────────────────────
+function renderStudentApp(){
+  var s=DB.find(function(x){return x.student_num===stuSession.student_num;}); if(!s){logout();return;}
+  el('stuNameBadge').textContent=s.name;
+  var scEl=el('studentContent');
+  var tabs=[['schools','🏫 희망대학'],['stu_report','📊 분석'],['analysis','생기부'],['counsel','상담기록'],['resv','📅 상담예약'],['edit','내 정보 수정']];
+  var tbar='<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">'
+    +'<div style="display:flex;background:#f3f4f6;border-radius:9px;padding:3px;overflow-x:auto;flex:1">';
+  tabs.forEach(function(t){tbar+='<button class="tab-btn'+(stuTab===t[0]?' active':'')+'" data-stutab="'+t[0]+'">'+t[1]+'</button>';});
+  tbar+='</div>';
+  if(stuTab==='schools'){
+    tbar+='<button class="btn btn-secondary btn-sm" id="btnStuRefresh" title="새로고침" style="flex-shrink:0">🔄</button>';
+  }
+  tbar+='</div>';
+  if(stuTab==='schools') scEl.innerHTML=tbar+'<div style="font-size:12px;color:#6b7280;background:#f0f7ff;border:1px solid #dbeafe;border-radius:8px;padding:9px 13px;margin-bottom:12px">💡 희망 대학을 직접 추가·수정할 수 있어요!</div>'+renderSchoolsTab(s,false,true);
+  else if(stuTab==='stu_report'){ scEl.innerHTML=tbar; showStudentAnalysisModal(s.student_num); return; }
+  else if(stuTab==='analysis') scEl.innerHTML=tbar+renderAnalysisTab(s,false);
+  else if(stuTab==='counsel') scEl.innerHTML=tbar+renderCounselTab(s,false);
+  else if(stuTab==='resv') { showStuResv(); return; }
+  else scEl.innerHTML=tbar+renderStuEdit(s);
+  scEl.querySelectorAll('[data-stutab]').forEach(function(btn){ btn.addEventListener('click',function(){ stuTab=this.dataset.stutab; renderStudentApp(); }); });
+  if(stuTab==='schools'){
+    on('btnStuRefresh','click',function(){ loadResvData(); renderStudentApp(); toast('🔄 새로고침됨'); });
+    on('btnAddSchool','click',function(){ showAddSchool(s.student_num); });
+    on('btnAddReserve','click',function(){ showAddReserve(s.student_num); });
+    content.querySelectorAll('[data-editschool]').forEach(function(btn){ btn.addEventListener('click',function(){ showEditSchool(s.student_num,parseInt(this.dataset.editschool)); }); });
+    content.querySelectorAll('[data-delschool]').forEach(function(btn){ btn.addEventListener('click',function(){ deleteSchool(s.student_num,parseInt(this.dataset.delschool)); }); });
+    content.querySelectorAll('[data-delreserve]').forEach(function(btn){ btn.addEventListener('click',function(){ deleteReserve(s.student_num,parseInt(this.dataset.delreserve)); }); });
+  }
+}
+function renderStuEdit(s){
+  var a=s.analysis||{};
+  return'<div class="card card-body"><div class="sec-title">내 정보 수정</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px"><div class="form-group"><label class="form-label">희망 진로</label><input type="text" id="stuCareer" value="'+esc(s.career_hope||'')+'"></div><div class="form-group"><label class="form-label">희망 학과</label><input type="text" id="stuDept" value="'+esc(s.hope_dept||'')+'"></div></div><div class="divider"></div><div class="sec-title">활동 내용</div><div class="form-group"><label class="form-label">자율활동</label><textarea id="stuAuto">'+esc(a.autonomous||'')+'</textarea></div><div class="form-group"><label class="form-label">동아리</label><textarea id="stuClub">'+esc(a.club||'')+'</textarea></div><div class="form-group"><label class="form-label">봉사</label><textarea id="stuVol">'+esc(a.volunteer||'')+'</textarea></div><div class="form-group"><label class="form-label">진로활동</label><textarea id="stuCareerAct">'+esc(a.career_activity||'')+'</textarea></div><button class="btn btn-primary" id="btnSaveStu">💾 저장</button></div>';
+}
+// saveStuEdit는 renderStudentApp 후 바인딩
+setTimeout(function(){on('btnSaveStu','click',function(){ var s=DB.find(function(x){return x.student_num===stuSession.student_num;}); s.career_hope=el('stuCareer').value.trim(); s.hope_dept=el('stuDept').value.trim(); if(!s.analysis)s.analysis={}; s.analysis.autonomous=el('stuAuto').value.trim(); s.analysis.club=el('stuClub').value.trim(); s.analysis.volunteer=el('stuVol').value.trim(); s.analysis.career_activity=el('stuCareerAct').value.trim(); scheduleSave(); toast('✅ 저장됨!'); stuTab='schools'; renderStudentApp(); });},100);
+
+// ── 모달 ──────────────────────────────────────
+function openModal(t,b){ el('modalTitle').textContent=t; el('modalBody').innerHTML=b; el('modalBox').style.maxWidth='960px'; el('modalOverlay').classList.remove('hidden'); }
+function openModalSm(t,b){ el('modalTitle').textContent=t; el('modalBody').innerHTML=b; el('modalBox').style.maxWidth='560px'; el('modalOverlay').classList.remove('hidden'); }
+function closeModal(){ el('modalOverlay').classList.add('hidden'); }
+function confirm2(t,m){ return new Promise(function(res){ cfResolve=res; el('cfTitle').textContent=t; el('cfMsg').textContent=m; el('cfOverlay').classList.remove('hidden'); }); }
+function resolveCf(v){ el('cfOverlay').classList.add('hidden'); if(cfResolve){cfResolve(v);cfResolve=null;} }
+function toast(msg){ var e=el('toast'); e.textContent=msg; e.classList.add('show'); setTimeout(function(){e.classList.remove('show');},2500); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// ══════════════════════════════════════════════
+// 예약 데이터 로드/저장
+// ══════════════════════════════════════════════
+function loadResvData() {
+  if(typeof google !== 'undefined' && google.script) {
+    // 예약/알림 데이터 로드
+    google.script.run
+      .withSuccessHandler(function(data){
+        if(!data) return;
+        var prevResvLen = RESERVATIONS.length;
+        var prevNotifLen = NOTIFICATIONS.length;
+        RESERVATIONS = data.resvs || [];
+        NOTIFICATIONS = data.notifs || [];
+        updateNotifBadge();
+        autoRefreshView(prevResvLen, prevNotifLen);
+      })
+      .withFailureHandler(function(){})
+      .loadResv();
+    // 학생 DB도 같이 최신화 (폴링 시)
+    google.script.run
+      .withSuccessHandler(function(arr){
+        if(arr && arr.length) {
+          DB = arr;
+          // 현재 학생 상세 보고 있으면 갱신
+          if(role==='teacher' && currentNum) {
+            renderDetail(DB.find(function(x){return x.student_num===currentNum;})||{});
+          }
+        }
+      })
+      .withFailureHandler(function(){})
+      .load();
+  } else {
+    try {
+      var rd = localStorage.getItem('resv_39_2026');
+      if(rd) RESERVATIONS = JSON.parse(rd);
+      var nd = localStorage.getItem('notif_39_2026');
+      if(nd) NOTIFICATIONS = JSON.parse(nd);
+      var od = localStorage.getItem('dateOverrides_39');
+      if(od) DATE_SLOT_OVERRIDES = JSON.parse(od);
+    } catch(e) {}
+    updateNotifBadge();
+  }
+}
+
+function autoRefreshView(prevResvLen, prevNotifLen) {
+  // 변동사항 있으면 현재 탭 자동 갱신
+  if(RESERVATIONS.length !== prevResvLen || NOTIFICATIONS.length !== prevNotifLen) {
+    if(role === 'teacher' && navMode === 'resv') renderResvCalendar();
+    if(role === 'student' && stuTab === 'resv') renderStuResvCalendar();
+  }
+}
+
+function startPolling() {
+  stopPolling();
+  _pollTimer = setInterval(function(){ loadResvData(); }, 10000); // 10초마다
+}
+function stopPolling() {
+  if(_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+}
+function saveResvData() {
+  try { localStorage.setItem('dateOverrides_39', JSON.stringify(DATE_SLOT_OVERRIDES)); } catch(e){}
+  if(typeof google !== 'undefined' && google.script) {
+    google.script.run
+      .withSuccessHandler(function(){ loadResvData(); })
+      .withFailureHandler(function(){})
+      .saveResv(RESERVATIONS, NOTIFICATIONS);
+  } else {
+    try {
+      localStorage.setItem('resv_39_2026', JSON.stringify(RESERVATIONS));
+      localStorage.setItem('notif_39_2026', JSON.stringify(NOTIFICATIONS));
+    } catch(e) {}
+    updateNotifBadge();
+  }
+}
+
+// ══════════════════════════════════════════════
+// 알림 시스템
+// ══════════════════════════════════════════════
+
+function navigateToLink(link) {
+  if(!link) return;
+  var parts = link.split(':');
+  var type = parts[0];
+  if(type==='resv') {
+    if(role==='teacher'){ setNav('resv'); }
+    else { stuTab='resv'; renderStudentApp(); }
+  } else if(type==='school') {
+    var num = parts[1];
+    if(role==='teacher'){
+      // 교사: 시트에서 최신 DB 불러온 후 이동
+      currentTab='schools';
+      reloadDBThenShow(num);
+    } else {
+      stuTab='schools'; renderStudentApp();
+    }
+  } else if(type==='overview') {
+    if(role==='teacher') showOverview();
+  }
+}
+
+function reloadDBThenShow(num) {
+  if(typeof google !== 'undefined' && google.script) {
+    google.script.run
+      .withSuccessHandler(function(arr){
+        if(arr && arr.length) DB = arr;
+        showStudent(num);
+      })
+      .withFailureHandler(function(){
+        showStudent(num);
+      })
+      .load();
+  } else {
+    showStudent(num);
+  }
+}
+
+function addNotif(msg, target, link) {
+  NOTIFICATIONS.unshift({id:Date.now(), msg:msg, time:new Date().toLocaleString('ko-KR'), read:false, target:target||'teacher', link:link||''});
+  if(NOTIFICATIONS.length > 50) NOTIFICATIONS = NOTIFICATIONS.slice(0,50);
+  saveResvData();
+  updateNotifBadge();
+}
+function updateNotifBadge() {
+  // 교사 알림
+  var teacherUnread = NOTIFICATIONS.filter(function(n){ return n.target==='teacher' && !n.read; }).length;
+  var dot = el('notifDot');
+  if(dot){ if(teacherUnread>0){dot.textContent=teacherUnread;dot.classList.remove('hidden');}else{dot.classList.add('hidden');} }
+  // 학생 알림
+  if(stuSession) {
+    var stuUnread = NOTIFICATIONS.filter(function(n){ return n.target===stuSession.student_num && !n.read; }).length;
+    var sDot = el('stuNotifDot');
+    if(sDot){ if(stuUnread>0){sDot.textContent=stuUnread;sDot.classList.remove('hidden');}else{sDot.classList.add('hidden');} }
+  }
+}
+function toggleNotifPanel() {
+  var panel = el('notifPanel');
+  if(!panel) return;
+  panel.classList.toggle('hidden');
+  if(!panel.classList.contains('hidden')) renderNotifPanel();
+}
+function renderNotifPanel() {
+  var panel = el('notifPanel');
+  if(!panel) return;
+  var target = role==='teacher' ? 'teacher' : (stuSession ? stuSession.student_num : null);
+  if(!target) return;
+  var myNotifs = NOTIFICATIONS.filter(function(n){ return n.target===target; });
+  // 읽음 처리
+  myNotifs.forEach(function(n){ n.read=true; });
+  saveResvData(); updateNotifBadge();
+  var listEl = el('notifList');
+  if(!myNotifs.length){ listEl.innerHTML='<div class="notif-empty">새 알림이 없습니다</div>'; return; }
+  listEl.innerHTML = myNotifs.map(function(n){
+    var link = n.link ? ' data-link="'+n.link+'"' : '';
+    return'<div class="notif-item'+(n.link?' notif-clickable':'')+'"'+link+' style="'+(n.link?'cursor:pointer;':'')+'"><div>'+n.msg+'</div><div class="ni-time">'+n.time+'</div></div>';
+  }).join('');
+  listEl.querySelectorAll('.notif-clickable').forEach(function(item){
+    item.addEventListener('click', function(){
+      var link = this.dataset.link;
+      el('notifPanel').classList.add('hidden');
+      navigateToLink(link);
+    });
+  });
+}
+function clearNotifs() {
+  var target = role==='teacher' ? 'teacher' : (stuSession ? stuSession.student_num : null);
+  NOTIFICATIONS = NOTIFICATIONS.filter(function(n){ return n.target!==target; });
+  saveResvData(); renderNotifPanel(); updateNotifBadge();
+}
+
+// ══════════════════════════════════════════════
+// 상담 예약 캘린더 (교사용)
+// ══════════════════════════════════════════════
+var resvCalYear, resvCalMonth;
+var HOLIDAYS = {'2026-01-01':'신정','2026-02-17':'설날','2026-02-18':'설날','2026-02-19':'설날','2026-03-01':'삼일절','2026-05-05':'어린이날','2026-05-25':'부처님오신날','2026-06-06':'현충일','2026-08-15':'광복절','2026-09-24':'추석','2026-09-25':'추석','2026-09-26':'추석','2026-10-03':'개천절','2026-10-09':'한글날','2026-12-25':'크리스마스'};
+// 상담 타임 설정 — {id, label, startTime, endTime}
+var DATE_SLOT_OVERRIDES = {}; // {'2026-05-11': [{id:1,label:'1타임',startTime:'16:00',endTime:'17:00'}]}
+var BLOCKED_SLOTS = {}; // {'2026-05-11': [1, 2]} — 마감 처리된 슬롯 ID 목록
+
+var CONSULT_SLOTS = [
+  {id:1, label:'1타임', startTime:'17:00', endTime:'18:00'},
+  {id:2, label:'2타임', startTime:'19:00', endTime:'20:00'}
+];
+var SLOT_LABELS = {}; // id → '1타임 17-18시' 형태, 아래서 동적 생성
+
+
+// 특정 날짜의 실제 슬롯 (오버라이드 있으면 적용)
+function getSlotsForDate(dateStr) {
+  return DATE_SLOT_OVERRIDES[dateStr] || CONSULT_SLOTS;
+}
+
+// 날짜별 오버라이드 저장
+function saveDateOverrides() {
+  if(typeof google !== 'undefined' && google.script) {
+    // Apps Script PropertiesService에 저장 (loadResv/saveResv에 포함)
+    // 예약 데이터에 포함해서 저장
+    saveResvData();
+  }
+  try {
+    localStorage.setItem('dateOverrides_39', JSON.stringify(DATE_SLOT_OVERRIDES));
+  } catch(e){}
+}
+
+// loadResvData에서 오버라이드도 같이 로드
+function loadDateOverrides() {
+  try {
+    var d = localStorage.getItem('dateOverrides_39');
+    if(d) DATE_SLOT_OVERRIDES = JSON.parse(d);
+  } catch(e){}
+}
+
+function saveBlockedSlots() {
+  try { localStorage.setItem('blockedSlots_date_39', JSON.stringify(BLOCKED_SLOTS)); } catch(e){}
+}
+function loadBlockedSlots() {
+  try {
+    var d = localStorage.getItem('blockedSlots_date_39');
+    if(d) BLOCKED_SLOTS = JSON.parse(d);
+  } catch(e){}
+}
+
+
+// 10분 단위 시간 select 옵션 생성
+function timeOptions(selected) {
+  var opts = '';
+  for(var h=8; h<=21; h++) {
+    for(var m=0; m<60; m+=10) {
+      if(h===21 && m>0) break; // 21:00까지만
+      var hh = (h<10?'0':'')+h;
+      var mm = (m===0?'00':String(m));
+      var val = hh+':'+mm;
+      var ampm = h<12 ? '오전 '+h : h===12 ? '오후 12' : '오후 '+(h-12);
+      var label = ampm+'시 '+mm+'분';
+      opts += '<option value="'+val+'"'+(val===selected?' selected':'')+'>'+label+'</option>';
+    }
+  }
+  // 선택값이 범위 밖이면 첫 옵션 선택되도록 처리
+  return opts;
+}
+function buildSlotLabels() {
+  SLOT_LABELS = {};
+  CONSULT_SLOTS.forEach(function(s){
+    SLOT_LABELS[s.id] = s.label+' '+s.startTime+'-'+s.endTime;
+  });
+}
+buildSlotLabels();
+
+function saveSlots() {
+  try { localStorage.setItem('consultSlots_39', JSON.stringify(CONSULT_SLOTS)); } catch(e){}
+  if(typeof google !== 'undefined' && google.script) {
+    google.script.run.withFailureHandler(function(){}).saveConsultSlots(CONSULT_SLOTS);
+  }
+}
+function loadSlots() {
+  try {
+    var d = localStorage.getItem('consultSlots_39');
+    if(d) { CONSULT_SLOTS = JSON.parse(d); buildSlotLabels(); }
+  } catch(e){}
+  if(typeof google !== 'undefined' && google.script) {
+    google.script.run
+      .withSuccessHandler(function(slots){ if(slots&&slots.length){ CONSULT_SLOTS=slots; buildSlotLabels(); } })
+      .withFailureHandler(function(){})
+      .loadConsultSlots();
+  }
+}
+
+function showResvCalendar() {
+  currentNum=null; navMode='resv'; setNavActive('navResv');
+  var now = new Date();
+  if(!resvCalYear) resvCalYear = now.getFullYear();
+  if(!resvCalMonth && resvCalMonth !== 0) resvCalMonth = now.getMonth();
+  el('topbarTitle').textContent='📅 상담 예약 관리';
+  el('topbarActions').innerHTML='<button class="btn btn-secondary btn-sm" id="btnRefreshResv" title="새로고침">🔄</button><button class="btn btn-warn btn-sm" id="btnManageSlots">⏱ 타임 관리</button><button class="btn btn-secondary btn-sm" id="btnResvList">📋 전체 예약 목록</button>';
+  on('btnRefreshResv','click',function(){ loadResvData(); renderResvCalendar(); toast('🔄 새로고침됨'); });
+  on('btnManageSlots','click', showManageSlots);
+  on('btnResvList','click', showAllResvList);
+  var now = new Date();
+  resvCalYear = now.getFullYear();
+  resvCalMonth = now.getMonth();
+  renderResvCalendar();
+}
+
+function renderResvCalendar() {
+  var year=resvCalYear, month=resvCalMonth;
+  var monthNames=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  var tcEl = el('teacherContent');
+  if(!tcEl) return;
+  tcEl.innerHTML = '<div class="cal-wrap">'
+    +'<div class="cal-header"><h3>'+year+'년 '+monthNames[month]+'</h3><div class="cal-nav"><button id="btnCalPrev">‹</button><button id="btnCalNext">›</button></div></div>'
+    +'<div class="cal-grid" id="calGrid"></div></div>'
+    +'<div id="resvLegend" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;font-size:11px">'
+    +'<span style="background:#f0fdf4;color:#059669;padding:2px 8px;border-radius:6px;font-weight:700">✓ 예약가능</span>'
+    +'<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:6px;font-weight:700">신청대기</span>'
+    +'<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:6px;font-weight:700">확정</span>'
+    +'<span style="background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:6px;font-weight:700">예약마감</span>'
+    +'</div>';
+  on('btnCalPrev','click',function(){ resvCalMonth--; if(resvCalMonth<0){resvCalMonth=11;resvCalYear--;} renderResvCalendar(); });
+  on('btnCalNext','click',function(){ resvCalMonth++; if(resvCalMonth>11){resvCalMonth=0;resvCalYear++;} renderResvCalendar(); });
+  renderCalGrid(year, month, 'calGrid', true);
+}
+
+function renderCalGrid(year, month, gridId, isTeacher) {
+  var grid = el(gridId);
+  var dows=['일','월','화','수','목','금','토'];
+  var today = new Date(); today.setHours(0,0,0,0);
+  grid.innerHTML = dows.map(function(d){ return '<div class="cal-dow">'+d+'</div>'; }).join('');
+  var firstDay = new Date(year, month, 1).getDay();
+  var lastDate = new Date(year, month+1, 0).getDate();
+  var prevLast = new Date(year, month, 0).getDate();
+  // 이전달 빈칸
+  for(var i=0;i<firstDay;i++){
+    var d = prevLast - firstDay + 1 + i;
+    grid.innerHTML += '<div class="cal-day other-month"><div class="cal-day-num">'+d+'</div></div>';
+  }
+  for(var d=1;d<=lastDate;d++){
+    var dateObj = new Date(year, month, d);
+    var dateStr = year+'-'+pad(month+1)+'-'+pad(d);
+    var dow = dateObj.getDay();
+    var isPast = dateObj < today;
+    var isWeekend = dow===0||dow===6;
+    var holiday = HOLIDAYS[dateStr];
+    var cls = 'cal-day';
+    if(dateObj.getTime()===today.getTime()) cls+=' today';
+    if(isPast) cls+=' past';
+    if(holiday||isWeekend) cls+=' holiday';
+    // 슬롯 상태
+
+    var isNoConsult = isWeekend || holiday;
+    var dayHtml = '<div class="'+cls+'" data-date="'+dateStr+'">'
+      +'<div class="cal-day-num'+(dow===0?' sun':dow===6?' sat':'')+'">'+d+(holiday?'<div style="font-size:9px;color:#ef4444">'+holiday+'</div>':'')+'</div>';
+    if(isNoConsult){
+      dayHtml += '<div class="no-consult-label">상담 없음</div>';
+    } else if(!isPast) {
+      var daySlots = getSlotsForDate(dateStr);
+      daySlots.forEach(function(slot){
+        var status = getSlotStatus(dateStr, slot.id, isTeacher);
+        dayHtml += renderSlotBtn(dateStr, slot.id, status, isTeacher);
+      });
+      // 날짜 오버라이드가 있으면 표시
+      if(DATE_SLOT_OVERRIDES[dateStr] && isTeacher) {
+        dayHtml += '<div style="font-size:9px;color:var(--c-primary-500);font-weight:700;margin-top:3px">✏️ 개별설정</div>';
+      }
+    }
+    dayHtml += '</div>';
+    grid.innerHTML += dayHtml;
+  }
+  // 다음달 빈칸
+  var total = firstDay + lastDate;
+  var remaining = total%7===0?0:7-(total%7);
+  for(var i=1;i<=remaining;i++){
+    grid.innerHTML += '<div class="cal-day other-month"><div class="cal-day-num">'+i+'</div></div>';
+  }
+  // 슬롯 버튼 이벤트
+  grid.querySelectorAll('[data-slot]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var date=this.dataset.date, slot=parseInt(this.dataset.slot);
+      if(isTeacher) showTeacherSlotModal(date, slot);
+      else showStudentBookModal(date, slot);
+    });
+  });
+}
+
+
+function renderSlotBtn(dateStr, slot, status, isTeacher) {
+  var daySlots = getSlotsForDate(dateStr);
+  var slotObj = daySlots.find(function(s){return s.id===slot;}) || CONSULT_SLOTS.find(function(s){return s.id===slot;}) || {label:slot+'타임',startTime:'',endTime:''};
+  var slotShort = slotObj.label;
+  var timeLabel = slotObj.startTime+(slotObj.endTime?'-'+slotObj.endTime:'');
+  // 학생용: 본인 예약이면 mine
+  if(!isTeacher && stuSession) {
+    var resv = getSlotResv(dateStr, slot);
+    if(resv && resv.studentNum===stuSession.student_num) {
+      var sLabel = resv.status==='confirmed'?'확정':'대기중';
+      return '<button class="slot-btn slot-mine" data-slot="'+slot+'" data-date="'+dateStr+'">'+slotShort+' '+sLabel+'</button>';
+    }
+    if(status!=='available') return '<button class="slot-btn slot-full" disabled>'+slotShort+' 마감</button>';
+    return '<button class="slot-btn slot-available" data-slot="'+slot+'" data-date="'+dateStr+'">'+slotShort+' '+timeLabel+'</button>';
+  }
+  // 교사용
+  var clsMap={available:'slot-available',pending:'slot-pending',confirmed:'slot-confirmed',teacher:'slot-confirmed',full:'slot-full'};
+  var lblMap={available:slotShort+' '+timeLabel,pending:slotShort+' 신청대기',confirmed:slotShort+' 확정',teacher:slotShort+' 확정',full:slotShort+' 마감🚫'};
+  // 교사는 마감 슬롯도 클릭 가능 (해제를 위해)
+  var disabled = (!isTeacher && status==='full') ? ' disabled' : '';
+  return '<button class="slot-btn '+clsMap[status]+'"'+disabled+' data-slot="'+slot+'" data-date="'+dateStr+'">'+lblMap[status]+'</button>';
+}
+function getStatusLabel(s){ return s==='pending'?'신청대기':s==='confirmed'?'확정':s==='teacher'?'확정':''; }
+function pad(n){ return n<10?'0'+n:String(n); }
+
+// ── 교사 슬롯 모달
+function showTeacherSlotModal(dateStr, slot) {
+  // 마감 슬롯이면 해제 모달
+  if(BLOCKED_SLOTS[dateStr] && BLOCKED_SLOTS[dateStr].indexOf(slot) !== -1) {
+    var slotObj = getSlotsForDate(dateStr).find(function(s){return s.id===slot;}) || {label:slot+'타임',startTime:'',endTime:''};
+    var html = '<div style="margin-bottom:14px"><b>'+dateStr+'</b> &nbsp;'+slotObj.label+' '+slotObj.startTime+(slotObj.endTime?'-'+slotObj.endTime:'')+'</div>'
+      +'<div style="background:#fee2e2;border:1px solid #fecdd3;border-radius:8px;padding:12px;font-size:13px;color:#dc2626;font-weight:600;margin-bottom:14px">🚫 현재 예약 마감 상태입니다</div>'
+      +'<button class="btn btn-primary" style="width:100%" id="btnUnblockSlot">✅ 마감 해제</button>';
+    openModalSm(dateStr+' 슬롯 마감 해제', html);
+    on('btnUnblockSlot','click',function(){
+      BLOCKED_SLOTS[dateStr] = BLOCKED_SLOTS[dateStr].filter(function(id){ return id !== slot; });
+      if(BLOCKED_SLOTS[dateStr].length === 0) delete BLOCKED_SLOTS[dateStr];
+      saveBlockedSlots();
+      toast('✅ 마감이 해제됐어요');
+      closeModal();
+      renderResvCalendar();
+    });
+    return;
+  }
+  var resv = getSlotResv(dateStr, slot);
+  var daySlotObjs = getSlotsForDate(dateStr);
+  var slotObjForLabel = daySlotObjs.find(function(s){return s.id===slot;}) || CONSULT_SLOTS.find(function(s){return s.id===slot;}) || {label:slot+'타임',startTime:'',endTime:''};
+  var slotLabel = slotObjForLabel.label+' '+slotObjForLabel.startTime+(slotObjForLabel.endTime?'-'+slotObjForLabel.endTime:'');
+  var html = '<div style="margin-bottom:14px"><b>'+dateStr+'</b> &nbsp;'+slotLabel+'</div>';
+  if(!resv) {
+    // 날짜별 타임 정보
+    var daySlots = getSlotsForDate(dateStr);
+    var thisSlot = daySlots.find(function(s){return s.id===slot;}) || CONSULT_SLOTS.find(function(s){return s.id===slot;}) || {label:slot+'타임',startTime:'',endTime:''};
+    var hasOverride = !!DATE_SLOT_OVERRIDES[dateStr];
+
+    html += '<div class="form-group"><label class="form-label">학생 선택</label><select id="teacherBookStu">'
+      + DB.map(function(s){ return'<option value="'+s.student_num+'">'+s.name+' ('+s.student_num+')</option>'; }).join('')
+      +'</select></div>'
+      +'<div class="form-group"><label class="form-label">메모</label><input type="text" id="teacherBookMemo" placeholder="상담 내용 메모 (선택)"></div>'
+      +'<hr style="border:none;border-top:1px solid var(--c-gray-100);margin:14px 0">'
+      +'<div style="background:var(--c-gray-50);border:1px solid var(--c-border);border-radius:var(--radius-md);padding:12px">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--c-gray-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px">⏱ 이 날짜의 타임 설정'+(hasOverride?'  <span style="color:var(--c-primary-500)">✏️ 개별 설정됨</span>':'')+'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+      +'<input type="text" id="slotLabelEdit" value="'+thisSlot.label+'" style="width:80px" placeholder="타임명">'
+      +'<select id="slotStartEdit" style="flex:1;min-width:0">'+timeOptions(thisSlot.startTime)+'</select>'
+      +'<span style="color:var(--c-gray-400);flex-shrink:0">~</span>'
+      +'<select id="slotEndEdit" style="flex:1;min-width:0">'+timeOptions(thisSlot.endTime)+'</select>'
+      +'<button class="btn btn-secondary btn-sm" id="btnApplySlotEdit">적용</button>'
+      +(hasOverride?'<button class="btn btn-danger btn-sm" id="btnResetSlotEdit">초기화</button>':'')
+      +'</div>'
+      +'<div style="font-size:11px;color:var(--c-gray-400);margin-top:8px">💡 이 날짜에만 적용되는 개별 타임이에요</div>'
+      +'</div>'
+      +'<div style="margin-top:14px;display:flex;gap:8px">'
+      +'<button class="btn btn-primary" style="flex:1" id="btnTeacherBook">📅 예약 확정</button>'
+      +'<button class="btn btn-warn" id="btnCloseSlotEmpty">🚫 마감</button>'
+      +'</div>'
+      +'<button class="btn btn-secondary" style="width:100%;margin-top:8px" id="btnAddDateSlot">➕ 이 날짜에 타임 추가</button>';
+    openModalSm(dateStr+' 상담 예약 잡기', html);
+    on('btnTeacherBook','click',function(){ teacherBook(dateStr,slot); });
+    on('btnCloseSlotEmpty','click',function(){ closeSlot(dateStr, slot, null); });
+    on('btnAddDateSlot','click',function(){ closeModal(); showAddDateSlot(dateStr); });
+    on('btnApplySlotEdit','click',function(){
+      var lbl = (el('slotLabelEdit')||{value:''}).value.trim();
+      var st  = (el('slotStartEdit')||{value:''}).value;
+      var en  = (el('slotEndEdit')||{value:''}).value;
+      if(!lbl||!st||!en||st>=en){ toast('❌ 타임명과 시간을 올바르게 입력해주세요'); return; }
+      // 이 날짜의 오버라이드 설정
+      var baseSlots = JSON.parse(JSON.stringify(DATE_SLOT_OVERRIDES[dateStr] || CONSULT_SLOTS));
+      var target = baseSlots.find(function(s){return s.id===slot;});
+      if(target){ target.label=lbl; target.startTime=st; target.endTime=en; }
+      else { baseSlots.push({id:slot,label:lbl,startTime:st,endTime:en}); }
+      DATE_SLOT_OVERRIDES[dateStr] = baseSlots;
+      buildSlotLabels();
+      saveDateOverrides();
+      toast('✅ '+dateStr+' 타임이 개별 설정됐어요');
+      closeModal();
+      renderResvCalendar();
+    });
+    if(hasOverride){
+      on('btnResetSlotEdit','click',function(){
+        delete DATE_SLOT_OVERRIDES[dateStr];
+        saveDateOverrides();
+        toast('✅ 기본 타임으로 초기화됐어요');
+        closeModal();
+        renderResvCalendar();
+      });
+    }
+  } else {
+    // 예약 있음 - 확정 or 취소
+    var s = DB.find(function(x){ return x.student_num===resv.studentNum; });
+    html += '<div class="resv-item">'
+      +'<div><div class="resv-name">'+(s?s.name:resv.studentNum)+'</div>'
+      +'<div class="resv-slot">'+slotLabel+'</div>'
+      +'<div style="margin-top:4px"><span class="resv-status '+(resv.status==='pending'?'status-pending':'status-confirmed')+'">'+getStatusLabel(resv.status)+'</span></div>'
+      +(resv.memo?'<div style="font-size:12px;color:#6b7280;margin-top:4px">📝 '+resv.memo+'</div>':'')
+      +'</div></div>';
+    if(resv.status==='pending') {
+      html += '<div style="display:flex;gap:8px;margin-top:12px">'
+        +'<button class="btn btn-primary" style="flex:1" id="btnConfirmResv">✅ 예약 확정</button>'
+        +'<button class="btn btn-danger" style="flex:1" id="btnCancelResv">❌ 예약 취소</button>'
+        +'</div>'
+        +'<button class="btn btn-warn" style="width:100%;margin-top:8px" id="btnCloseSlot">🚫 예약 마감</button>';
+    } else {
+      html += '<div style="display:flex;gap:8px;margin-top:12px">'
+        +'<button class="btn btn-danger" style="flex:1" id="btnCancelResv">❌ 예약 취소</button>'
+        +'<button class="btn btn-warn" style="flex:1" id="btnCloseSlot">🚫 예약 마감</button>'
+        +'</div>';
+    }
+    openModalSm(dateStr+' 상담 예약', html);
+    on('btnConfirmResv','click',function(){ confirmResv(resv.id); });
+    on('btnCancelResv','click',function(){ cancelResv(resv.id); });
+    on('btnCloseSlot','click',function(){ closeSlot(dateStr, slot, resv.id); });
+  }
+}
+
+function teacherBook(dateStr, slot) {
+  var stuNum = el('teacherBookStu').value;
+  var s = DB.find(function(x){ return x.student_num===stuNum; });
+  var memo = el('teacherBookMemo').value.trim();
+  var resv = {id:Date.now(), date:dateStr, slot:slot, studentNum:stuNum, studentName:s?s.name:'', status:'confirmed', memo:memo, createdAt:new Date().toISOString()};
+  RESERVATIONS.push(resv);
+  saveResvData();
+  addNotif('📅 '+dateStr+' '+slot+'타임 상담이 확정되었습니다.', stuNum, 'resv');
+  toast('✅ 예약 확정됨');
+  closeModal();
+  renderResvCalendar();
+}
+
+function confirmResv(id) {
+  var resv = RESERVATIONS.find(function(r){ return r.id===id; });
+  if(!resv) return;
+  resv.status = 'confirmed';
+  saveResvData();
+  addNotif('✅ '+resv.date+' '+resv.slot+'타임 상담이 확정되었습니다!', resv.studentNum, 'resv');
+  toast('✅ 예약 확정됨');
+  closeModal();
+  renderResvCalendar();
+}
+
+function cancelResv(id) {
+  var resv = RESERVATIONS.find(function(r){ return r.id===id; });
+  if(!resv) return;
+  var stuNum = resv.studentNum;
+  var date = resv.date, slot = resv.slot;
+  RESERVATIONS = RESERVATIONS.filter(function(r){ return r.id!==id; });
+  saveResvData();
+  addNotif('❌ '+date+' '+slot+'타임 상담 예약이 취소되었습니다.', stuNum, 'resv');
+  toast('✅ 취소됨');
+  closeModal();
+  renderResvCalendar();
+}
+
+// ── 슬롯 마감 처리
+function closeSlot(dateStr, slotId, resvId) {
+  // 기존 예약이 있으면 먼저 취소 알림 발송
+  if(resvId) {
+    var resv = RESERVATIONS.find(function(r){ return r.id===resvId; });
+    if(resv) {
+      RESERVATIONS = RESERVATIONS.filter(function(r){ return r.id!==resvId; });
+      addNotif('🚫 '+dateStr+' '+slotId+'타임 상담 예약이 마감 처리되었습니다.', resv.studentNum, 'resv');
+    }
+  }
+  // BLOCKED_SLOTS에 등록
+  if(!BLOCKED_SLOTS[dateStr]) BLOCKED_SLOTS[dateStr] = [];
+  if(BLOCKED_SLOTS[dateStr].indexOf(slotId) === -1) BLOCKED_SLOTS[dateStr].push(slotId);
+  saveBlockedSlots();
+  toast('🚫 해당 타임이 마감 처리됐어요');
+  closeModal();
+  renderResvCalendar();
+}
+
+// ── 날짜별 타임 추가
+function showAddDateSlot(dateStr) {
+  var newId = Date.now(); // 고유 ID
+  var html = '<div style="margin-bottom:10px;font-size:13px;color:var(--c-gray-600)"><b>'+dateStr+'</b>에만 적용되는 새 타임을 추가합니다.</div>'
+    +'<div class="form-group"><label class="form-label">타임 이름</label><input type="text" id="newSlotLabel" placeholder="예: 3타임" value="'+(getSlotsForDate(dateStr).length+1)+'타임"></div>'
+    +'<div class="form-group"><label class="form-label">시작 시간</label><select id="newSlotStart">'+timeOptions('14:00')+'</select></div>'
+    +'<div class="form-group"><label class="form-label">종료 시간</label><select id="newSlotEnd">'+timeOptions('15:00')+'</select></div>'
+    +'<button class="btn btn-primary" style="width:100%;margin-top:4px" id="btnConfirmAddDateSlot">➕ 타임 추가</button>';
+  openModalSm(dateStr+' 타임 추가', html);
+  on('btnConfirmAddDateSlot','click',function(){
+    var lbl = el('newSlotLabel').value.trim();
+    var st  = el('newSlotStart').value;
+    var en  = el('newSlotEnd').value;
+    if(!lbl){ toast('❌ 타임 이름을 입력해주세요'); return; }
+    if(st >= en){ toast('❌ 종료 시간은 시작 시간보다 늦어야 해요'); return; }
+    var baseSlots = JSON.parse(JSON.stringify(DATE_SLOT_OVERRIDES[dateStr] || CONSULT_SLOTS));
+    var newSlot = {id: newId, label: lbl, startTime: st, endTime: en};
+    baseSlots.push(newSlot);
+    DATE_SLOT_OVERRIDES[dateStr] = baseSlots;
+    saveDateOverrides();
+    toast('✅ '+dateStr+'에 '+lbl+' 타임이 추가됐어요');
+    closeModal();
+    renderResvCalendar();
+  });
+}
+
+// ── 학생 예약 모달
+function showStudentBookModal(dateStr, slot) {
+  var resv = getSlotResv(dateStr, slot);
+  var slotLabel = SLOT_LABELS[slot];
+  if(resv && resv.studentNum===stuSession.student_num) {
+    // 내 예약 - 취소 가능
+    var html='<div style="margin-bottom:12px"><b>'+dateStr+'</b> &nbsp;'+slotLabel+'</div>'
+      +'<div class="resv-item"><div><div class="resv-name">내 예약</div><div class="resv-slot">'+slotLabel+'</div>'
+      +'<div style="margin-top:4px"><span class="resv-status '+(resv.status==='pending'?'status-pending':'status-confirmed')+'">'+getStatusLabel(resv.status)+'</span></div></div></div>'
+      +'<button class="btn btn-danger" style="width:100%;margin-top:12px" id="btnStuCancelResv">❌ 예약 취소</button>';
+    openModalSm('내 상담 예약', html);
+    on('btnStuCancelResv','click',function(){ cancelResv(resv.id); closeModal(); renderStuResvCalendar(); });
+    return;
+  }
+  if(resv) { toast('❌ 이미 예약된 시간입니다'); return; }
+  var s = DB.find(function(x){ return x.student_num===stuSession.student_num; });
+  var html='<div style="margin-bottom:12px"><b>'+dateStr+'</b> &nbsp;'+slotLabel+'</div>'
+    +'<div style="background:#f0f7ff;border:1px solid #dbeafe;border-radius:8px;padding:10px;margin-bottom:12px;font-size:13px">'
+    +'🎓 <b>'+s.name+'</b> 학생의 상담을 예약합니다.</div>'
+    +'<div class="form-group"><label class="form-label">상담 내용 (선택)</label><input type="text" id="stuBookMemo" placeholder="상담하고 싶은 내용을 간략히 입력하세요"></div>'
+    +'<button class="btn btn-primary" style="width:100%" id="btnStuDoBook">📅 예약 신청</button>';
+  openModalSm('상담 예약 신청', html);
+  on('btnStuDoBook','click',function(){ studentBook(dateStr, slot); });
+}
+
+function studentBook(dateStr, slot) {
+  var s = DB.find(function(x){ return x.student_num===stuSession.student_num; });
+  var memo = el('stuBookMemo').value.trim();
+  // 이미 같은 날 예약했는지 확인
+  var existing = RESERVATIONS.find(function(r){ return r.studentNum===stuSession.student_num && r.date===dateStr; });
+  if(existing){ toast('❌ 같은 날 이미 예약이 있습니다'); return; }
+  var resv = {id:Date.now(), date:dateStr, slot:slot, studentNum:stuSession.student_num, studentName:s.name, status:'pending', memo:memo, createdAt:new Date().toISOString()};
+  RESERVATIONS.push(resv);
+  saveResvData();
+  addNotif('📬 '+s.name+' 학생이 '+dateStr+' '+slot+'타임 상담을 신청했습니다.', 'teacher', 'resv');
+  toast('✅ 예약 신청 완료! 선생님 확정 후 알림이 옵니다.');
+  closeModal();
+  renderStuResvCalendar();
+}
+
+// ── 학생용 예약 캘린더
+function showStuResv() {
+  var now = new Date();
+  resvCalYear = now.getFullYear();
+  resvCalMonth = now.getMonth();
+  renderStuResvCalendar();
+}
+
+function renderStuResvCalendar() {
+  var s = DB.find(function(x){ return x.student_num===stuSession.student_num; });
+  var scEl = el('studentContent');
+  if(!scEl) return;
+  var content = scEl;
+  var monthNames=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  var myResvs = RESERVATIONS.filter(function(r){ return r.studentNum===stuSession.student_num; });
+  var tbar = renderStuTabBar();
+  var myResvHtml = '';
+  if(myResvs.length) {
+    myResvHtml = '<div class="card card-body" style="margin-bottom:14px"><div class="sec-title">📋 내 예약 현황</div>'
+      +myResvs.sort(function(a,b){return a.date.localeCompare(b.date);}).map(function(r){
+        return'<div class="resv-item"><div class="resv-date">'+r.date+'</div>'
+          +'<div class="resv-slot">'+SLOT_LABELS[r.slot]+'</div>'
+          +'<span class="resv-status '+(r.status==='pending'?'status-pending':'status-confirmed')+'">'+getStatusLabel(r.status)+'</span>'
+          +(r.memo?'<div style="font-size:11px;color:#6b7280">'+r.memo+'</div>':'')
+          +'</div>';
+      }).join('')
+      +'</div>';
+  }
+  content.innerHTML = tbar + myResvHtml
+    +'<div class="cal-wrap">'
+    +'<div class="cal-header"><h3>'+resvCalYear+'년 '+monthNames[resvCalMonth]+'</h3><div style="display:flex;align-items:center;gap:6px"><button class="btn btn-secondary btn-sm" id="btnStuResvRefresh" title="새로고침">🔄</button><div class="cal-nav"><button id="btnStuCalPrev">‹</button><button id="btnStuCalNext">›</button></div></div></div>'
+    +'<div class="cal-grid" id="stuCalGrid"></div></div>'
+    +'<div style="margin-top:10px;font-size:11px;color:#9ca3af;text-align:center">💡 예약 가능한 날짜를 클릭해서 상담을 신청하세요</div>';
+  content.querySelectorAll('[data-stutab]').forEach(function(btn){ btn.addEventListener('click',function(){ stuTab=this.dataset.stutab; renderStudentApp(); }); });
+  on('btnStuRefresh','click',function(){ loadResvData(); renderStudentApp(); toast('🔄 새로고침됨'); });
+  on('btnStuResvRefresh','click',function(){ loadResvData(); renderStuResvCalendar(); toast('🔄 새로고침됨'); });
+  on('btnStuCalPrev','click',function(){ resvCalMonth--; if(resvCalMonth<0){resvCalMonth=11;resvCalYear--;} renderStuResvCalendar(); });
+  on('btnStuCalNext','click',function(){ resvCalMonth++; if(resvCalMonth>11){resvCalMonth=0;resvCalYear++;} renderStuResvCalendar(); });
+  renderCalGrid(resvCalYear, resvCalMonth, 'stuCalGrid', false);
+}
+
+function renderStuTabBar() {
+  var tabs=[['schools','🏫 희망대학'],['stu_report','📊 분석'],['analysis','생기부'],['counsel','상담기록'],['resv','📅 상담예약'],['edit','내 정보 수정']];
+  var html='<div style="display:flex;align-items:center;gap:6px;margin-bottom:16px"><div style="display:flex;background:#f3f4f6;border-radius:9px;padding:3px;overflow-x:auto;flex:1">';
+  tabs.forEach(function(t){ html+='<button class="tab-btn'+(stuTab===t[0]?' active':'')+'" data-stutab="'+t[0]+'">'+t[1]+'</button>'; });
+  // 희망대학 탭일 때만 새로고침 버튼 표시
+  if(stuTab==='schools') {
+    html+='</div><button class="btn btn-secondary btn-sm" id="btnStuRefresh" title="새로고침">🔄</button></div>';
+  } else {
+    html+='</div></div>';
+  }
+  return html;
+}
+
+// ── 전체 예약 목록 (교사용)
+function showAllResvList() {
+  var sorted = RESERVATIONS.slice().sort(function(a,b){ return a.date.localeCompare(b.date)||a.slot-b.slot; });
+  var html = '<div style="margin-bottom:12px;display:flex;gap:8px">'
+    +'<button class="btn btn-secondary btn-sm" id="btnFilterAll" style="'+(true?'border-color:#4f46e5;color:#4f46e5':'')+'">전체</button>'
+    +'<button class="btn btn-secondary btn-sm" id="btnFilterPending">신청대기</button>'
+    +'<button class="btn btn-secondary btn-sm" id="btnFilterConfirmed">확정</button>'
+    +'</div>';
+  if(!sorted.length){ html+='<div style="text-align:center;color:#d1d5db;padding:30px">예약이 없습니다</div>'; }
+  else {
+    html += sorted.map(function(r){
+      var s = DB.find(function(x){ return x.student_num===r.studentNum; });
+      return'<div class="resv-item">'
+        +'<div class="resv-date">'+r.date+'<div class="resv-slot">'+SLOT_LABELS[r.slot]+'</div></div>'
+        +'<div class="resv-name">'+(s?s.name:r.studentNum)+'</div>'
+        +(r.memo?'<div style="font-size:12px;color:#6b7280;flex:1">'+r.memo+'</div>':'<div style="flex:1"></div>')
+        +'<span class="resv-status '+(r.status==='pending'?'status-pending':'status-confirmed')+'">'+getStatusLabel(r.status)+'</span>'
+        +(r.status==='pending'?'<button class="btn btn-primary btn-sm" data-confirmid="'+r.id+'">확정</button>':'')
+        +'<button class="btn btn-danger btn-sm" data-cancelid="'+r.id+'">취소</button>'
+        +'</div>';
+    }).join('');
+  }
+  openModal('📋 전체 예약 목록', html);
+  el('modalBox').querySelectorAll('[data-confirmid]').forEach(function(btn){
+    btn.addEventListener('click',function(){ confirmResv(parseInt(this.dataset.confirmid)); closeModal(); showAllResvList(); });
+  });
+  el('modalBox').querySelectorAll('[data-cancelid]').forEach(function(btn){
+    btn.addEventListener('click',function(){ cancelResv(parseInt(this.dataset.cancelid)); closeModal(); if(navMode==='resv') renderResvCalendar(); });
+  });
+}
+</script>
+</body>
+</html>
