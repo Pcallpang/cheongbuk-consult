@@ -74,8 +74,16 @@ body {
   transition: background .3s;
 }
 .cell.empty { background: #0a1120; border-color: #1a2535; }
-.cell.new { animation: pop .4s ease; }
-@keyframes pop { 0%{transform:scale(.92);opacity:.7} 100%{transform:scale(1);opacity:1} }
+.cell.sel {
+  border-color: #4ade80;
+  box-shadow: 0 0 0 3px rgba(74,222,128,0.35);
+  background: #1a3a2a;
+  transform: scale(1.04);
+}
+.cell.swapped { animation: flash .5s ease; }
+@keyframes flash { 0%,100%{background:#1e293b} 40%{background:#1a3a2a} }
+.cell:not(.empty) { cursor: pointer; }
+.cell:not(.empty):hover { border-color: #94a3b8; }
 .board {
   background: #14532d;
   border: 1.5px solid #166534;
@@ -127,22 +135,102 @@ body {
 // ─────────────────────────────────────────────────
 var KEY = 'sns_seating_result';
 var currentTs = null;
+var currentData = null;
 var _sb = null;
+var selected = null; // {r, c}
+
+// ─────────────────────────────────────────────────
+//  클릭 투 클릭 자리 교환 (DOM 직접 수정, 전체 재렌더 없음)
+// ─────────────────────────────────────────────────
+function handleCellClick(r, c) {
+  if (!currentData) return;
+  var clickedCell = document.querySelector('.cell[data-r="'+r+'"][data-c="'+c+'"]');
+  if (!clickedCell || clickedCell.classList.contains('empty')) return;
+
+  if (!selected) {
+    // 첫 번째 클릭 — 선택
+    selected = {r: r, c: c};
+    clickedCell.classList.add('sel');
+    updateHint();
+    return;
+  }
+  if (selected.r === r && selected.c === c) {
+    // 같은 셀 — 선택 해제
+    clickedCell.classList.remove('sel');
+    selected = null;
+    updateHint();
+    return;
+  }
+
+  // 두 번째 클릭 — 두 셀만 텍스트 교환 (DOM 전체 재렌더 없음)
+  var selCell = document.querySelector('.cell[data-r="'+selected.r+'"][data-c="'+selected.c+'"]');
+  if (!selCell) { selected = null; updateHint(); return; }
+
+  var tmpTxt = clickedCell.textContent;
+  clickedCell.textContent = selCell.textContent;
+  selCell.textContent = tmpTxt;
+
+  // 빈 자리와 교환하는 경우 empty 클래스 이동
+  var selWasEmpty = selCell.classList.contains('empty');
+  var clickedWasEmpty = clickedCell.classList.contains('empty');
+  if (selWasEmpty)    { selCell.classList.remove('empty');    clickedCell.classList.add('empty'); }
+  if (clickedWasEmpty){ clickedCell.classList.remove('empty'); selCell.classList.add('empty'); }
+
+  // 선택 상태 해제 + 교환 플래시
+  selCell.classList.remove('sel');
+  clickedCell.classList.remove('sel');
+  selCell.classList.add('swapped');
+  clickedCell.classList.add('swapped');
+  setTimeout(function(){ selCell.classList.remove('swapped'); clickedCell.classList.remove('swapped'); }, 550);
+
+  // 데이터 모델 업데이트
+  var newGrid = currentData.grid.map(function(row){ return row.slice(); });
+  var tmpVal = newGrid[selected.r][selected.c];
+  newGrid[selected.r][selected.c] = newGrid[r][c];
+  newGrid[r][c] = tmpVal;
+  var newTs = new Date().toISOString();
+  currentData = Object.assign({}, currentData, {grid: newGrid, updatedAt: newTs});
+  currentTs = newTs; // 폴링에서 불필요한 전체 재렌더 방지
+
+  selected = null;
+  updateHint();
+  saveSwap(currentData);
+}
+
+function updateHint() {
+  var el = document.getElementById('statusTxt');
+  if (!el) return;
+  el.textContent = selected ? '✅ 이동할 자리를 클릭하세요' : '실시간 연결됨';
+  el.style.color = selected ? '#4ade80' : '';
+}
+
+function saveSwap(data) {
+  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {}
+  if (_sb) {
+    _sb.from('app_settings')
+      .upsert([{key:'seating_result', value:data, updated_at:data.updatedAt}], {onConflict:'key'})
+      .then(function(){}).catch(function(e){ console.error('saveSwap', e); });
+  }
+}
 
 // ─────────────────────────────────────────────────
 //  렌더링
 // ─────────────────────────────────────────────────
 function render(data) {
   if (!data || !data.grid) return;
-  if (currentTs && data.updatedAt <= currentTs) return; // 오래된 데이터 무시
+  if (currentTs && data.updatedAt <= currentTs) return;
   currentTs = data.updatedAt;
+  currentData = data;
 
   var gr = data.grid, rows = data.rows, cols = data.cols;
   var main = document.getElementById('main');
 
   // 헤더 상태
   document.getElementById('dot').classList.remove('off');
-  document.getElementById('statusTxt').textContent = '실시간 연결됨';
+  if (!selected) {
+    document.getElementById('statusTxt').textContent = '실시간 연결됨';
+    document.getElementById('statusTxt').style.color = '';
+  }
   if (data.updatedAt) {
     var d = new Date(data.updatedAt);
     document.getElementById('timeTxt').textContent =
@@ -155,12 +243,20 @@ function render(data) {
   gridEl.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
 
   for (var di = 0; di < rows; di++) {
-    var r = rows - 1 - di; // 칠판이 아래
+    var r = rows - 1 - di;
     for (var c = 0; c < cols; c++) {
       var name = (gr[r] && gr[r][c]) || null;
       var cell = document.createElement('div');
-      cell.className = 'cell' + (name ? ' new' : ' empty');
+      var isSel = selected && selected.r === r && selected.c === c;
+      cell.className = 'cell' + (name ? (isSel ? ' sel' : '') : ' empty');
+      cell.dataset.r = r;
+      cell.dataset.c = c;
       cell.textContent = name || '';
+      if (name) {
+        (function(row, col) {
+          cell.addEventListener('click', function(){ handleCellClick(row, col); });
+        })(r, c);
+      }
       gridEl.appendChild(cell);
     }
   }

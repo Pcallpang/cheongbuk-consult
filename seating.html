@@ -919,6 +919,19 @@ function App() {
     if(step===2&&names.length>0) setAnalysis(analyze(names,survey));
   },[step]);
 
+  // seating-display.html에서 클릭 투 클릭으로 변경 시 교사 관리에도 반영
+  useEffect(()=>{
+    const handler = (e) => {
+      if(e.key !== 'sns_seating_result') return;
+      try {
+        const data = JSON.parse(e.newValue);
+        if(data && data.grid) setSeating(data.grid);
+      } catch(err) {}
+    };
+    window.addEventListener('storage', handler);
+    return ()=>window.removeEventListener('storage', handler);
+  },[]);
+
   // seating-display.html의 자리 배치 생성 버튼 수신
   const _genRef = useRef({});
   useEffect(()=>{ _genRef.current = {names,survey,rows,cols,goalOrder}; });
