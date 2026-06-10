@@ -3409,7 +3409,7 @@ function renderStudentApp(){
   else if(stuTab==='analysis') scEl.innerHTML=tbar+renderAnalysisTab(s,false);
   else if(stuTab==='counsel') scEl.innerHTML=tbar+renderCounselTab(s,false);
   else if(stuTab==='resv') { showStuResv(); return; }
-  else if(stuTab==='seat_survey') scEl.innerHTML=tbar+renderSeatView(s)+renderSeatSurvey(s);
+  else if(stuTab==='seat_survey') scEl.innerHTML=tbar+renderSeatSurvey(s);
   else scEl.innerHTML=tbar+renderStuEdit(s);
   scEl.querySelectorAll('[data-stutab]').forEach(function(btn){ btn.addEventListener('click',function(){ stuTab=this.dataset.stutab; renderStudentApp(); }); });
   if(stuTab==='schools'){
