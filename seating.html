@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *  { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
   body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: #F5F8F5; }
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-thumb { background: #C8D4C8; border-radius: 4px; }
@@ -768,13 +769,13 @@ function SaveStep({names, rows, cols, seating, analysis}) {
     setSaving(true);
     try {
       const canvas = await window.html2canvas(gridRef.current, {
-        backgroundColor:'#ffffff',
-        scale: 2,
-        useCORS: true,
-        logging: false,
+        backgroundColor:'#ffffff', scale:2, useCORS:true, logging:false,
       });
+      const today = new Date();
+      const mm = String(today.getMonth()+1).padStart(2,'0');
+      const dd = String(today.getDate()).padStart(2,'0');
       const link = document.createElement('a');
-      link.download = '자리배치.png';
+      link.download = `자리배치(${mm}${dd}).png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch(e) { console.error(e); }
@@ -794,8 +795,16 @@ function SaveStep({names, rows, cols, seating, analysis}) {
           {Array.from({length:rows}).flatMap((_,di)=>{
             const r=rows-1-di;
             return Array.from({length:cols}).map((_,c)=>{
-              const name=seating[r]?.[c],s=name?(analysis?.statusMap[name]||'normal'):null,m=s?SM[s]:null;
-              return <div key={`${r}-${c}`} style={{background:name?m.bg:'#F8FAF8',border:`0.5px solid ${name?m.bd:C.bd}`,borderRadius:'8px',padding:'7px 4px',textAlign:'center',fontSize:'12px',fontWeight:name?'600':'400',color:name?m.tx:C.t3,minHeight:'40px',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Noto Sans KR, sans-serif'}}>{name||'─'}</div>;
+              const name=seating[r]?.[c];
+              return <div key={`${r}-${c}`} style={{
+                background:name?'#F0F4F0':'#F8FAF8',
+                border:`0.5px solid ${name?'#B8CDB8':C.bd}`,
+                borderRadius:'8px',padding:'7px 4px',textAlign:'center',
+                fontSize:'12px',fontWeight:name?'600':'400',
+                color:name?'#1A2B1E':C.t3,
+                minHeight:'40px',display:'flex',alignItems:'center',justifyContent:'center',
+                fontFamily:'Noto Sans KR, sans-serif'
+              }}>{name||'─'}</div>;
             });
           })}
         </div>
@@ -944,21 +953,23 @@ function App() {
   ];
 
   return (
-    <div style={{minHeight:'100vh',background:C.surf,fontFamily:"'Noto Sans KR',sans-serif",display:'flex',flexDirection:'column'}}>
+    <div style={{height:'100vh',background:C.surf,fontFamily:"'Noto Sans KR',sans-serif",display:'flex',flexDirection:'column',overflow:'hidden'}}>
       <div style={{background:C.p,padding:'10px 20px',display:'flex',alignItems:'center',gap:'10px',flexShrink:0}}>
         <span style={{fontSize:'15px'}}>🧭</span>
         <span style={{fontSize:'14px',fontWeight:'700',color:'white'}}>학급 사회관계망 자리배치</span>
         {names.length>0&&<span style={{fontSize:'11px',color:'rgba(255,255,255,0.6)',marginLeft:'auto'}}>{names.length}명 · {rows}×{cols}</span>}
       </div>
       <Progress step={step}/>
-      <div style={{flex:1,maxWidth:'680px',width:'100%',margin:'0 auto',padding:'20px 20px 90px'}}>
-        <div style={{marginBottom:'18px'}}>
-          <h2 style={{margin:'0 0 6px',fontSize:'18px',fontWeight:'700',color:C.t1}}>{SL[step]}</h2>
-          <div style={{height:'3px',width:'36px',background:C.p,borderRadius:'2px'}}/>
+      <div style={{flex:1,overflowY:'auto',minHeight:0}}>
+        <div style={{maxWidth:'680px',width:'100%',margin:'0 auto',padding:'20px 20px 16px'}}>
+          <div style={{marginBottom:'18px'}}>
+            <h2 style={{margin:'0 0 6px',fontSize:'18px',fontWeight:'700',color:C.t1}}>{SL[step]}</h2>
+            <div style={{height:'3px',width:'36px',background:C.p,borderRadius:'2px'}}/>
+          </div>
+          {steps[step]}
         </div>
-        {steps[step]}
       </div>
-      <div style={{position:'sticky',bottom:0,background:'white',borderTop:`0.5px solid ${C.bd}`,padding:'10px 20px',display:'flex',justifyContent:'space-between',flexShrink:0}}>
+      <div style={{background:'white',borderTop:`0.5px solid ${C.bd}`,padding:'10px 20px',display:'flex',justifyContent:'space-between',flexShrink:0}}>
         <button onClick={()=>setStep(s=>Math.max(s-1,0))} disabled={step===0}
           style={{padding:'8px 18px',borderRadius:'10px',fontSize:'13px',fontWeight:'500',cursor:step===0?'not-allowed':'pointer',opacity:step===0?0.5:1,background:'white',color:C.t1,border:`0.5px solid ${C.bd}`,fontFamily:'inherit'}}>← 이전</button>
         {step<6
