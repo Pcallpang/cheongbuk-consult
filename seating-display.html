@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🪑 자리 배치 공개 화면</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; width: 100%; overflow: hidden; background: #0f172a; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 헤더 */
+.hdr {
+  background: #1e293b;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  border-bottom: 1px solid #334155;
+}
+.hdr-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.hdr-right { display: flex; align-items: center; gap: 14px; }
+.status-dot {
+  width: 10px; height: 10px; border-radius: 50%; background: #22c55e;
+  animation: blink 2s ease-in-out infinite;
+}
+.status-dot.off { background: #475569; animation: none; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+.hdr-info { font-size: 12px; opacity: .65; }
+.fs-btn {
+  padding: 5px 14px; border-radius: 8px; border: 1px solid #475569;
+  background: transparent; color: #cbd5e1; cursor: pointer;
+  font-size: 13px; font-family: inherit; transition: background .15s;
+}
+.fs-btn:hover { background: #334155; }
+.gen-btn {
+  padding: 6px 16px; border-radius: 8px; border: 1px solid #4ade80;
+  background: #14532d; color: #4ade80; cursor: pointer;
+  font-size: 13px; font-family: inherit; font-weight: 700;
+  transition: background .15s;
+}
+.gen-btn:hover { background: #166534; }
+
+/* 메인 그리드 영역 */
+.main { flex: 1; padding: 14px 16px 12px; display: flex; flex-direction: column; min-height: 0; }
+.grid-wrap { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.grid {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+  min-height: 0;
+}
+.cell {
+  background: #1e293b;
+  border: 1.5px solid #334155;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #f1f5f9;
+  text-align: center;
+  padding: 4px;
+  overflow: hidden;
+  font-size: clamp(12px, 3vw, 30px);
+  transition: background .3s;
+}
+.cell.empty { background: #0a1120; border-color: #1a2535; }
+.cell.new { animation: pop .4s ease; }
+@keyframes pop { 0%{transform:scale(.92);opacity:.7} 100%{transform:scale(1);opacity:1} }
+.board {
+  background: #14532d;
+  border: 1.5px solid #166534;
+  border-radius: 10px;
+  padding: 8px 12px;
+  text-align: center;
+  color: #4ade80;
+  font-weight: 700;
+  font-size: clamp(13px, 1.8vw, 20px);
+  flex-shrink: 0;
+}
+
+/* 대기 화면 */
+.waiting {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 20px;
+}
+.waiting-icon { font-size: clamp(48px, 8vw, 80px); opacity: .4; }
+.waiting-text { font-size: clamp(16px, 2.5vw, 26px); font-weight: 700; opacity: .4; }
+.waiting-sub  { font-size: clamp(13px, 1.8vw, 18px); opacity: .25; }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="hdr">
+  <div class="hdr-title">🪑 자리 배치</div>
+  <div class="hdr-right">
+    <div class="status-dot off" id="dot"></div>
+    <span class="hdr-info" id="statusTxt">연결 대기 중</span>
+    <span class="hdr-info" id="timeTxt"></span>
+    <button class="gen-btn" onclick="requestGenerate()">🎲 자리 배치 생성</button>
+    <button class="fs-btn" onclick="toggleFS()">⛶ 전체화면</button>
+  </div>
+</div>
+
+<!-- 메인 -->
+<div class="main" id="main">
+  <div class="waiting">
+    <div class="waiting-icon">🪑</div>
+    <div class="waiting-text">교사가 자리 배치를 확정하면 여기에 표시됩니다</div>
+    <div class="waiting-sub">seating.html 6단계에서 「🎲 자리 배치 생성」 후 「🖥 전체화면 공개」를 클릭하세요</div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────
+//  설정
+// ─────────────────────────────────────────────────
+var KEY = 'sns_seating_result';
+var currentTs = null;
+var _sb = null;
+
+// ─────────────────────────────────────────────────
+//  렌더링
+// ─────────────────────────────────────────────────
+function render(data) {
+  if (!data || !data.grid) return;
+  if (currentTs && data.updatedAt <= currentTs) return; // 오래된 데이터 무시
+  currentTs = data.updatedAt;
+
+  var gr = data.grid, rows = data.rows, cols = data.cols;
+  var main = document.getElementById('main');
+
+  // 헤더 상태
+  document.getElementById('dot').classList.remove('off');
+  document.getElementById('statusTxt').textContent = '실시간 연결됨';
+  if (data.updatedAt) {
+    var d = new Date(data.updatedAt);
+    document.getElementById('timeTxt').textContent =
+      '최종 업데이트 ' + d.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  }
+
+  // 그리드 생성
+  var gridEl = document.createElement('div');
+  gridEl.className = 'grid';
+  gridEl.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+
+  for (var di = 0; di < rows; di++) {
+    var r = rows - 1 - di; // 칠판이 아래
+    for (var c = 0; c < cols; c++) {
+      var name = (gr[r] && gr[r][c]) || null;
+      var cell = document.createElement('div');
+      cell.className = 'cell' + (name ? ' new' : ' empty');
+      cell.textContent = name || '';
+      gridEl.appendChild(cell);
+    }
+  }
+
+  var board = document.createElement('div');
+  board.className = 'board';
+  board.textContent = '📋 칠판';
+
+  var wrap = document.createElement('div');
+  wrap.className = 'grid-wrap';
+  wrap.appendChild(gridEl);
+  wrap.appendChild(board);
+
+  main.innerHTML = '';
+  main.appendChild(wrap);
+}
+
+// ─────────────────────────────────────────────────
+//  로컬스토리지 (같은 기기·같은 브라우저)
+// ─────────────────────────────────────────────────
+function loadLocal() {
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) render(JSON.parse(raw));
+  } catch(e) {}
+}
+
+window.addEventListener('storage', function(e) {
+  if (e.key === KEY && e.newValue) {
+    try { render(JSON.parse(e.newValue)); } catch(err) {}
+  }
+});
+
+// ─────────────────────────────────────────────────
+//  Supabase Realtime (다른 기기·다른 브라우저)
+// ─────────────────────────────────────────────────
+function initSB() {
+  try {
+    var cfg = JSON.parse(localStorage.getItem('sns_supabase_config') || 'null');
+    if (!cfg || !cfg.url || cfg.url === 'YOUR_SUPABASE_URL') return;
+
+    _sb = supabase.createClient(cfg.url, cfg.key);
+
+    // 초기 데이터 로드
+    _sb.from('app_settings').select('value').eq('key','seating_result').single()
+      .then(function(r) { if (r.data && r.data.value) render(r.data.value); });
+
+    // 실시간 구독
+    _sb.channel('seat-display')
+      .on('postgres_changes', {event:'*', schema:'public', table:'app_settings'}, function(p) {
+        if (p.new && p.new.key === 'seating_result') render(p.new.value);
+      })
+      .subscribe(function(status) {
+        if (status === 'SUBSCRIBED') {
+          document.getElementById('statusTxt').textContent = '실시간 연결됨';
+          document.getElementById('dot').classList.remove('off');
+        }
+      });
+  } catch(e) { console.warn('Supabase 연결 실패:', e); }
+}
+
+// ─────────────────────────────────────────────────
+//  전체화면
+// ─────────────────────────────────────────────────
+function toggleFS() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(function() {});
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+document.addEventListener('fullscreenchange', function() {
+  var btn = document.querySelector('.fs-btn');
+  btn.textContent = document.fullscreenElement ? '✕ 전체화면 종료' : '⛶ 전체화면';
+});
+
+// ─────────────────────────────────────────────────
+//  자리 배치 생성 요청 → seating.html이 수신해서 처리 후 결과 반영
+// ─────────────────────────────────────────────────
+function requestGenerate() {
+  var btn = document.querySelector('.gen-btn');
+  btn.textContent = '⏳ 생성 중...';
+  btn.disabled = true;
+  localStorage.setItem('sns_generate_request', Date.now().toString());
+  setTimeout(function() {
+    btn.textContent = '🎲 자리 배치 생성';
+    btn.disabled = false;
+  }, 2500);
+}
+
+// ─────────────────────────────────────────────────
+//  실행
+// ─────────────────────────────────────────────────
+loadLocal();
+initSB();
+setInterval(loadLocal, 2000); // 2초 폴링 (백업)
+</script>
+</body>
+</html>

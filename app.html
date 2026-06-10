@@ -1269,7 +1269,7 @@ input[type=text]:hover,input[type=password]:hover,input[type=tel]:hover,input[ty
   .lc h2{font-size:18px}
 }
 
-/* ══ Apps Script 모바일 강제 적용 ══ */
+/* ══ 모바일 텍스트 렌더링 ══ */
 html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
@@ -1946,7 +1946,7 @@ var _analysisChart = null;
 
 
 function setNavActive(key) {
-  ['navAll','navDash','navCal','navAnalysis','navResv','navManage'].forEach(function(id){
+  ['navAll','navDash','navCal','navAnalysis','navResv','navManage','navSeat'].forEach(function(id){
     var e=el(id); if(e) e.classList.remove('active');
   });
   if(el(key)) el(key).classList.add('active');
@@ -2224,7 +2224,7 @@ function bindAnalysisTabs() {
       <button class="nb active" id="navAll">전체</button>
       <button class="nb" id="navDash">현황</button>
       <button class="nb" id="navCal">일정</button>
-      <button class="nb" id="navResv">예약</button><button class="nb" id="navManage">관리</button>
+      <button class="nb" id="navResv">예약</button><button class="nb" id="navManage">관리</button><button class="nb" id="navSeat">🧭 자리배치</button>
     </div>
     <div class="s-list" id="sideList"></div>
     <div class="sb-foot"><button id="btnLogout">🚪 로그아웃</button></div>
@@ -2291,6 +2291,7 @@ var _parsedRows = [], _saveTimer = null, _isSaving = false, _savingNum = null;
 var _pollTimer = null;
 var RESERVATIONS = []; // {id, date, slot, studentNum, studentName, status, createdAt}
 var NOTIFICATIONS = []; // {id, msg, time, read, target} target: teacher or studentNum
+var SEATING_RESULT = null; // {grid, names, rows, cols, updatedAt}
 var _notifTimer = null;
 
 // ── 초기화 ──────────────────────────────────────
@@ -2308,12 +2309,14 @@ function initSupabase() {
     _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
       realtime: {
         params: { eventsPerSecond: 40 },
-        heartbeatIntervalMs: 15000,   // 15초 (기본 30초) — 연결 유지
-        reconnectAfterMs: function(tries) { return Math.min(tries * 500, 3000); } // 재연결 빠르게
+        heartbeatIntervalMs: 15000,
+        reconnectAfterMs: function(tries) { return Math.min(tries * 500, 3000); }
       },
       db: { schema: 'public' },
       global: { fetch: fetch.bind(globalThis) }
     });
+    // seating-display.html이 다른 기기에서도 Supabase에 연결할 수 있도록 설정 저장
+    try { localStorage.setItem('sns_supabase_config', JSON.stringify({url:SUPABASE_URL, key:SUPABASE_KEY})); } catch(e) {}
     return _sb;
   } catch(e) { console.error('Supabase init fail', e); return null; }
 }
@@ -2385,7 +2388,7 @@ async function sbLoadResv() {
   var [r1, r2, r3] = await Promise.all([
     _sb.from('reservations').select('*').order('created_at'),
     _sb.from('notifications').select('*').order('created_at', {ascending: false}),
-    _sb.from('app_settings').select('*').in('key', ['date_overrides','blocked_slots','consult_slots'])
+    _sb.from('app_settings').select('*').in('key', ['date_overrides','blocked_slots','consult_slots','seating_result'])
   ]);
   if (r1.error) throw r1.error;
   var resvs = r1.data.map(function(r) {
@@ -2404,7 +2407,8 @@ async function sbLoadResv() {
     notifs: notifs,
     dateOverrides: settings['date_overrides'] || {},
     blockedSlots:  settings['blocked_slots']  || {},
-    consultSlots:  settings['consult_slots']  || null
+    consultSlots:  settings['consult_slots']  || null,
+    seatingResult: settings['seating_result'] || null
   };
 }
 
@@ -2505,6 +2509,10 @@ function startRealtime() {
       if (key === 'date_overrides') DATE_SLOT_OVERRIDES = val || {};
       if (key === 'blocked_slots')  BLOCKED_SLOTS = val || {};
       if (key === 'consult_slots')  { CONSULT_SLOTS = val || CONSULT_SLOTS; buildSlotLabels(); }
+      if (key === 'seating_result') {
+        SEATING_RESULT = val || null;
+        if (role === 'student' && stuTab === 'seat_survey') renderStudentApp();
+      }
       if (role === 'teacher' && navMode === 'resv') renderResvCalendar();
       if (role === 'student' && stuTab === 'resv') renderStuResvCalendar();
     })
@@ -2587,6 +2595,14 @@ window.onload = async function() {
   window.addEventListener('orientationchange', function(){ setTimeout(setVh, 200); });
   bindEvents();
 
+  // 자리배치 앱(iframe)으로부터 배치 결과 수신
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'seating_update') return;
+    SEATING_RESULT = e.data;
+    saveSeatingResult(SEATING_RESULT);
+    if (role === 'student' && stuTab === 'seat_survey') renderStudentApp();
+  });
+
   // Supabase 초기화
   initSupabase();
 
@@ -2601,6 +2617,7 @@ window.onload = async function() {
       DATE_SLOT_OVERRIDES = resvData.dateOverrides || {};
       BLOCKED_SLOTS = resvData.blockedSlots || {};
       if (resvData.consultSlots) { CONSULT_SLOTS = resvData.consultSlots; buildSlotLabels(); }
+      if (resvData.seatingResult) SEATING_RESULT = resvData.seatingResult;
       hide('loadingScreen');
       showPage('landing');
     } catch(e) {
@@ -2610,25 +2627,6 @@ window.onload = async function() {
       showPage('landing');
       toast('⚠️ DB 연결 실패 — 설정을 확인해주세요');
     }
-  } else if (typeof google !== 'undefined' && google.script) {
-    // ── GAS 모드 (하위 호환) ──
-    google.script.run
-      .withSuccessHandler(function(arr) {
-        DB = (arr && arr.length) ? arr : SAMPLE_DB;
-        hide('loadingScreen');
-        showPage('landing');
-      })
-      .withFailureHandler(function() {
-        try {
-          var savedDB = localStorage.getItem('db_39_local');
-          DB = (savedDB && JSON.parse(savedDB).length) ? JSON.parse(savedDB) : SAMPLE_DB;
-        } catch(e2) { DB = SAMPLE_DB; }
-        hide('loadingScreen');
-        showPage('landing');
-        toast('⚠️ 서버 연결 실패');
-      })
-      .load();
-    loadSlots(); loadDateOverrides(); loadBlockedSlots(); loadResvData();
   } else {
     // ── 로컬 모드 (개발/테스트) ──
     try {
@@ -2663,6 +2661,7 @@ function bindEvents() {
   on('sbOverlay', 'click', toggleSidebar);
   on('navResv', 'click', function(){ closeSidebar(); setNav('resv'); });
   on('navManage', 'click', function(){ closeSidebar(); setNav('manage'); });
+  on('navSeat', 'click', function(){ closeSidebar(); setNav('seat'); });
   on('btnNotif', 'click', toggleNotifPanel);
   on('btnStuNotif', 'click', toggleNotifPanel);
   on('btnClearNotif', 'click', clearNotifs);
@@ -2677,7 +2676,7 @@ function hide(id){ var e=el(id); if(e) e.style.display='none'; }
 
 // ── 저장 ──────────────────────────────────────
 // ══════════════════════════════════════════════
-// 저장 함수 — Supabase / GAS / localStorage 자동 분기
+// 저장 함수 — Supabase / localStorage 자동 분기
 // ══════════════════════════════════════════════
 
 // 학생 1명 저장 (핵심 — 충돌 없는 upsert)
@@ -2691,13 +2690,6 @@ async function saveOneNow(num) {
   try {
     if (isSupabase()) {
       await sbSaveOne(s);
-    } else if (typeof google !== 'undefined' && google.script) {
-      await new Promise(function(resolve, reject) {
-        google.script.run
-          .withSuccessHandler(resolve)
-          .withFailureHandler(reject)
-          .saveOne(s);
-      });
     } else {
       localStorage.setItem('db_39_local', JSON.stringify(DB));
     }
@@ -2721,14 +2713,9 @@ async function saveAllNow() {
   ind.textContent = '☁️ 저장 중…'; ind.classList.add('show');
   try {
     if (isSupabase()) {
-      // Supabase는 upsert 방식으로 전체 업데이트
       for (var i = 0; i < DB.length; i++) {
         await sbSaveOne(DB[i]);
       }
-    } else if (typeof google !== 'undefined' && google.script) {
-      await new Promise(function(resolve, reject) {
-        google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).save(DB);
-      });
     } else {
       localStorage.setItem('db_39_local', JSON.stringify(DB));
     }
@@ -2772,10 +2759,6 @@ async function teacherLogin() {
     var ok;
     if (isSupabase()) {
       ok = await sbCheckPwd(pwd);
-    } else if (typeof google !== 'undefined' && google.script) {
-      ok = await new Promise(function(res,rej){
-        google.script.run.withSuccessHandler(res).withFailureHandler(rej).checkPwd(pwd);
-      });
     } else {
       ok = (pwd === '1234');
     }
@@ -2799,14 +2782,33 @@ function logout(){ role=null; stuSession=null; stopPolling(); showPage('landing'
 // ── 사이드바 ──────────────────────────────────────
 function setNav(m) {
   navMode=m;
-  ['navAll','navDash','navCal','navAnalysis','navResv','navManage'].forEach(function(id){var e=el(id);if(e)e.classList.remove('active');});
-  var map={all:'navAll',dash:'navDash',cal:'navCal',resv:'navResv',manage:'navManage'};
+  ['navAll','navDash','navCal','navAnalysis','navResv','navManage','navSeat'].forEach(function(id){var e=el(id);if(e)e.classList.remove('active');});
+  var map={all:'navAll',dash:'navDash',cal:'navCal',resv:'navResv',manage:'navManage',seat:'navSeat'};
   if(el(map[m]))el(map[m]).classList.add('active');
   if(m==='manage') showManage();
   else if(m==='dash') showDashboard();
   else if(m==='cal') showCalendar();
   else if(m==='resv') showResvCalendar();
+  else if(m==='seat') showSeating();
   else{renderSidebar();showOverview();}
+}
+function showSeating() {
+  currentNum=null; setNavActive('navSeat');
+  try {
+    var names = DB.map(function(s){ return s.name; });
+    localStorage.setItem('sns_class_names', JSON.stringify(names));
+    // 학생들이 제출한 설문 데이터도 함께 전달
+    var surveys = {};
+    DB.forEach(function(s){
+      if(s.analysis && s.analysis.seating_survey){
+        surveys[s.name] = s.analysis.seating_survey;
+      }
+    });
+    localStorage.setItem('sns_survey_data', JSON.stringify(surveys));
+  } catch(e) {}
+  el('topbarTitle').textContent='🧭 자리 배치';
+  el('topbarActions').innerHTML='';
+  el('teacherContent').innerHTML='<iframe src="seating.html" style="width:100%;height:calc(100vh - 56px);border:none;display:block" title="학급 사회관계망 자리배치" allowfullscreen></iframe>';
 }
 function renderSidebar() {
   var q=(el('sideSearch')||{value:''}).value.toLowerCase();
@@ -3345,7 +3347,7 @@ function showManage(){
   el('teacherContent').innerHTML='<div class="card card-body" style="margin-bottom:14px"><div class="sec-title">비밀번호 변경</div><div style="display:flex;gap:10px;align-items:flex-end;max-width:420px"><div style="flex:1"><label class="form-label">새 비밀번호</label><input type="password" id="np1" placeholder="새 비밀번호"></div><div style="flex:1"><label class="form-label">확인</label><input type="password" id="np2" placeholder="재입력"></div><button class="btn btn-primary" id="btnChangePwd">변경</button></div></div>';
   on('btnChangePwd','click',changePwd);
 }
-function changePwd(){ var p1=el('np1').value,p2=el('np2').value; if(!p1){toast('❌ 비밀번호 입력');return;} if(p1!==p2){toast('❌ 불일치');return;} if(isSupabase()){sbSetPwd(p1).then(function(){toast('✅ 변경됨');});}else if(typeof google!=='undefined'&&google.script){google.script.run.withSuccessHandler(function(){toast('✅ 변경됨');}).setPwd(p1);}else{toast('✅ 변경됨');} }
+function changePwd(){ var p1=el('np1').value,p2=el('np2').value; if(!p1){toast('❌ 비밀번호 입력');return;} if(p1!==p2){toast('❌ 불일치');return;} if(isSupabase()){sbSetPwd(p1).then(function(){toast('✅ 변경됨');});}else{toast('✅ 변경됨');} }
 
 // ── 학생앱 ──────────────────────────────────────
 // 희망대학 탭만 빠르게 부분 갱신 (탭바·헤더는 그대로 유지)
@@ -3393,7 +3395,7 @@ function renderStudentApp(){
   var s=DB.find(function(x){return x.student_num===stuSession.student_num;}); if(!s){logout();return;}
   el('stuNameBadge').textContent=s.name;
   var scEl=el('studentContent');
-  var tabs=[['schools','🏫 희망대학'],['stu_report','📊 분석'],['analysis','생기부'],['counsel','상담기록'],['resv','📅 상담예약'],['edit','내 정보 수정']];
+  var tabs=[['schools','🏫 희망대학'],['stu_report','📊 분석'],['analysis','생기부'],['counsel','상담기록'],['resv','📅 상담예약'],['seat_survey','🪑 자리배치'],['edit','내 정보 수정']];
   var tbar='<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">'
     +'<div style="display:flex;background:#f3f4f6;border-radius:9px;padding:3px;overflow-x:auto;flex:1">';
   tabs.forEach(function(t){tbar+='<button class="tab-btn'+(stuTab===t[0]?' active':'')+'" data-stutab="'+t[0]+'">'+t[1]+'</button>';});
@@ -3407,6 +3409,7 @@ function renderStudentApp(){
   else if(stuTab==='analysis') scEl.innerHTML=tbar+renderAnalysisTab(s,false);
   else if(stuTab==='counsel') scEl.innerHTML=tbar+renderCounselTab(s,false);
   else if(stuTab==='resv') { showStuResv(); return; }
+  else if(stuTab==='seat_survey') scEl.innerHTML=tbar+renderSeatView(s)+renderSeatSurvey(s);
   else scEl.innerHTML=tbar+renderStuEdit(s);
   scEl.querySelectorAll('[data-stutab]').forEach(function(btn){ btn.addEventListener('click',function(){ stuTab=this.dataset.stutab; renderStudentApp(); }); });
   if(stuTab==='schools'){
@@ -3419,6 +3422,9 @@ function renderStudentApp(){
   }
   if(stuTab==='edit'){
     on('btnSaveStu','click',function(){ saveStuEdit(s.student_num); });
+  }
+  if(stuTab==='seat_survey'){
+    bindSeatSurveyEvents(s.student_num);
   }
 }
 function renderStuEdit(s){
@@ -3452,6 +3458,162 @@ function saveStuEdit(stuNum) {
   });
 }
 
+
+// ── 자리배치 설문 (학생용) ──────────────────────────────────────
+async function saveSeatingResult(data) {
+  if(isSupabase()){
+    try{
+      await _sb.from('app_settings').upsert([{key:'seating_result',value:data,updated_at:new Date().toISOString()}],{onConflict:'key'});
+    }catch(e){ console.error('saveSeatingResult',e); }
+  } else {
+    try{ localStorage.setItem('sns_seating_result',JSON.stringify(data)); }catch(e){}
+  }
+}
+
+function renderSeatView(s) {
+  if(!SEATING_RESULT || !SEATING_RESULT.grid) return '';
+  var gr=SEATING_RESULT.grid, cols=SEATING_RESULT.cols, rows=SEATING_RESULT.rows;
+  var h='<div class="card card-body" style="margin-bottom:16px">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+  h+='<div class="sec-title" style="margin:0">📌 현재 자리 배치</div>';
+  h+='<span style="font-size:11px;color:#94a3b8">내 자리 <span style="background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:8px;font-weight:700">초록</span></span>';
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:4px">';
+  for(var di=0;di<rows;di++){
+    var r=rows-1-di;
+    for(var c=0;c<cols;c++){
+      var name=(gr[r]&&gr[r][c])||null;
+      var isMe=(name===s.name);
+      h+='<div style="padding:6px 4px;border-radius:8px;text-align:center;font-size:12px;font-weight:'+(isMe?'700':'500')+';'
+        +'min-height:36px;display:flex;align-items:center;justify-content:center;'
+        +'background:'+(isMe?'#dcfce7':'#f8faff')+';color:'+(isMe?'#16a34a':'#374151')+';'
+        +'border:1.5px solid '+(isMe?'#16a34a':'#e5e7eb')+';">'
+        +(name?esc(name):'<span style="color:#d1d5db">-</span>')+'</div>';
+    }
+  }
+  h+='</div>';
+  h+='<div style="background:#E8EEE8;border-radius:8px;padding:4px;margin-top:8px;text-align:center;font-size:11px;color:#6b7280">📋 칠판</div>';
+  h+='</div>';
+  return h;
+}
+
+function renderSeatSurvey(s) {
+  var sv = (s.analysis && s.analysis.seating_survey) || {};
+  var others = DB.filter(function(x){ return x.student_num !== s.student_num; }).map(function(x){ return x.name; });
+  var qList = [
+    {k:'Q1',lbl:'옆자리에 앉고 싶은 친구',      max:3,cl:'#6d5ff0'},
+    {k:'Q2',lbl:'함께 공부하고 싶은 친구',      max:3,cl:'#0f6e56'},
+    {k:'Q3',lbl:'힘들 때 이야기하고 싶은 친구', max:3,cl:'#1d4ed8'},
+    {k:'Q4',lbl:'반 분위기를 좋게 만드는 친구', max:3,cl:'#b45309'},
+    {k:'Q5',lbl:'가까우면 집중이 어려운 친구',  max:2,cl:'#dc2626',note:'익명 처리'},
+  ];
+  var submitted = sv.Q1 || sv.Q2;
+  var h = '<div class="card card-body">';
+  h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
+  h += '<div class="sec-title" style="margin:0">🪑 자리배치 설문</div>';
+  if(submitted) h += '<span style="font-size:11px;background:#dcfce7;color:#16a34a;padding:3px 9px;border-radius:10px;font-weight:700">✓ 제출 완료</span>';
+  h += '</div>';
+  h += '<p style="font-size:12px;color:#6b7280;background:#f0f7ff;border:1px solid #dbeafe;border-radius:8px;padding:9px 13px;margin-bottom:18px">💡 선생님이 자리배치에 활용하는 설문이에요. Q5는 익명 처리되며 결과는 선생님만 확인합니다.</p>';
+  qList.forEach(function(q){
+    var sel = sv[q.k] || [];
+    h += '<div style="margin-bottom:18px">';
+    h += '<div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:4px">'+q.lbl;
+    if(q.note) h += ' <span style="font-size:11px;font-weight:400;color:#94a3b8">('+q.note+')</span>';
+    h += ' <span style="font-size:11px;font-weight:400;color:#94a3b8">최대 '+q.max+'명</span></div>';
+    h += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">';
+    others.forEach(function(name){
+      var on2 = sel.indexOf(name)>=0;
+      h += '<button class="sc-chip'+(on2?' sc-on':'')+'" data-q="'+q.k+'" data-name="'+esc(name)+'" data-max="'+q.max+'" data-cl="'+q.cl+'"'
+          +' style="padding:5px 12px;border-radius:14px;font-size:12px;font-family:inherit;cursor:pointer;transition:all .12s;'
+          +'border:1.5px solid '+(on2?q.cl:'#d1d5db')+';background:'+(on2?q.cl+'18':'white')
+          +';color:'+(on2?q.cl:'#6b7280')+';font-weight:'+(on2?'700':'400')+';">'
+          +esc(name)+'</button>';
+    });
+    h += '</div></div>';
+  });
+  var selfVal = sv.self||3;
+  h += '<div style="margin-bottom:18px;padding-top:14px;border-top:0.5px solid #e5e7eb">';
+  h += '<div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:4px">앞자리 희망 여부</div>';
+  h += '<div style="font-size:11px;color:#94a3b8;margin-bottom:8px">칠판과 가까운 앞쪽 자리를 원하나요?</div>';
+  h += '<div style="display:flex;gap:8px">';
+  [[true,'✋ 앞자리 원해요','#16a34a','#dcfce7'],[false,'😊 상관없어요','#6b7280','#f3f4f6']].forEach(function(item){
+    var val=item[0],lbl=item[1],clr=item[2],bg=item[3];
+    var isOn=(sv.wantFront===val);
+    h+='<button class="fp-btn'+(isOn?' fp-on':'')+'" data-val="'+(val?'true':'false')+'"'
+      +' style="padding:6px 18px;border-radius:14px;font-size:12px;font-family:inherit;cursor:pointer;'
+      +'border:1.5px solid '+(isOn?clr:'#d1d5db')+';background:'+(isOn?bg:'white')+';'
+      +'color:'+(isOn?clr:'#6b7280')+';font-weight:'+(isOn?'700':'400')+';">'+lbl+'</button>';
+  });
+  h+='</div></div>';
+  h += '<div style="margin-bottom:20px"><div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:8px">나는 친구들과 잘 어울리는 편이에요</div>';
+  h += '<div style="display:flex;gap:4px;align-items:center">';
+  for(var i=1;i<=5;i++) h += '<button class="sc-star" data-v="'+i+'" style="font-size:28px;background:none;border:none;cursor:pointer;padding:0;line-height:1;color:'+(i<=selfVal?'#f59e0b':'#e5e7eb')+'">★</button>';
+  h += '<span id="scSelfLbl" data-v="'+selfVal+'" style="font-size:12px;color:#94a3b8;margin-left:8px">'+['','매우 그렇지 않음','그렇지 않음','보통','그렇다','매우 그렇다'][selfVal]+'</span>';
+  h += '</div></div>';
+  h += '<button class="btn btn-primary" style="width:100%" id="btnSaveSeatSurvey">💾 설문 제출하기</button>';
+  h += '</div>';
+  return h;
+}
+
+function bindSeatSurveyEvents(stuNum) {
+  document.querySelectorAll('.sc-chip').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var q=this.dataset.q,name=this.dataset.name,max=parseInt(this.dataset.max),cl=this.dataset.cl;
+      if(this.classList.contains('sc-on')){
+        this.classList.remove('sc-on');
+        this.style.cssText='padding:5px 12px;border-radius:14px;font-size:12px;font-family:inherit;cursor:pointer;transition:all .12s;border:1.5px solid #d1d5db;background:white;color:#6b7280;font-weight:400;';
+      } else {
+        var cnt=document.querySelectorAll('.sc-chip[data-q="'+q+'"].sc-on').length;
+        if(cnt>=max){toast('최대 '+max+'명까지 선택할 수 있어요');return;}
+        this.classList.add('sc-on');
+        this.style.cssText='padding:5px 12px;border-radius:14px;font-size:12px;font-family:inherit;cursor:pointer;transition:all .12s;border:1.5px solid '+cl+';background:'+cl+'18;color:'+cl+';font-weight:700;';
+      }
+    });
+  });
+  document.querySelectorAll('.fp-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.fp-btn').forEach(function(b){
+        var bval=b.dataset.val==='true';
+        b.classList.remove('fp-on');
+        b.style.borderColor='#d1d5db'; b.style.background='white';
+        b.style.color='#6b7280'; b.style.fontWeight='400';
+      });
+      var val=this.dataset.val==='true';
+      this.classList.add('fp-on');
+      this.style.borderColor=val?'#16a34a':'#6b7280';
+      this.style.background=val?'#dcfce7':'#f3f4f6';
+      this.style.color=val?'#16a34a':'#6b7280';
+      this.style.fontWeight='700';
+    });
+  });
+  document.querySelectorAll('.sc-star').forEach(function(star){
+    star.addEventListener('click',function(){
+      var val=parseInt(this.dataset.v);
+      document.querySelectorAll('.sc-star').forEach(function(s){s.style.color=parseInt(s.dataset.v)<=val?'#f59e0b':'#e5e7eb';});
+      var lbl=el('scSelfLbl'); lbl.textContent=['','매우 그렇지 않음','그렇지 않음','보통','그렇다','매우 그렇다'][val]; lbl.dataset.v=val;
+    });
+  });
+  on('btnSaveSeatSurvey','click',function(){ saveSeatSurvey(stuNum); });
+}
+
+async function saveSeatSurvey(stuNum) {
+  var s=DB.find(function(x){return x.student_num===stuNum;}); if(!s)return;
+  var survey={Q1:[],Q2:[],Q3:[],Q4:[],Q5:[]};
+  ['Q1','Q2','Q3','Q4','Q5'].forEach(function(q){
+    document.querySelectorAll('.sc-chip[data-q="'+q+'"].sc-on').forEach(function(c){survey[q].push(c.dataset.name);});
+  });
+  survey.self=parseInt((el('scSelfLbl')||{dataset:{v:3}}).dataset.v||3);
+  var fpOn=document.querySelector('.fp-btn.fp-on');
+  survey.wantFront=fpOn?(fpOn.dataset.val==='true'):undefined;
+  if(!s.analysis) s.analysis={};
+  s.analysis.seating_survey=survey;
+  try{
+    await saveOneNow(stuNum);
+    toast('✅ 설문이 제출됐어요!');
+    renderStudentApp();
+  }catch(e){ toast('❌ 저장 실패. 다시 시도해주세요.'); }
+}
+
 // ── 모달 ──────────────────────────────────────
 function openModal(t,b){ el('modalTitle').textContent=t; el('modalBody').innerHTML=b; el('modalBox').style.maxWidth='960px'; el('modalOverlay').classList.remove('hidden'); }
 function openModalSm(t,b){ el('modalTitle').textContent=t; el('modalBody').innerHTML=b; el('modalBox').style.maxWidth='560px'; el('modalOverlay').classList.remove('hidden'); }
@@ -3473,20 +3635,6 @@ async function loadResvData() {
       if (data.dateOverrides) DATE_SLOT_OVERRIDES = data.dateOverrides;
       if (data.blockedSlots)  BLOCKED_SLOTS = data.blockedSlots;
       if (data.consultSlots)  { CONSULT_SLOTS = data.consultSlots; buildSlotLabels(); }
-    } else if (typeof google !== 'undefined' && google.script) {
-      google.script.run
-        .withSuccessHandler(function(data){
-          if(!data) return;
-          RESERVATIONS = data.resvs || [];
-          NOTIFICATIONS = data.notifs || [];
-          if(data.dateOverrides) DATE_SLOT_OVERRIDES = data.dateOverrides;
-          if(data.blockedSlots)  BLOCKED_SLOTS = data.blockedSlots;
-          updateNotifBadge();
-          autoRefreshView();
-        })
-        .withFailureHandler(function(){})
-        .loadResv();
-      return; // GAS는 콜백 방식이라 여기서 리턴
     } else {
       try {
         var rd = localStorage.getItem('resv_39_2026');
@@ -3495,6 +3643,8 @@ async function loadResvData() {
         if(od) DATE_SLOT_OVERRIDES = JSON.parse(od);
         var bd = localStorage.getItem('blockedSlots_date_39');
         if(bd) BLOCKED_SLOTS = JSON.parse(bd);
+        var sr = localStorage.getItem('sns_seating_result');
+        if(sr) SEATING_RESULT = JSON.parse(sr);
       } catch(e) {}
     }
     updateNotifBadge();
@@ -3550,12 +3700,6 @@ async function saveResvData() {
   try {
     if (isSupabase()) {
       await sbSaveResv(RESERVATIONS, NOTIFICATIONS, DATE_SLOT_OVERRIDES, BLOCKED_SLOTS);
-    } else if (typeof google !== 'undefined' && google.script) {
-      google.script.run
-        .withSuccessHandler(function(){ loadResvData(); })
-        .withFailureHandler(function(){})
-        .saveResv(RESERVATIONS, NOTIFICATIONS, DATE_SLOT_OVERRIDES, BLOCKED_SLOTS);
-      return;
     } else {
       try {
         localStorage.setItem('resv_39_2026', JSON.stringify(RESERVATIONS));
@@ -3595,19 +3739,7 @@ function navigateToLink(link) {
 }
 
 function reloadDBThenShow(num) {
-  if(typeof google !== 'undefined' && google.script) {
-    google.script.run
-      .withSuccessHandler(function(arr){
-        if(!_isSaving && arr && arr.length) DB = arr;
-        showStudent(num);
-      })
-      .withFailureHandler(function(){
-        showStudent(num);
-      })
-      .load();
-  } else {
-    showStudent(num);
-  }
+  showStudent(num);
 }
 
 function addNotif(msg, target, link) {
@@ -3738,9 +3870,6 @@ function saveSlots() {
     sbSaveConsultSlots(CONSULT_SLOTS).catch(function(e){ console.error('saveSlots',e); });
   } else {
     try { localStorage.setItem('consultSlots_39', JSON.stringify(CONSULT_SLOTS)); } catch(e){}
-    if(typeof google !== 'undefined' && google.script) {
-      google.script.run.withFailureHandler(function(){}).saveConsultSlots(CONSULT_SLOTS);
-    }
   }
 }
 function loadSlots() {
@@ -3748,12 +3877,6 @@ function loadSlots() {
     var d = localStorage.getItem('consultSlots_39');
     if(d) { CONSULT_SLOTS = JSON.parse(d); buildSlotLabels(); }
   } catch(e){}
-  if(typeof google !== 'undefined' && google.script) {
-    google.script.run
-      .withSuccessHandler(function(slots){ if(slots&&slots.length){ CONSULT_SLOTS=slots; buildSlotLabels(); } })
-      .withFailureHandler(function(){})
-      .loadConsultSlots();
-  }
 }
 
 function showResvCalendar() {
@@ -4152,7 +4275,7 @@ function renderStuResvCalendar() {
 }
 
 function renderStuTabBar() {
-  var tabs=[['schools','🏫 희망대학'],['stu_report','📊 분석'],['analysis','생기부'],['counsel','상담기록'],['resv','📅 상담예약'],['edit','내 정보 수정']];
+  var tabs=[['schools','🏫 희망대학'],['stu_report','📊 분석'],['analysis','생기부'],['counsel','상담기록'],['resv','📅 상담예약'],['seat_survey','🪑 자리배치'],['edit','내 정보 수정']];
   var html='<div style="display:flex;align-items:center;gap:6px;margin-bottom:16px"><div style="display:flex;background:#f3f4f6;border-radius:9px;padding:3px;overflow-x:auto;flex:1">';
   tabs.forEach(function(t){ html+='<button class="tab-btn'+(stuTab===t[0]?' active':'')+'" data-stutab="'+t[0]+'">'+t[1]+'</button>'; });
   // 희망대학 탭일 때만 새로고침 버튼 표시

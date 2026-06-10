@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자리 배치 | 사회관계망 분석</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *  { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: #F5F8F5; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-thumb { background: #C8D4C8; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="root" style="min-height:100vh"></div>
+
+<script type="text/babel">
+// ══════════════════════════════════════════════════════
+//  localStorage 기반 storage 폴리필
+//  (Claude 아티팩트 밖에서 window.storage 대체)
+// ══════════════════════════════════════════════════════
+if (!window.storage) {
+  window.storage = {
+    get: async (key) => {
+      try { const v = localStorage.getItem('sns_' + key); return v ? { key, value: v } : null; }
+      catch(e) { return null; }
+    },
+    set: async (key, value) => {
+      try { localStorage.setItem('sns_' + key, String(value)); return { key, value }; }
+      catch(e) { return null; }
+    }
+  };
+}
+
+const { useState, useEffect, useMemo, useRef, Fragment } = React;
+
+// ══════════════════════════════════════════════════════
+//  DEMO DATA
+// ══════════════════════════════════════════════════════
+const DEMO_NAMES = [
+  '김서연','이하은','박지호','최수아','정민서',
+  '강민준','윤준혁','임소율','오태양','한채원',
+  '신동현','류지은','배성민','송예린','조현우','황지우'
+];
+const DEMO_SURVEY = {
+  '김서연': { Q1:['박지호','정민서'], Q2:['이하은'], Q3:['윤준혁'], Q4:['이하은'], Q5:[], self:4 },
+  '이하은': { Q1:['강민준','한채원'], Q2:['최수아'], Q3:['임소율'], Q4:['김서연'], Q5:[], self:5 },
+  '박지호': { Q1:['김서연','정민서'], Q2:['신동현'], Q3:['임소율'], Q4:[], Q5:[], self:4 },
+  '최수아': { Q1:['임소율'], Q2:['황지우','이하은'], Q3:['한채원'], Q4:['이하은'], Q5:[], self:4 },
+  '정민서': { Q1:['김서연','박지호'], Q2:['류지은'], Q3:['송예린'], Q4:[], Q5:[], self:3 },
+  '강민준': { Q1:['이하은','한채원'], Q2:['오태양'], Q3:['최수아'], Q4:['이하은'], Q5:[], self:4 },
+  '윤준혁': { Q1:['이하은','오태양'], Q2:['김서연'], Q3:['신동현'], Q4:[], Q5:[], self:4 },
+  '임소율': { Q1:['최수아'], Q2:['류지은'], Q3:['이하은'], Q4:[], Q5:[], self:3 },
+  '오태양': { Q1:['윤준혁'], Q2:['신동현','류지은'], Q3:['강민준'], Q4:[], Q5:[], self:3 },
+  '한채원': { Q1:['이하은','강민준'], Q2:['임소율'], Q3:['최수아'], Q4:[], Q5:[], self:4 },
+  '신동현': { Q1:['황지우'], Q2:['오태양','류지은'], Q3:['정민서'], Q4:[], Q5:[], self:3 },
+  '류지은': { Q1:['임소율'], Q2:['신동현','오태양'], Q3:['정민서'], Q4:[], Q5:[], self:3 },
+  '배성민': { Q1:[], Q2:[], Q3:['조현우'], Q4:[], Q5:[], self:2 },
+  '송예린': { Q1:['황지우','최수아'], Q2:['임소율'], Q3:['류지은'], Q4:[], Q5:[], self:3 },
+  '조현우': { Q1:['이하은','최수아'], Q2:[], Q3:[], Q4:[], Q5:[], self:1 },
+  '황지우': { Q1:['송예린','최수아'], Q2:['류지은'], Q3:['신동현'], Q4:[], Q5:[], self:4 },
+};
+
+// ══════════════════════════════════════════════════════
+//  DESIGN TOKENS
+// ══════════════════════════════════════════════════════
+const C = {
+  p:'#1B5C3F', pL:'#E8F4EE', surf:'#F5F8F5', card:'#FFFFFF',
+  bd:'#DDE8DD', t1:'#1A2B1E', t2:'#5A6B5E', t3:'#9BA899',
+  hub:    { bg:'#EEEDFE', tx:'#3C3489', bd:'#534AB7' },
+  bridge: { bg:'#E1F5EE', tx:'#085041', bd:'#0F6E56' },
+  iso:    { bg:'#FCEBEB', tx:'#791F1F', bd:'#A32D2D' },
+  risk:   { bg:'#FAEEDA', tx:'#633806', bd:'#854F0B' },
+  normal: { bg:'#F3F4F6', tx:'#6B7280', bd:'#D1D5DB' },
+};
+const SM = {
+  hub:    { label:'허브',   ...C.hub    },
+  bridge: { label:'브리지', ...C.bridge },
+  iso:    { label:'고립',   ...C.iso    },
+  risk:   { label:'위험',   ...C.risk   },
+  normal: { label:'일반',   ...C.normal },
+};
+const QM = [
+  { key:'Q1', label:'친밀 관계',   desc:'옆자리에 앉고 싶은 친구',           max:3 },
+  { key:'Q2', label:'학습 관계',   desc:'함께 공부하고 싶은 친구',           max:3 },
+  { key:'Q3', label:'지지 관계',   desc:'힘들 때 이야기하고 싶은 친구',      max:3 },
+  { key:'Q4', label:'긍정 영향력', desc:'반 분위기를 좋게 만드는 친구',      max:3 },
+  { key:'Q5', label:'집중 방해',   desc:'가까우면 집중이 어려운 친구 (익명)', max:2 },
+];
+const SL = ['학급 설정','설문 조사','관계망 분석','관계망 시각화','배치 목표','자리 배치','저장·활용'];
+
+// ══════════════════════════════════════════════════════
+//  ALGORITHM: ANALYZE
+// ══════════════════════════════════════════════════════
+function analyze(names, survey) {
+  const scores = {}, received = {}, mutualMap = {};
+  names.forEach(n => { scores[n] = 0; received[n] = 0; mutualMap[n] = []; });
+
+  names.forEach(from => {
+    const s = survey[from] || {};
+    ['Q1','Q2','Q3'].forEach((q, qi) => {
+      (s[q]||[]).forEach(to => { if (scores[to] !== undefined) scores[to] += [3,2,1][qi]; });
+    });
+    const chosen = new Set([...(s.Q1||[]),...(s.Q2||[]),...(s.Q3||[])]);
+    chosen.forEach(to => { if (received[to] !== undefined) received[to]++; });
+  });
+
+  for (let i = 0; i < names.length; i++) {
+    for (let j = i+1; j < names.length; j++) {
+      const a = names[i], b = names[j];
+      const sa = survey[a]||{}, sb = survey[b]||{};
+      const aOut = new Set([...(sa.Q1||[]),...(sa.Q2||[]),...(sa.Q3||[])]);
+      const bOut = new Set([...(sb.Q1||[]),...(sb.Q2||[]),...(sb.Q3||[])]);
+      if (aOut.has(b) && bOut.has(a)) { mutualMap[a].push(b); mutualMap[b].push(a); }
+    }
+  }
+
+  const triSet = new Map();
+  names.forEach(a => {
+    const ma = mutualMap[a];
+    for (let j = 0; j < ma.length; j++) {
+      const b = ma[j]; if (b <= a) continue;
+      for (let k = j+1; k < ma.length; k++) {
+        const c = ma[k]; if (c <= b) continue;
+        if (mutualMap[b].includes(c)) {
+          const key = [a,b,c].sort().join('|');
+          if (!triSet.has(key)) triSet.set(key, [a,b,c].sort());
+        }
+      }
+    }
+  });
+  const triangles = [...triSet.values()];
+
+  const pairSet = new Map();
+  names.forEach(a => {
+    mutualMap[a].forEach(b => {
+      if (b <= a) return;
+      if (!triangles.some(tr => tr.includes(a) && tr.includes(b))) {
+        const key = [a,b].sort().join('|');
+        if (!pairSet.has(key)) pairSet.set(key, [a,b].sort());
+      }
+    });
+  });
+  const cliques = [
+    ...triangles.map(m => ({ members:m, strength:'strong' })),
+    ...[...pairSet.values()].map(m => ({ members:m, strength:'pair' })),
+  ];
+
+  const inTriangle = new Set(triangles.flat());
+  const bridges = new Set();
+  names.forEach(n => {
+    if (inTriangle.has(n)) return;
+    const connTri = new Set();
+    (mutualMap[n]||[]).forEach(partner => {
+      triangles.forEach(tr => { if (tr.includes(partner)) connTri.add(tr.join('|')); });
+    });
+    if (connTri.size >= 2) bridges.add(n);
+  });
+
+  const vals = names.map(n => scores[n]);
+  const mean = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const std  = Math.sqrt(vals.reduce((a,b)=>a+(b-mean)**2,0)/vals.length);
+  const hubThresh = mean + std;
+  const minRcv    = Math.max(3, Math.floor(names.length * 0.15));
+
+  const statusMap = {};
+  names.forEach(n => {
+    const ws=scores[n], r=received[n], self=survey[n]?.self??3;
+    if (r === 0)                               statusMap[n] = 'iso';
+    else if (self <= 2 && r <= 2)              statusMap[n] = 'risk';
+    else if (ws >= hubThresh && r >= minRcv)   statusMap[n] = 'hub';
+    else if (bridges.has(n))                   statusMap[n] = 'bridge';
+    else                                       statusMap[n] = 'normal';
+  });
+
+  const negEdges = [];
+  names.forEach(from => (survey[from]?.Q5||[]).forEach(to => negEdges.push({from,to})));
+
+  return { scores, received, mutualMap, cliques, triangles,
+    bridges:[...bridges], isolated:names.filter(n=>statusMap[n]==='iso'),
+    atRisk:names.filter(n=>statusMap[n]==='risk'), statusMap, negEdges };
+}
+
+// ══════════════════════════════════════════════════════
+//  ALGORITHM: FORCE LAYOUT
+// ══════════════════════════════════════════════════════
+function forceLayout(names, survey, W, H) {
+  const n = names.length;
+  const pos = names.map((_,i) => ({
+    x: W/2 + W*0.38*Math.cos(2*Math.PI*i/n - Math.PI/2),
+    y: H/2 + H*0.38*Math.sin(2*Math.PI*i/n - Math.PI/2),
+    vx:0, vy:0
+  }));
+  const ni = Object.fromEntries(names.map((nm,i)=>[nm,i]));
+  const edges = [];
+  names.forEach((from,fi) => {
+    const s = survey[from]||{};
+    [...(s.Q1||[]),...(s.Q2||[]),...(s.Q3||[])].forEach(to => {
+      const ti = ni[to];
+      if (ti !== undefined) edges.push([fi,ti]);
+    });
+  });
+  for (let iter = 0; iter < 130; iter++) {
+    for (let i = 0; i < n; i++) { pos[i].vx = 0; pos[i].vy = 0; }
+    for (let i = 0; i < n; i++) {
+      for (let j = i+1; j < n; j++) {
+        const dx=pos[j].x-pos[i].x, dy=pos[j].y-pos[i].y;
+        const d=Math.sqrt(dx*dx+dy*dy)||1, f=1800/(d*d);
+        pos[i].vx-=f*dx/d; pos[i].vy-=f*dy/d;
+        pos[j].vx+=f*dx/d; pos[j].vy+=f*dy/d;
+      }
+    }
+    edges.forEach(([i,j]) => {
+      const dx=pos[j].x-pos[i].x, dy=pos[j].y-pos[i].y;
+      const d=Math.sqrt(dx*dx+dy*dy)||1, f=(d-85)*0.035;
+      pos[i].vx+=f*dx/d; pos[i].vy+=f*dy/d;
+      pos[j].vx-=f*dx/d; pos[j].vy-=f*dy/d;
+    });
+    pos.forEach(p => {
+      p.vx+=(W/2-p.x)*0.012; p.vy+=(H/2-p.y)*0.012;
+      p.x=Math.max(22,Math.min(W-22,p.x+p.vx*0.55));
+      p.y=Math.max(22,Math.min(H-42,p.y+p.vy*0.55));
+    });
+  }
+  return names.map((name,i) => ({name, x:pos[i].x, y:pos[i].y}));
+}
+
+// ══════════════════════════════════════════════════════
+//  ALGORITHM: SEATING  (goalOrder = 우선순위 배열)
+// ══════════════════════════════════════════════════════
+function generateSeating(names, analysis, survey, rows, cols, goalOrder) {
+  const active = new Set(goalOrder);
+  const grid = Array.from({length:rows}, ()=>Array(cols).fill(null));
+  const positions = [];
+  for (let r=0;r<rows;r++) for (let c=0;c<cols;c++) positions.push([r,c]);
+  for (let i=positions.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [positions[i],positions[j]]=[positions[j],positions[i]];
+  }
+  const placed={}, avail=[...positions];
+  function place(name,r,c) {
+    grid[r][c]=name; placed[name]=[r,c];
+    const idx=avail.findIndex(([ar,ac])=>ar===r&&ac===c);
+    if(idx>=0) avail.splice(idx,1);
+  }
+  function adj(r,c) { return [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].filter(([ar,ac])=>ar>=0&&ar<rows&&ac>=0&&ac<cols); }
+  function scorePos(name,r,c) {
+    let s=0;
+    adj(r,c).forEach(([ar,ac])=>{
+      const nb=grid[ar][ac]; if(!nb)return;
+      if(active.has('honorQ1')&&(survey[name]?.Q1||[]).includes(nb)) s+=10;
+      if(active.has('respectQ5')&&analysis.negEdges.some(e=>(e.from===name&&e.to===nb)||(e.from===nb&&e.to===name))) s-=50;
+    });
+    return s;
+  }
+  function bestPos(name) {
+    let best=null,bs=-Infinity;
+    avail.forEach(([r,c])=>{ const s=scorePos(name,r,c); if(s>bs){bs=s;best=[r,c];} });
+    return best||avail[0];
+  }
+
+  const frontRowCount=Math.max(1,Math.ceil(rows*0.4));
+
+  // goalOrder 순서대로 처리 — 먼저 클릭한 목표가 먼저 자리를 잡음
+  goalOrder.forEach(goal=>{
+    if(goal==='spreadHubs'){
+      const hubs=names.filter(n=>!placed[n]&&analysis.statusMap[n]==='hub');
+      if(hubs.length>0){
+        const step=Math.max(1,Math.floor(positions.length/hubs.length));
+        hubs.forEach((h,i)=>{ const [r,c]=positions[Math.min(i*step,positions.length-1)]; if(!grid[r][c]) place(h,r,c); });
+      }
+    } else if(goal==='connectIso'){
+      analysis.isolated.forEach(iso=>{
+        if(placed[iso])return;
+        let bPos=null;
+        analysis.bridges.forEach(br=>{ if(placed[br])bPos=placed[br]; });
+        if(bPos){
+          const [br,bc]=bPos;
+          const cands=avail.filter(([r,c])=>Math.abs(r-br)+Math.abs(c-bc)<=2);
+          if(cands.length){place(iso,cands[0][0],cands[0][1]);return;}
+        }
+        const p=bestPos(iso); if(p) place(iso,p[0],p[1]);
+      });
+    } else if(goal==='frontSeat'){
+      // 앞자리 희망 학생 → 낮은 행 번호(r=0 쪽, 칠판 가까운 아래쪽)에 먼저 배치
+      names.filter(n=>!placed[n]&&survey[n]?.wantFront===true).forEach(student=>{
+        let best=null,bs=-Infinity;
+        avail.forEach(([r,c])=>{
+          const s=scorePos(student,r,c)+(r<frontRowCount?50:-20);
+          if(s>bs){bs=s;best=[r,c];}
+        });
+        if(best) place(student,best[0],best[1]);
+      });
+    } else if(goal==='separateCliques'){
+      // 클릭 분산: 같은 클릭 멤버끼리 인접 피하도록 bestPos에서 패널티 적용
+      // (scoring에서 동적으로 처리되므로 별도 배치 단계 없음)
+    }
+    // honorQ1, respectQ5는 scorePos에서 처리
+  });
+
+  // 나머지 학생 배치
+  const pri={hub:0,bridge:1,risk:2,iso:3,normal:4};
+  names.filter(n=>!placed[n])
+    .sort((a,b)=>(pri[analysis.statusMap[a]]||4)-(pri[analysis.statusMap[b]]||4))
+    .forEach(name=>{ const p=bestPos(name); if(p) place(name,p[0],p[1]); });
+  return grid;
+}
+
+function q1Sat(names, survey, seating, rows, cols) {
+  if(!seating.length) return 0;
+  const pm={};
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) if(seating[r]?.[c]) pm[seating[r][c]]=[r,c];
+  let total=0,met=0;
+  names.forEach(name=>{
+    const q1=survey[name]?.Q1||[];
+    total+=q1.length;
+    const [nr,nc]=pm[name]||[];
+    if(nr===undefined)return;
+    q1.forEach(other=>{
+      const [or,oc]=pm[other]||[];
+      if(or!==undefined&&Math.abs(nr-or)+Math.abs(nc-oc)<=1) met++;
+    });
+  });
+  return total>0?Math.round(met/total*100):0;
+}
+
+// 자리배치 결과를 부모 앱(app.html)에 전달
+function saveSeatingToParent(grid, names, rows, cols) {
+  try {
+    const data = {grid, names, rows, cols, updatedAt: new Date().toISOString()};
+    localStorage.setItem('sns_seating_result', JSON.stringify(data));
+    window.parent.postMessage({type:'seating_update', ...data}, '*');
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════════
+//  UI PRIMITIVES
+// ══════════════════════════════════════════════════════
+function Tag({s}) {
+  const m=SM[s]||SM.normal;
+  return <span style={{display:'inline-block',fontSize:'10px',fontWeight:'600',padding:'2px 7px',borderRadius:'10px',border:`0.5px solid ${m.bd}`,background:m.bg,color:m.tx,whiteSpace:'nowrap'}}>{m.label}</span>;
+}
+function Btn({children,onClick,disabled,variant='primary',style:sx={}}) {
+  const v={
+    primary:{background:C.p,color:'white',border:'none'},
+    ghost:{background:'white',color:C.t1,border:`0.5px solid ${C.bd}`},
+  };
+  return <button onClick={onClick} disabled={disabled} style={{padding:'8px 18px',borderRadius:'10px',fontSize:'13px',fontWeight:'500',cursor:disabled?'not-allowed':'pointer',opacity:disabled?0.5:1,fontFamily:'inherit',...v[variant],...sx}}>{children}</button>;
+}
+function Sec({children}) {
+  return <div style={{fontSize:'11px',fontWeight:'700',color:C.t2,textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'10px'}}>{children}</div>;
+}
+
+// ══════════════════════════════════════════════════════
+//  STEP 0 — SETUP
+// ══════════════════════════════════════════════════════
+function SetupStep({names, setNames, rows, setRows, cols, setCols, setSurvey}) {
+  const [text, setText] = useState(names.join('\n'));
+  const synced = useRef(false);
+  // 부모 앱에서 명단이 비동기로 들어오면 textarea에 반영
+  useEffect(()=>{
+    if(names.length > 0 && !synced.current){
+      setText(names.join('\n'));
+      synced.current = true;
+    }
+  },[names]);
+  const parsed = text.split('\n').map(s=>s.trim()).filter(Boolean);
+  const apply = () => { setNames(parsed); setSurvey({}); };
+  const demo  = () => { setNames(DEMO_NAMES); setSurvey(DEMO_SURVEY); setText(DEMO_NAMES.join('\n')); };
+  return (
+    <div>
+      <div style={{display:'flex',gap:'8px',marginBottom:'16px',flexWrap:'wrap'}}>
+        <Btn onClick={apply} disabled={parsed.length<4}>✓ 이름 적용 ({parsed.length}명)</Btn>
+        <Btn onClick={demo} variant='ghost'>🔢 데모 16명 불러오기</Btn>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 180px',gap:'16px',alignItems:'start'}}>
+        <div>
+          <Sec>학생 이름 (한 줄에 한 명)</Sec>
+          <textarea value={text} onChange={e=>setText(e.target.value)} rows={12}
+            style={{width:'100%',padding:'10px 12px',borderRadius:'10px',border:`0.5px solid ${C.bd}`,fontSize:'13px',fontFamily:'inherit',color:C.t1,resize:'vertical',outline:'none',lineHeight:1.7}}
+            placeholder={'예:\n김민준\n이서현\n박지우'}/>
+        </div>
+        <div>
+          <Sec>교실 크기</Sec>
+          {[['행 (세로)',rows,setRows],['열 (가로)',cols,setCols]].map(([lbl,val,set])=>(
+            <div key={lbl} style={{marginBottom:'14px',background:C.card,border:`0.5px solid ${C.bd}`,borderRadius:'10px',padding:'12px'}}>
+              <div style={{fontSize:'12px',color:C.t2,marginBottom:'8px'}}>{lbl}</div>
+              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                <button onClick={()=>set(v=>Math.max(2,v-1))} style={{width:'28px',height:'28px',borderRadius:'50%',border:`0.5px solid ${C.bd}`,background:'white',cursor:'pointer',fontSize:'16px',lineHeight:1}}>−</button>
+                <span style={{fontSize:'20px',fontWeight:'600',color:C.t1,minWidth:'28px',textAlign:'center'}}>{val}</span>
+                <button onClick={()=>set(v=>Math.min(10,v+1))} style={{width:'28px',height:'28px',borderRadius:'50%',border:`0.5px solid ${C.bd}`,background:'white',cursor:'pointer',fontSize:'16px',lineHeight:1}}>+</button>
+              </div>
+            </div>
+          ))}
+          <div style={{background:C.card,border:`0.5px solid ${C.bd}`,borderRadius:'10px',padding:'12px',fontSize:'12px'}}>
+            <div style={{color:C.t2}}>총 자리 수</div>
+            <div style={{fontSize:'18px',fontWeight:'600',color:C.t1,margin:'4px 0'}}>{rows*cols}석</div>
+            {names.length>0&&<div style={{color:rows*cols>=names.length?C.p:'#A32D2D',fontWeight:'500'}}>
+              {names.length}명 → {rows*cols>=names.length?'✓ 수용 가능':'✗ 자리 부족'}
+            </div>}
+          </div>
+        </div>
+      </div>
+      {names.length>0&&<div style={{marginTop:'12px',background:C.pL,borderRadius:'10px',padding:'10px 14px',fontSize:'12px',color:C.p,lineHeight:1.8}}>
+        적용됨: {names.join(' · ')}
+      </div>}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+//  STEP 1 — SURVEY
+// ══════════════════════════════════════════════════════
+function SurveyStep({names, survey, setSurvey}) {
+  const [sel, setSel] = useState(names[0]||'');
+  const getSv = n => survey[n]||{Q1:[],Q2:[],Q3:[],Q4:[],Q5:[],self:3};
+  const upd = (name,q,val) => setSurvey(p=>({...p,[name]:{...getSv(name),[q]:val}}));
+  const cur = getSv(sel);
+  const others = names.filter(n=>n!==sel);
+  const done = names.filter(n=>(survey[n]?.Q1||[]).length+(survey[n]?.Q2||[]).length>0).length;
+  return (
+    <div style={{display:'grid',gridTemplateColumns:'106px 1fr',gap:'14px'}}>
+      <div>
+        <Sec>학생 목록</Sec>
+        <div style={{maxHeight:'500px',overflowY:'auto'}}>
+          {names.map(n=>{
+            const isDone=(survey[n]?.Q1||[]).length+(survey[n]?.Q2||[]).length>0;
+            return <div key={n} onClick={()=>setSel(n)} style={{padding:'7px 9px',borderRadius:'8px',cursor:'pointer',marginBottom:'2px',border:`0.5px solid ${sel===n?C.p:'transparent'}`,background:sel===n?C.pL:'transparent',display:'flex',alignItems:'center',justifyContent:'space-between',fontSize:'13px'}}>
+              <span style={{color:sel===n?C.p:C.t1}}>{n}</span>
+              {isDone&&<span style={{color:'#22C55E',fontSize:'11px'}}>✓</span>}
+            </div>;
+          })}
+        </div>
+        <div style={{borderTop:`0.5px solid ${C.bd}`,paddingTop:'8px',marginTop:'8px',fontSize:'11px',color:C.t3}}>{done}/{names.length}명 완료</div>
+      </div>
+      <div style={{maxHeight:'520px',overflowY:'auto',paddingRight:'2px'}}>
+        <div style={{fontSize:'16px',fontWeight:'600',color:C.t1,marginBottom:'16px',paddingBottom:'10px',borderBottom:`0.5px solid ${C.bd}`}}>{sel}의 설문</div>
+        {QM.map(q=>{
+          const sel_arr=cur[q.key]||[];
+          const atMax=sel_arr.length>=q.max;
+          return (
+            <div key={q.key} style={{marginBottom:'18px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'3px'}}>
+                <span style={{fontSize:'13px',fontWeight:'600',color:C.t1}}>{q.label}</span>
+                <span style={{fontSize:'11px',color:C.t3}}>최대 {q.max}명 / {sel_arr.length}명</span>
+              </div>
+              <div style={{fontSize:'11px',color:C.t3,marginBottom:'8px'}}>{q.desc}</div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>
+                {others.map(o=>{
+                  const on2=sel_arr.includes(o);
+                  return <button key={o} onClick={()=>{
+                    if(on2) upd(sel,q.key,sel_arr.filter(x=>x!==o));
+                    else if(!atMax) upd(sel,q.key,[...sel_arr,o]);
+                  }} style={{padding:'4px 10px',borderRadius:'14px',fontSize:'12px',fontFamily:'inherit',border:`1.5px solid ${on2?C.p:C.bd}`,background:on2?C.pL:'white',color:on2?C.p:C.t2,cursor:(!on2&&atMax)?'not-allowed':'pointer',opacity:(!on2&&atMax)?0.4:1}}>{o}</button>;
+                })}
+              </div>
+            </div>
+          );
+        })}
+        <div style={{borderTop:`0.5px solid ${C.bd}`,paddingTop:'14px',marginBottom:'14px'}}>
+          <div style={{fontSize:'13px',fontWeight:'600',color:C.t1,marginBottom:'4px'}}>앞자리 희망 여부</div>
+          <div style={{fontSize:'11px',color:C.t3,marginBottom:'8px'}}>칠판과 가까운 앞쪽 자리를 원하나요?</div>
+          <div style={{display:'flex',gap:'8px'}}>
+            {[[true,'✋ 앞자리 원해요','#16a34a','#dcfce7'],[false,'😊 상관없어요',C.t2,C.surf]].map(([val,lbl,clr,bg])=>{
+              const isOn=cur.wantFront===val;
+              return <button key={String(val)} onClick={()=>upd(sel,'wantFront',val)} style={{
+                padding:'6px 18px',borderRadius:'14px',fontSize:'12px',fontFamily:'inherit',cursor:'pointer',
+                border:`1.5px solid ${isOn?clr:C.bd}`,background:isOn?bg:'white',
+                color:isOn?clr:C.t2,fontWeight:isOn?'700':'400',transition:'all .12s'
+              }}>{lbl}</button>;
+            })}
+          </div>
+        </div>
+        <div style={{borderTop:`0.5px solid ${C.bd}`,paddingTop:'14px'}}>
+          <div style={{fontSize:'13px',fontWeight:'600',color:C.t1,marginBottom:'8px'}}>자기 인식 척도</div>
+          <div style={{display:'flex',gap:'4px',alignItems:'center'}}>
+            {[1,2,3,4,5].map(n=><button key={n} onClick={()=>upd(sel,'self',n)} style={{fontSize:'26px',background:'none',border:'none',cursor:'pointer',padding:'0',lineHeight:1,color:n<=(cur.self||3)?'#F59E0B':'#E5E7EB'}}>★</button>)}
+            <span style={{fontSize:'11px',color:C.t3,marginLeft:'8px'}}>{['','매우 낮음','낮음','보통','높음','매우 높음'][cur.self||3]}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+//  STEP 2 — ANALYSIS
+// ══════════════════════════════════════════════════════
+function AnalysisStep({names, analysis}) {
+  const [filt, setFilt] = useState('all');
+  if (!analysis) return <div style={{textAlign:'center',padding:'40px',color:C.t3}}>분석 중...</div>;
+  const {scores,received,statusMap,cliques} = analysis;
+  const sorted = [...names].sort((a,b)=>(scores[b]||0)-(scores[a]||0));
+  const filtered = filt==='all'?sorted:sorted.filter(n=>statusMap[n]===filt);
+  const maxS = Math.max(...sorted.map(n=>scores[n]||0),1);
+  const cnt = s=>sorted.filter(n=>statusMap[n]===s).length;
+  const strongCliques = cliques.filter(cl=>cl.strength==='strong');
+  return (
+    <div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px',marginBottom:'16px'}}>
+        {['hub','bridge','iso','risk'].map(s=>{
+          const m=SM[s];
+          return <div key={s} style={{background:m.bg,border:`0.5px solid ${m.bd}`,borderRadius:'12px',padding:'12px',textAlign:'center'}}>
+            <div style={{fontSize:'24px',fontWeight:'600',color:m.tx,lineHeight:1}}>{cnt(s)}</div>
+            <div style={{marginTop:'6px'}}><Tag s={s}/></div>
+          </div>;
+        })}
+      </div>
+      <div style={{display:'flex',gap:'5px',marginBottom:'12px',flexWrap:'wrap'}}>
+        {[['all','전체'],['hub','허브'],['bridge','브리지'],['iso','고립'],['risk','위험']].map(([v,l])=>(
+          <button key={v} onClick={()=>setFilt(v)} style={{padding:'5px 12px',borderRadius:'20px',fontSize:'12px',cursor:'pointer',fontFamily:'inherit',border:`0.5px solid ${filt===v?C.p:C.bd}`,background:filt===v?C.pL:'white',color:filt===v?C.p:C.t2}}>{l}</button>
+        ))}
+      </div>
+      <Sec>학생별 분석 결과</Sec>
+      <div style={{display:'grid',gridTemplateColumns:'68px 1fr 38px 34px 68px',gap:'8px',padding:'0 0 6px',borderBottom:`0.5px solid ${C.bd}`,marginBottom:'4px'}}>
+        {['이름','가중 점수','점수','선택수','상태'].map(h=><span key={h} style={{fontSize:'10px',color:C.t3}}>{h}</span>)}
+      </div>
+      {filtered.map(name=>{
+        const ws=scores[name]||0,r=received[name]||0,s=statusMap[name]||'normal';
+        return <div key={name} style={{display:'grid',gridTemplateColumns:'68px 1fr 38px 34px 68px',gap:'8px',alignItems:'center',padding:'6px 0',borderBottom:`0.5px solid #EEF2EE`}}>
+          <span style={{fontSize:'13px',fontWeight:'500',color:C.t1}}>{name}</span>
+          <div style={{height:'5px',background:'#EEF2EE',borderRadius:'3px',overflow:'hidden'}}>
+            <div style={{width:`${Math.round(ws/maxS*100)}%`,height:'100%',background:C.p,borderRadius:'3px'}}/>
+          </div>
+          <span style={{fontSize:'12px',color:C.t2,textAlign:'right'}}>{ws}점</span>
+          <span style={{fontSize:'12px',color:C.t2,textAlign:'right'}}>{r}명</span>
+          <Tag s={s}/>
+        </div>;
+      })}
+      {strongCliques.length>0&&(
+        <div style={{marginTop:'20px'}}>
+          <Sec>클릭 그룹 · {strongCliques.length}개 삼각형</Sec>
+          {strongCliques.map((cl,i)=>(
+            <div key={i} style={{border:`0.5px solid ${C.bd}`,borderRadius:'10px',padding:'10px 14px',marginBottom:'6px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
+                <span style={{fontSize:'13px',fontWeight:'600',color:C.t1}}>클릭 {String.fromCharCode(65+i)}</span>
+                <span style={{fontSize:'11px',color:C.t3}}>{cl.members.length}명 강한 상호선택</span>
+              </div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:'4px'}}>
+                {cl.members.map(m=><span key={m} style={{fontSize:'12px',padding:'3px 9px',border:`0.5px solid ${C.bd}`,borderRadius:'12px',color:C.t2}}>{m}</span>)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+//  STEP 3 — NETWORK
+// ══════════════════════════════════════════════════════
+function NetworkStep({names, survey, analysis}) {
+  const [showQ, setShowQ] = useState({Q1:true,Q2:false,Q3:false});
+  const W=560, H=420, R=12;
+  const positions = useMemo(()=>forceLayout(names,survey,W,H),[names,survey]);
+  const posMap = Object.fromEntries(positions.map(p=>[p.name,p]));
+  const qC={Q1:'#534AB7',Q2:'#0F6E56',Q3:'#8B9A8C'};
+  const qL={Q1:'친밀',Q2:'학습',Q3:'지지'};
+  const edges=[];
+  if(analysis) names.forEach(from=>{
+    const s=survey[from]||{};
+    ['Q1','Q2','Q3'].forEach(q=>{
+      if(!showQ[q])return;
+      (s[q]||[]).forEach(to=>{
+        if(posMap[to]){ const mutual=(survey[to]?.[q]||[]).includes(from); edges.push({from,to,q,mutual}); }
+      });
+    });
+  });
+  return (
+    <div>
+      <div style={{display:'flex',gap:'6px',marginBottom:'12px',alignItems:'center',flexWrap:'wrap'}}>
+        {['Q1','Q2','Q3'].map(q=>(
+          <button key={q} onClick={()=>setShowQ(p=>({...p,[q]:!p[q]}))} style={{padding:'4px 12px',borderRadius:'16px',fontSize:'12px',cursor:'pointer',fontFamily:'inherit',border:`1.5px solid ${qC[q]}`,background:showQ[q]?qC[q]+'25':'white',color:showQ[q]?qC[q]:C.t2}}>
+            {qL[q]} ({q})
+          </button>
+        ))}
+        <span style={{fontSize:'11px',color:C.t3}}>굵은 선 = 상호선택</span>
+      </div>
+      <div style={{border:`0.5px solid ${C.bd}`,borderRadius:'12px',overflow:'hidden',background:'#FAFBFA'}}>
+        <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{display:'block'}}>
+          <defs>
+            {['Q1','Q2','Q3'].map(q=>(
+              <marker key={q} id={`a${q}`} markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill={qC[q]} opacity="0.7"/>
+              </marker>
+            ))}
+          </defs>
+          {edges.map((e,i)=>{
+            const a=posMap[e.from],b=posMap[e.to]; if(!a||!b)return null;
+            const dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)||1;
+            const nx=dx/d,ny=dy/d;
+            return <line key={i} x1={a.x+nx*R} y1={a.y+ny*R} x2={b.x-nx*(R+9)} y2={b.y-ny*(R+9)}
+              stroke={qC[e.q]} strokeWidth={e.mutual?2.5:1} strokeOpacity={e.mutual?0.8:0.4}
+              markerEnd={`url(#a${e.q})`}/>;
+          })}
+          {positions.map(({name,x,y})=>{
+            const s=analysis?.statusMap[name]||'normal',m=SM[s];
+            const nw=name.length*11+8;
+            return <g key={name}>
+              <circle cx={x} cy={y} r={R} fill={m.bg} stroke={m.bd} strokeWidth={2}/>
+              <rect x={x-nw/2} y={y+R+1} width={nw} height={14} fill="rgba(255,255,255,0.88)" rx={2}/>
+              <text x={x} y={y+R+12} textAnchor="middle" fontSize="10" fontWeight="600" fill={m.tx}>{name}</text>
+            </g>;
+          })}
+        </svg>
+      </div>
+      <div style={{display:'flex',flexWrap:'wrap',gap:'10px',marginTop:'10px'}}>
+        {Object.entries(SM).map(([k,m])=>(
+          <div key={k} style={{display:'flex',alignItems:'center',gap:'4px',fontSize:'11px'}}>
+            <div style={{width:'10px',height:'10px',borderRadius:'50%',background:m.bg,border:`1px solid ${m.bd}`}}/>
+            <span style={{color:C.t2}}>{m.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+//  STEP 4 — GOALS  (클릭 순서 = 우선순위)
+// ══════════════════════════════════════════════════════
+function GoalsStep({goalOrder, setGoalOrder, analysis}) {
+  const gs=[
+    {k:'frontSeat',      icon:'⬆️', label:'앞자리 희망 반영', desc:'앞자리를 희망한 학생을 칠판 근처 앞쪽에 우선 배치'},
+    {k:'spreadHubs',     icon:'🌐', label:'허브 분산',         desc:'영향력 있는 학생들을 교실 전체에 고르게 배치'},
+    {k:'connectIso',     icon:'🤝', label:'고립 연결',         desc:'고립·위험 학생을 브리지 학생 옆에 우선 배치'},
+    {k:'separateCliques',icon:'🔀', label:'클릭 분산',         desc:'강한 소집단 멤버를 의도적으로 분리 배치'},
+    {k:'honorQ1',        icon:'💚', label:'Q1 우선 반영',      desc:'친밀 선택(Q1)을 인접 배치에 최대한 반영'},
+    {k:'respectQ5',      icon:'🚫', label:'Q5 제약 준수',      desc:'집중 방해 학생 쌍 인접 배치 금지'},
+  ];
+  const toggle = (k) => {
+    setGoalOrder(prev=>{
+      const idx=prev.indexOf(k);
+      if(idx>=0) return prev.filter(x=>x!==k); // 제거
+      return [...prev, k];                       // 끝에 추가
+    });
+  };
+  return (
+    <div>
+      <div style={{fontSize:'13px',color:C.t2,marginBottom:'6px'}}>클릭 순서가 배치 우선순위예요. 먼저 클릭한 목표가 먼저 반영됩니다.</div>
+      <div style={{fontSize:'12px',color:C.t3,marginBottom:'14px'}}>선택된 번호 = 실행 순서 · 다시 클릭하면 제거</div>
+      <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+        {gs.map(g=>{
+          const rank=goalOrder.indexOf(g.k); // -1이면 미선택
+          const isOn=rank>=0;
+          return (
+            <div key={g.k} onClick={()=>toggle(g.k)} style={{
+              display:'flex',alignItems:'center',gap:'12px',padding:'13px 16px',
+              border:`0.5px solid ${isOn?C.p:C.bd}`,borderRadius:'12px',cursor:'pointer',
+              background:isOn?C.pL:'white',transition:'all .15s'
+            }}>
+              <span style={{fontSize:'20px'}}>{g.icon}</span>
+              <div style={{flex:1}}>
+                <div style={{fontSize:'14px',fontWeight:'500',color:isOn?C.p:C.t1}}>{g.label}</div>
+                <div style={{fontSize:'12px',color:C.t2,marginTop:'2px'}}>{g.desc}</div>
+              </div>
+              <div style={{
+                width:'28px',height:'28px',borderRadius:'50%',flexShrink:0,
+                border:`2px solid ${isOn?C.p:C.bd}`,
+                background:isOn?C.p:'white',
+                display:'flex',alignItems:'center',justifyContent:'center',
+                fontSize:'13px',fontWeight:'700',color:isOn?'white':C.t3,
+              }}>
+                {isOn?rank+1:''}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {goalOrder.length>0&&(
+        <div style={{marginTop:'14px',background:C.pL,borderRadius:'10px',padding:'10px 14px',fontSize:'12px',color:C.p}}>
+          실행 순서: {goalOrder.map((k,i)=>{
+            const g=gs.find(x=>x.k===k);
+            return <span key={k}>{i>0&&' → '}{g?g.icon:''} {g?g.label:k}</span>;
+          })}
+        </div>
+      )}
+      {analysis?.negEdges?.length>0&&(
+        <div style={{marginTop:'12px',background:'#FEF9E7',border:`0.5px solid #F59E0B`,borderRadius:'10px',padding:'12px 14px'}}>
+          <div style={{fontSize:'13px',fontWeight:'600',color:'#92400E',marginBottom:'6px'}}>⚠ Q5 인접 금지 쌍</div>
+          {analysis.negEdges.map((e,i)=><div key={i} style={{fontSize:'12px',color:'#78350F'}}>{e.from} — {e.to}</div>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+//  STEP 5 — SEATING
+// ══════════════════════════════════════════════════════
+function SeatingStep({names, survey, analysis, goals, rows, cols, seating, setSeating, setAnalysis}) {
+  const [sel, setSel] = useState(null);
+  const sat = useMemo(()=>q1Sat(names,survey,seating,rows,cols),[seating,names,survey,rows,cols]);
+
+  // analysis 없어도 즉시 계산 후 생성 — 어디서 호출해도 안전
+  const doGen = () => {
+    if(!names.length) return;
+    const fresh = analysis || analyze(names, survey);
+    if(!analysis) setAnalysis(fresh);
+    const g = generateSeating(names, fresh, survey, rows, cols, goals);
+    setSeating(g); setSel(null);
+    saveSeatingToParent(g, names, rows, cols);
+  };
+
+  const openDisplay = () => {
+    if(!seating.length) doGen();
+    window.open('seating-display.html','_blank','width=1280,height=800');
+  };
+
+  const handleClick = (r,c) => {
+    if(!sel) { setSel({r,c}); return; }
+    if(sel.r===r && sel.c===c) { setSel(null); return; }
+    const g=seating.map(row=>[...row]);
+    [g[r][c],g[sel.r][sel.c]]=[g[sel.r][sel.c],g[r][c]];
+    setSeating(g); setSel(null);
+    saveSeatingToParent(g, names, rows, cols);
+  };
+
+  return (
+    <div>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px',flexWrap:'wrap',gap:'8px'}}>
+        <div style={{fontSize:'13px',color:C.t2}}>
+          {seating.length>0&&<>Q1 친밀 인접 충족률 <strong style={{color:C.p,fontSize:'16px'}}>{sat}%</strong></>}
+        </div>
+        <div style={{display:'flex',gap:'8px'}}>
+          <Btn onClick={doGen} variant='ghost'>🎲 자리 배치 생성</Btn>
+          <Btn onClick={openDisplay} style={{background:'#1e293b',color:'#f1f5f9',border:'1px solid #475569',fontSize:'14px',padding:'9px 20px'}}>
+            🖥 전체화면 공개
+          </Btn>
+        </div>
+      </div>
+
+      {!seating.length?(
+        <div style={{textAlign:'center',padding:'60px 20px',color:C.t3,background:'#FAFBFA',borderRadius:'12px',border:`0.5px solid ${C.bd}`,fontSize:'14px'}}>
+          「🎲 자리 배치 생성」으로 배치를 만들거나,<br/>「🖥 전체화면 공개」로 생성 후 학생들과 함께 보세요
+        </div>
+      ):(
+        <>
+          <div style={{marginBottom:'8px',fontSize:'11px',color:C.t3}}>
+            {sel?'✅ 이동할 자리를 클릭하세요':'클릭으로 자리를 조정할 수 있어요 · 변경사항은 전체화면에 즉시 반영됩니다'}
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:`repeat(${cols},1fr)`,gap:'5px'}}>
+            {Array.from({length:rows}).flatMap((_,di)=>{
+              const r=rows-1-di;
+              return Array.from({length:cols}).map((_,c)=>{
+                const name=seating[r]?.[c],s=name?(analysis?.statusMap[name]||'normal'):null,m=s?SM[s]:null;
+                const isSelected=sel&&sel.r===r&&sel.c===c;
+                return <div key={`${r}-${c}`} onClick={()=>handleClick(r,c)} style={{
+                  background:isSelected?'#EEF2FF':name?m.bg:'#F8FAF8',
+                  border:`2px solid ${isSelected?C.p:name?m.bd:C.bd}`,
+                  borderRadius:'8px',padding:'5px 3px',minHeight:'52px',textAlign:'center',
+                  display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
+                  cursor:'pointer',transition:'all .15s',
+                  boxShadow:isSelected?`0 0 0 3px ${C.p}30`:'none',
+                }}>
+                  {name&&<div style={{width:'100%'}}>
+                    <div style={{fontSize:'12px',fontWeight:'600',color:isSelected?C.p:m.tx,lineHeight:1.3}}>{name}</div>
+                    <div style={{marginTop:'3px'}}><Tag s={s}/></div>
+                  </div>}
+                </div>;
+              });
+            })}
+          </div>
+          <div style={{background:'#E8EEE8',borderRadius:'8px',padding:'4px',marginTop:'8px',textAlign:'center',fontSize:'11px',color:C.t2}}>📋 칠판</div>
+          <div style={{marginTop:'10px',display:'flex',flexWrap:'wrap',gap:'8px'}}>
+            {Object.entries(SM).map(([k,m])=>(
+              <div key={k} style={{display:'flex',alignItems:'center',gap:'3px',fontSize:'11px'}}>
+                <div style={{width:'8px',height:'8px',borderRadius:'50%',background:m.bg,border:`1px solid ${m.bd}`}}/>
+                <span style={{color:C.t2}}>{m.label}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+//  STEP 6 — SAVE
+// ══════════════════════════════════════════════════════
+function SaveStep({names, rows, cols, seating, analysis}) {
+  const [copied, setCopied] = useState(false);
+  const getText = () => {
+    const lines = ['📋 자리 배치표 (아래쪽이 칠판)\n'];
+    for(let di=0;di<rows;di++){
+      const r=rows-1-di;
+      lines.push(Array.from({length:cols},(_,c)=>(seating[r]?.[c]||'___').padEnd(6)).join(' | '));
+    }
+    if(analysis?.statusMap){
+      lines.push('\n📊 학생 분류');
+      Object.entries(SM).forEach(([k,m])=>{
+        const lst=names.filter(n=>analysis.statusMap[n]===k);
+        if(lst.length) lines.push(`${m.label}: ${lst.join(', ')}`);
+      });
+    }
+    return lines.join('\n');
+  };
+  const copy = () => {
+    navigator.clipboard.writeText(getText())
+      .then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);})
+      .catch(()=>{});
+  };
+  return (
+    <div>
+      <div style={{display:'flex',justifyContent:'flex-end',marginBottom:'14px'}}>
+        <Btn onClick={copy} style={{background:copied?'#22C55E':undefined}}>{copied?'✓ 복사됨':'📋 클립보드 복사'}</Btn>
+      </div>
+      <div style={{marginBottom:'8px',fontSize:'11px',color:C.t3}}>📐 칠판 기준 앞쪽이 아래</div>
+      <div style={{display:'grid',gridTemplateColumns:`repeat(${cols},1fr)`,gap:'5px',marginBottom:'8px'}}>
+        {Array.from({length:rows}).flatMap((_,di)=>{
+          const r=rows-1-di;
+          return Array.from({length:cols}).map((_,c)=>{
+            const name=seating[r]?.[c],s=name?(analysis?.statusMap[name]||'normal'):null,m=s?SM[s]:null;
+            return <div key={`${r}-${c}`} style={{background:name?m.bg:'#F8FAF8',border:`0.5px solid ${name?m.bd:C.bd}`,borderRadius:'8px',padding:'7px 4px',textAlign:'center',fontSize:'12px',fontWeight:name?'600':'400',color:name?m.tx:C.t3,minHeight:'40px',display:'flex',alignItems:'center',justifyContent:'center'}}>{name||'─'}</div>;
+          });
+        })}
+      </div>
+      <div style={{background:'#E8EEE8',borderRadius:'8px',padding:'4px',marginBottom:'12px',textAlign:'center',fontSize:'11px',color:C.t2}}>📋 칠판</div>
+      <div style={{background:'#F8FAF8',borderRadius:'10px',padding:'14px',fontFamily:'monospace',fontSize:'12px',whiteSpace:'pre-wrap',wordBreak:'break-all',border:`0.5px solid ${C.bd}`,color:C.t2,lineHeight:1.8}}>{getText()}</div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+//  PROGRESS BAR
+// ══════════════════════════════════════════════════════
+function Progress({step}) {
+  return (
+    <div style={{display:'flex',alignItems:'flex-start',justifyContent:'center',gap:0,padding:'10px 12px',background:'white',borderBottom:`0.5px solid ${C.bd}`,overflowX:'auto'}}>
+      {SL.map((label,i)=>(
+        <Fragment key={i}>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'4px',minWidth:'54px'}}>
+            <div style={{width:'24px',height:'24px',borderRadius:'50%',flexShrink:0,background:i<=step?C.p:'#E5EBE5',color:i<=step?'white':C.t3,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px',fontWeight:'700'}}>
+              {i<step?'✓':i+1}
+            </div>
+            <span style={{fontSize:'9px',color:i===step?C.p:C.t3,fontWeight:i===step?'700':'400',textAlign:'center',lineHeight:1.3,whiteSpace:'nowrap'}}>{label}</span>
+          </div>
+          {i<SL.length-1&&<div style={{width:'18px',flexShrink:0,height:'2px',background:i<step?C.p:'#E5EBE5',marginTop:'11px'}}/>}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+//  APP
+// ══════════════════════════════════════════════════════
+function App() {
+  const [step, setStep]       = useState(0);
+  const [names, setNames]     = useState([]);
+  const [rows, setRows]       = useState(4);
+  const [cols, setCols]       = useState(5);
+  const [survey, setSurvey]   = useState({});
+  const [analysis, setAnalysis] = useState(null);
+  const [goals, setGoals]     = useState(null); // 하위 호환용 — 실제론 goalOrder 사용
+  const [goalOrder, setGoalOrder] = useState(['frontSeat','spreadHubs','connectIso','honorQ1','respectQ5']);
+  const [seating, setSeating] = useState([]);
+
+  useEffect(()=>{
+    (async()=>{
+      try{
+        // 1. 저장된 상태 불러오기
+        let sNames=[], sSurvey={}, sRows=4, sCols=5, sGoals=null, sSeating=[];
+        const r = await window.storage.get('sns-seat-v2');
+        if(r?.value){
+          const d = JSON.parse(r.value);
+          sNames   = d.names   || [];
+          sSurvey  = d.survey  || {};
+          sRows    = d.rows    || 4;
+          sCols    = d.cols    || 5;
+          sGoals   = d.goals   || null;
+          sSeating = d.seating || [];
+        }
+
+        // 2. 부모 앱(app.html)이 전달한 학생 명단 확인
+        const cn = await window.storage.get('class_names');
+        if(cn?.value){
+          const pNames = JSON.parse(cn.value);
+          if(pNames && pNames.length > 0){
+            const isSame = sNames.length === pNames.length &&
+              sNames.every(function(n){ return pNames.includes(n); });
+            if(!isSame){
+              // 명단이 바뀐 경우: 새 명단에 있는 학생 설문만 유지, 배치 초기화
+              const kept = {};
+              pNames.forEach(function(n){ if(sSurvey[n]) kept[n] = sSurvey[n]; });
+              sNames   = pNames;
+              sSurvey  = kept;
+              sSeating = [];
+            }
+          }
+        }
+
+        // 3. 학생이 앱에서 제출한 설문 데이터 병합
+        //    학생 제출 우선, 없으면 교사 수동 입력 유지
+        const sd = await window.storage.get('survey_data');
+        if(sd?.value){
+          const pSurvey = JSON.parse(sd.value);
+          if(pSurvey && Object.keys(pSurvey).length > 0){
+            const merged = {};
+            sNames.forEach(function(n){
+              if(pSurvey[n])      merged[n] = pSurvey[n];  // 학생 제출 우선
+              else if(sSurvey[n]) merged[n] = sSurvey[n];  // 교사 수동 입력 폴백
+            });
+            sSurvey = merged;
+          }
+        }
+
+        // 4. 상태 적용 — goalOrder 읽기 (구버전 goals 객체면 마이그레이션)
+        const DEFAULT_ORDER = ['frontSeat','spreadHubs','connectIso','honorQ1','respectQ5'];
+        if(sNames.length) setNames(sNames);
+        setRows(sRows); setCols(sCols); setSurvey(sSurvey);
+        if(d.goalOrder && Array.isArray(d.goalOrder)) setGoalOrder(d.goalOrder);
+        else if(d.goals) setGoalOrder(DEFAULT_ORDER.filter(k=>d.goals[k]!==false));
+        setSeating(sSeating);
+        if(sNames.length > 0) setAnalysis(analyze(sNames, sSurvey));
+      }catch(e){}
+    })();
+  },[]);
+
+  useEffect(()=>{
+    if(!names.length)return;
+    (async()=>{try{ await window.storage.set('sns-seat-v2',JSON.stringify({names,rows,cols,survey,goalOrder,seating})); }catch{}})();
+  },[names,rows,cols,survey,goalOrder,seating]);
+
+  useEffect(()=>{
+    if(step===2&&names.length>0) setAnalysis(analyze(names,survey));
+  },[step]);
+
+  // seating-display.html의 자리 배치 생성 버튼 수신
+  const _genRef = useRef({});
+  useEffect(()=>{ _genRef.current = {names,survey,rows,cols,goalOrder}; });
+  useEffect(()=>{
+    const handler = (e) => {
+      if(e.key !== 'sns_generate_request') return;
+      const {names,survey,rows,cols,goalOrder} = _genRef.current;
+      if(!names || !names.length) return;
+      const freshAnalysis = analyze(names, survey);
+      setAnalysis(freshAnalysis);
+      const g = generateSeating(names, freshAnalysis, survey, rows, cols, goalOrder);
+      setSeating(g);
+      saveSeatingToParent(g, names, rows, cols);
+    };
+    window.addEventListener('storage', handler);
+    return ()=>window.removeEventListener('storage', handler);
+  },[]);
+
+  const canNext = () => {
+    if(step===0) return names.length>=4&&rows*cols>=names.length;
+    return true;
+  };
+
+  const steps = [
+    <SetupStep names={names} setNames={setNames} rows={rows} setRows={setRows} cols={cols} setCols={setCols} setSurvey={setSurvey}/>,
+    <SurveyStep names={names} survey={survey} setSurvey={setSurvey}/>,
+    <AnalysisStep names={names} analysis={analysis}/>,
+    <NetworkStep names={names} survey={survey} analysis={analysis}/>,
+    <GoalsStep goalOrder={goalOrder} setGoalOrder={setGoalOrder} analysis={analysis}/>,
+    <SeatingStep names={names} survey={survey} analysis={analysis} goals={goalOrder} rows={rows} cols={cols} seating={seating} setSeating={setSeating} setAnalysis={setAnalysis}/>,
+    <SaveStep names={names} rows={rows} cols={cols} seating={seating} analysis={analysis}/>,
+  ];
+
+  return (
+    <div style={{minHeight:'100vh',background:C.surf,fontFamily:"'Noto Sans KR',sans-serif",display:'flex',flexDirection:'column'}}>
+      <div style={{background:C.p,padding:'10px 20px',display:'flex',alignItems:'center',gap:'10px',flexShrink:0}}>
+        <span style={{fontSize:'15px'}}>🧭</span>
+        <span style={{fontSize:'14px',fontWeight:'700',color:'white'}}>학급 사회관계망 자리배치</span>
+        {names.length>0&&<span style={{fontSize:'11px',color:'rgba(255,255,255,0.6)',marginLeft:'auto'}}>{names.length}명 · {rows}×{cols}</span>}
+      </div>
+      <Progress step={step}/>
+      <div style={{flex:1,maxWidth:'680px',width:'100%',margin:'0 auto',padding:'20px 20px 90px'}}>
+        <div style={{marginBottom:'18px'}}>
+          <h2 style={{margin:'0 0 6px',fontSize:'18px',fontWeight:'700',color:C.t1}}>{SL[step]}</h2>
+          <div style={{height:'3px',width:'36px',background:C.p,borderRadius:'2px'}}/>
+        </div>
+        {steps[step]}
+      </div>
+      <div style={{position:'sticky',bottom:0,background:'white',borderTop:`0.5px solid ${C.bd}`,padding:'10px 20px',display:'flex',justifyContent:'space-between',flexShrink:0}}>
+        <button onClick={()=>setStep(s=>Math.max(s-1,0))} disabled={step===0}
+          style={{padding:'8px 18px',borderRadius:'10px',fontSize:'13px',fontWeight:'500',cursor:step===0?'not-allowed':'pointer',opacity:step===0?0.5:1,background:'white',color:C.t1,border:`0.5px solid ${C.bd}`,fontFamily:'inherit'}}>← 이전</button>
+        {step<6
+          ?<button onClick={()=>setStep(s=>s+1)} disabled={!canNext()}
+              style={{padding:'8px 18px',borderRadius:'10px',fontSize:'13px',fontWeight:'500',cursor:!canNext()?'not-allowed':'pointer',opacity:!canNext()?0.5:1,background:C.p,color:'white',border:'none',fontFamily:'inherit'}}>다음 →</button>
+          :<button onClick={()=>{setStep(0);setSeating([]);setAnalysis(null);}}
+              style={{padding:'8px 18px',borderRadius:'10px',fontSize:'13px',fontWeight:'500',background:C.p,color:'white',border:'none',cursor:'pointer',fontFamily:'inherit'}}>🔄 처음부터</button>
+        }
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
