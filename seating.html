@@ -41,30 +41,6 @@ const { useState, useEffect, useMemo, useRef, Fragment } = React;
 // ══════════════════════════════════════════════════════
 //  DEMO DATA
 // ══════════════════════════════════════════════════════
-const DEMO_NAMES = [
-  '김서연','이하은','박지호','최수아','정민서',
-  '강민준','윤준혁','임소율','오태양','한채원',
-  '신동현','류지은','배성민','송예린','조현우','황지우'
-];
-const DEMO_SURVEY = {
-  '김서연': { Q1:['박지호','정민서'], Q2:['이하은'], Q3:['윤준혁'], Q4:['이하은'], Q5:[], self:4 },
-  '이하은': { Q1:['강민준','한채원'], Q2:['최수아'], Q3:['임소율'], Q4:['김서연'], Q5:[], self:5 },
-  '박지호': { Q1:['김서연','정민서'], Q2:['신동현'], Q3:['임소율'], Q4:[], Q5:[], self:4 },
-  '최수아': { Q1:['임소율'], Q2:['황지우','이하은'], Q3:['한채원'], Q4:['이하은'], Q5:[], self:4 },
-  '정민서': { Q1:['김서연','박지호'], Q2:['류지은'], Q3:['송예린'], Q4:[], Q5:[], self:3 },
-  '강민준': { Q1:['이하은','한채원'], Q2:['오태양'], Q3:['최수아'], Q4:['이하은'], Q5:[], self:4 },
-  '윤준혁': { Q1:['이하은','오태양'], Q2:['김서연'], Q3:['신동현'], Q4:[], Q5:[], self:4 },
-  '임소율': { Q1:['최수아'], Q2:['류지은'], Q3:['이하은'], Q4:[], Q5:[], self:3 },
-  '오태양': { Q1:['윤준혁'], Q2:['신동현','류지은'], Q3:['강민준'], Q4:[], Q5:[], self:3 },
-  '한채원': { Q1:['이하은','강민준'], Q2:['임소율'], Q3:['최수아'], Q4:[], Q5:[], self:4 },
-  '신동현': { Q1:['황지우'], Q2:['오태양','류지은'], Q3:['정민서'], Q4:[], Q5:[], self:3 },
-  '류지은': { Q1:['임소율'], Q2:['신동현','오태양'], Q3:['정민서'], Q4:[], Q5:[], self:3 },
-  '배성민': { Q1:[], Q2:[], Q3:['조현우'], Q4:[], Q5:[], self:2 },
-  '송예린': { Q1:['황지우','최수아'], Q2:['임소율'], Q3:['류지은'], Q4:[], Q5:[], self:3 },
-  '조현우': { Q1:['이하은','최수아'], Q2:[], Q3:[], Q4:[], Q5:[], self:1 },
-  '황지우': { Q1:['송예린','최수아'], Q2:['류지은'], Q3:['신동현'], Q4:[], Q5:[], self:4 },
-};
-
 // ══════════════════════════════════════════════════════
 //  DESIGN TOKENS
 // ══════════════════════════════════════════════════════
@@ -370,12 +346,10 @@ function SetupStep({names, setNames, rows, setRows, cols, setCols, setSurvey}) {
   },[names]);
   const parsed = text.split('\n').map(s=>s.trim()).filter(Boolean);
   const apply = () => { setNames(parsed); setSurvey({}); };
-  const demo  = () => { setNames(DEMO_NAMES); setSurvey(DEMO_SURVEY); setText(DEMO_NAMES.join('\n')); };
   return (
     <div>
       <div style={{display:'flex',gap:'8px',marginBottom:'16px',flexWrap:'wrap'}}>
         <Btn onClick={apply} disabled={parsed.length<4}>✓ 이름 적용 ({parsed.length}명)</Btn>
-        <Btn onClick={demo} variant='ghost'>🔢 데모 16명 불러오기</Btn>
       </div>
       <div style={{display:'grid',gridTemplateColumns:'1fr 180px',gap:'16px',alignItems:'start'}}>
         <div>
