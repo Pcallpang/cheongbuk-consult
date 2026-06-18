@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>자리 배치 | 사회관계망 분석</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -853,16 +853,17 @@ function App() {
     (async()=>{
       try{
         // 1. 저장된 상태 불러오기
-        let sNames=[], sSurvey={}, sRows=4, sCols=5, sGoals=null, sSeating=[];
+        let sNames=[], sSurvey={}, sRows=4, sCols=5, sGoals=null, sSeating=[], sGoalOrder=null;
         const r = await window.storage.get('sns-seat-v2');
         if(r?.value){
           const d = JSON.parse(r.value);
-          sNames   = d.names   || [];
-          sSurvey  = d.survey  || {};
-          sRows    = d.rows    || 4;
-          sCols    = d.cols    || 5;
-          sGoals   = d.goals   || null;
-          sSeating = d.seating || [];
+          sNames     = d.names     || [];
+          sSurvey    = d.survey    || {};
+          sRows      = d.rows      || 4;
+          sCols      = d.cols      || 5;
+          sGoals     = d.goals     || null;
+          sSeating   = d.seating   || [];
+          sGoalOrder = d.goalOrder || null;
         }
 
         // 2. 부모 앱(app.html)이 전달한 학생 명단 확인
@@ -902,8 +903,8 @@ function App() {
         const DEFAULT_ORDER = ['frontSeat','spreadHubs','connectIso','honorQ1','respectQ5'];
         if(sNames.length) setNames(sNames);
         setRows(sRows); setCols(sCols); setSurvey(sSurvey);
-        if(d.goalOrder && Array.isArray(d.goalOrder)) setGoalOrder(d.goalOrder);
-        else if(d.goals) setGoalOrder(DEFAULT_ORDER.filter(k=>d.goals[k]!==false));
+        if(sGoalOrder && Array.isArray(sGoalOrder)) setGoalOrder(sGoalOrder);
+        else if(sGoals) setGoalOrder(DEFAULT_ORDER.filter(k=>sGoals[k]!==false));
         setSeating(sSeating);
         if(sNames.length > 0) setAnalysis(analyze(sNames, sSurvey));
       }catch(e){}
